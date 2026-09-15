@@ -1,0 +1,23 @@
+{
+  "name": "tuong-tac-pro",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "npm --workspace @tuong-tac-pro/web run dev",
+    "build:web": "npm --workspace @tuong-tac-pro/web run build",
+    "lint:web": "npm --workspace @tuong-tac-pro/web run lint",
+    "typecheck:web": "npm --workspace @tuong-tac-pro/web run typecheck",
+    "lint:web:offline": "npm --workspace @tuong-tac-pro/web run lint:offline",
+    "typecheck:web:offline": "npm --workspace @tuong-tac-pro/web run typecheck:offline",
+    "qa:offline": "node qa/component-contract-check.mjs && node qa/responsive-check.mjs && node qa/customer-application-check.mjs",
+    "check:offline": "npm --workspace @tuong-tac-pro/web run lint:offline && npm --workspace @tuong-tac-pro/web run typecheck:offline && npm run qa:offline",
+    "qa:customer": "node qa/customer-application-check.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
