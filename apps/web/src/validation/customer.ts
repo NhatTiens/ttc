@@ -8,12 +8,12 @@ export function validEmail(value: string) {
 }
 
 export function validUrl(value: string) {
-  if (!value.trim()) return "Vui lòng nhập link.";
+  if (!value.trim()) return "Vui lòng nhập URL.";
   try {
     const parsed = new URL(value);
-    return parsed.protocol === "https:" || parsed.protocol === "http:" ? "" : "Link phải bắt đầu bằng http:// hoặc https://.";
+    return parsed.protocol === "https:" || parsed.protocol === "http:" ? "" : "URL phải bắt đầu bằng http:// hoặc https://.";
   } catch {
-    return "Vui lòng nhập link hợp lệ, bao gồm https://.";
+    return "Vui lòng nhập URL hợp lệ, bao gồm https://.";
   }
 }
 

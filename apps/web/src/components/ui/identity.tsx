@@ -9,19 +9,19 @@ export function UserAvatar({ name, src, size = "md" }: { name: string; src?: str
 }
 
 export function WalletBalance({ amount, compact = false }: { amount: string; compact?: boolean }) {
-  return <div className={cn("wallet-balance", compact && "wallet-balance--compact")}><span className="wallet-balance__icon"><WalletIcon size={17} /></span><span><small>{compact ? "Balance" : "S\u1ed1 d\u01b0"}</small><strong>{amount}</strong></span></div>;
+  return <div className={cn("wallet-balance", compact && "wallet-balance--compact")}><span className="wallet-balance__icon"><WalletIcon size={17} /></span><span><small>{compact ? "Số dư" : "S\u1ed1 d\u01b0"}</small><strong>{amount}</strong></span></div>;
 }
 
 export function NotificationMenu({ count = 0, children }: { count?: number; children?: ReactNode }) {
   return (
     <details className="notification-menu">
-      <summary className="notification-menu__trigger" aria-label={`Notifications${count ? ` (${count} unread)` : ""}`}>
+      <summary className="notification-menu__trigger" aria-label={`Thông báo${count ? ` (${count} chưa đọc)` : ""}`}>
         <BellIcon size={20} />
         {count > 0 ? <span className="notification-menu__count">{count > 9 ? "9+" : count}</span> : null}
       </summary>
       <div className="notification-menu__panel">
-        <div className="notification-menu__head"><strong>Notifications</strong><span>{count} unread</span></div>
-        {children ?? <p className="notification-menu__empty">No new notifications.</p>}
+        <div className="notification-menu__head"><strong>Thông báo</strong><span>{count} chưa đọc</span></div>
+        {children ?? <p className="notification-menu__empty">Không có thông báo mới.</p>}
       </div>
     </details>
   );

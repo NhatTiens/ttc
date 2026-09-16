@@ -32,9 +32,9 @@ export default function DepositPage() {
   const amount = Number(amountText);
 
   function validate() {
-    if (!selectedMethod) return "Choose a deposit method.";
-    if (!Number.isFinite(amount) || amount <= 0) return "Enter a valid deposit amount.";
-    if (amount < selectedMethod.min || amount > selectedMethod.max) return `Amount must be between ${formatCurrency(selectedMethod.min)} and ${formatCurrency(selectedMethod.max)}.`;
+    if (!selectedMethod) return "Vui lòng chọn phương thức nạp tiền.";
+    if (!Number.isFinite(amount) || amount <= 0) return "Vui lòng nhập số tiền nạp hợp lệ.";
+    if (amount < selectedMethod.min || amount > selectedMethod.max) return `Số tiền phải nằm trong khoảng ${formatCurrency(selectedMethod.min)} đến ${formatCurrency(selectedMethod.max)}.`;
     return "";
   }
 
@@ -47,50 +47,50 @@ export default function DepositPage() {
       const deposit = await customerService.createDeposit(selectedMethod.id, amount);
       setCreatedDeposit({ id: deposit.id, amount: deposit.amount });
       refreshSession();
-      toast({ tone: "success", title: "Deposit request created", description: `${deposit.id} is pending confirmation.` });
+      toast({ tone: "success", title: "Đã tạo yêu cầu nạp tiền", description: `${deposit.id} đang chờ xác nhận.` });
     } catch (reason) {
-      const description = reason instanceof Error ? reason.message : "The deposit request could not be created.";
-      toast({ tone: "error", title: "Deposit failed", description });
+      const description = reason instanceof Error ? reason.message : "Không thể tạo yêu cầu nạp tiền.";
+      toast({ tone: "error", title: "Nạp tiền thất bại", description });
     } finally {
       setSubmitting(false);
     }
   }
 
-  if (resource.loading) return <LoadingState label="Loading deposit methods..." />;
-  if (resource.error) return <ErrorState title="Deposit options could not be loaded" description={resource.error} onRetry={resource.reload} />;
-  if (!resource.data || resource.data.methods.length === 0) return <EmptyState title="No deposit methods" description="An administrator must configure at least one deposit method." />;
+  if (resource.loading) return <LoadingState label="Đang tải phương thức nạp tiền..." />;
+  if (resource.error) return <ErrorState title="Không thể tải phương thức nạp tiền" description={resource.error} onRetry={resource.reload} />;
+  if (!resource.data || resource.data.methods.length === 0) return <EmptyState title="Chưa có phương thức nạp tiền" description="Hệ thống cần được cấu hình ít nhất một phương thức nạp tiền." />;
 
   if (createdDeposit) {
     return (
       <div className="customer-page narrow-page">
-        <PageHeader eyebrow="Wallet" title="Yêu cầu nạp tiền đã được tạo" description="Đây là luồng mock. Tiền chưa được cộng vào ví cho đến khi payment backend xác nhận." />
-        <Card className="success-panel"><span className="success-panel__mark">OK</span><h2>{createdDeposit.id}</h2><p>So tien: <strong>{formatCurrency(createdDeposit.amount)}</strong></p><Badge tone="amber">Pending</Badge><div className="button-row"><Link href="/wallet/history" className="button button--primary button--md">Xem lịch sử ví</Link><Button variant="outline" onClick={() => setCreatedDeposit(null)}>Tao yêu cầu khac</Button></div></Card>
+        <PageHeader eyebrow="Ví" title="Yêu cầu nạp tiền đã được tạo" description="Yêu cầu nạp tiền đã được ghi nhận và đang chờ xác nhận." />
+        <Card className="success-panel"><span className="success-panel__mark">OK</span><h2>{createdDeposit.id}</h2><p>Số tiền: <strong>{formatCurrency(createdDeposit.amount)}</strong></p><Badge tone="amber">Đang chờ</Badge><div className="button-row"><Link href="/wallet/history" className="button button--primary button--md">Xem lịch sử ví</Link><Button variant="outline" onClick={() => setCreatedDeposit(null)}>Tạo yêu cầu khác</Button></div></Card>
       </div>
     );
   }
 
   return (
     <div className="customer-page">
-      <PageHeader eyebrow="Wallet" title="Nạp tiền" description="Chọn một phương thức đã được cấu hình. Payment provider thật chưa được kết nối trong Work này." actions={<Link href="/wallet/history" className="button button--outline button--md">Lịch sử ví</Link>} />
+      <PageHeader eyebrow="Ví" title="Nạp tiền" description="Chọn phương thức nạp tiền phù hợp và nhập số tiền bạn muốn nạp." actions={<Link href="/wallet/history" className="button button--outline button--md">Lịch sử ví</Link>} />
       <div className="wallet-layout">
         <div className="wallet-layout__main">
           <Card className="form-card">
-            <div className="section-header"><div><h2>Phuong thuc nạp tiền</h2><p>Cac phuong thuc nay den tu repository cau hinh, không hard-code vao form.</p></div></div>
-            <div className="payment-method-grid" role="radiogroup" aria-label="Deposit method">
-              {resource.data.methods.map((method) => <button key={method.id} type="button" role="radio" aria-checked={methodId === method.id} disabled={!method.enabled} className={cn("payment-method-card", methodId === method.id && "payment-method-card--active")} onClick={() => { setMethodId(method.id); setError(""); }}><div><strong>{method.name}</strong>{method.enabled ? <Badge tone="green">Available</Badge> : <Badge tone="neutral">Disabled</Badge>}</div><p>{method.description}</p><span>{method.feeLabel}</span></button>)}
+            <div className="section-header"><div><h2>Phương thức nạp tiền</h2><p>Các phương thức khả dụng được cấu hình bởi hệ thống.</p></div></div>
+            <div className="payment-method-grid" role="radiogroup" aria-label="Phương thức nạp tiền">
+              {resource.data.methods.map((method) => <button key={method.id} type="button" role="radio" aria-checked={methodId === method.id} disabled={!method.enabled} className={cn("payment-method-card", methodId === method.id && "payment-method-card--active")} onClick={() => { setMethodId(method.id); setError(""); }}><div><strong>{method.name}</strong>{method.enabled ? <Badge tone="green">Khả dụng</Badge> : <Badge tone="neutral">Tạm tắt</Badge>}</div><p>{method.description}</p><span>{method.feeLabel}</span></button>)}
             </div>
           </Card>
 
           <Card className="form-card">
-            <h2>So tien nap</h2>
-            <Input label="Amount (VND)" type="number" inputMode="numeric" min={selectedMethod?.min ?? 1} max={selectedMethod?.max} value={amountText} onChange={(event) => { setAmountText(event.currentTarget.value); setError(""); }} error={error} hint={selectedMethod ? `Min ${formatCurrency(selectedMethod.min)} - Max ${formatCurrency(selectedMethod.max)}` : "Choose a method to see its configured limits."} />
-            <Button onClick={submit} loading={submitting} disabled={!selectedMethod} className="full-width">Tao yêu cầu nạp tiền</Button>
+            <h2>Số tiền nạp</h2>
+            <Input label="Số tiền (VND)" type="number" inputMode="numeric" min={selectedMethod?.min ?? 1} max={selectedMethod?.max} value={amountText} onChange={(event) => { setAmountText(event.currentTarget.value); setError(""); }} error={error} hint={selectedMethod ? `Tối thiểu ${formatCurrency(selectedMethod.min)} - Tối đa ${formatCurrency(selectedMethod.max)}` : "Chọn phương thức để xem giới hạn đã cấu hình."} />
+            <Button onClick={submit} loading={submitting} disabled={!selectedMethod} className="full-width">Tạo yêu cầu nạp tiền</Button>
           </Card>
         </div>
 
         <aside className="wallet-layout__aside">
-          <Card className="wallet-balance-card"><span>Số dư hiện tại</span><strong>{formatCurrency(resource.data.wallet.balance)}</strong><small>Available balance</small></Card>
-          {selectedMethod ? <Card className="instruction-card"><h3>Huong dan</h3><ol>{selectedMethod.instructions.map((item) => <li key={item}>{item}</li>)}</ol><div className="inline-alert">Trạng thái se la Pending cho den khi backend/payment webhook xác nhận giao dịch.</div></Card> : null}
+          <Card className="wallet-balance-card"><span>Số dư hiện tại</span><strong>{formatCurrency(resource.data.wallet.balance)}</strong><small>Số dư khả dụng</small></Card>
+          {selectedMethod ? <Card className="instruction-card"><h3>Hướng dẫn</h3><ol>{selectedMethod.instructions.map((item) => <li key={item}>{item}</li>)}</ol><div className="inline-alert">Trạng thái sẽ là Đang chờ cho đến khi giao dịch được xác nhận.</div></Card> : null}
         </aside>
       </div>
     </div>

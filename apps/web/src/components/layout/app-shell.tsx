@@ -17,7 +17,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <CustomerSessionProvider>
     <div className="app-shell">
-      <a className="skip-link" href="#main-content">Skip to main content</a>
+      <a className="skip-link" href="#main-content">Chuyển đến nội dung chính</a>
       <div className="app-shell__desktop-sidebar"><Sidebar /></div>
       <div className="app-shell__tablet-sidebar"><Sidebar compact /></div>
       <div className="app-shell__body">
@@ -25,9 +25,9 @@ export function AppShell({ children }: { children: ReactNode }) {
         <main className="app-shell__main" id="main-content">{children}</main>
       </div>
       <MobileNavigation />
-      <Drawer open={mobileMenuOpen} onOpenChange={setMobileMenuOpen} title="Navigation" side="left">
+      <Drawer open={mobileMenuOpen} onOpenChange={setMobileMenuOpen} title="Điều hướng" side="left">
         <div className="mobile-drawer-brand"><BrandMark /></div>
-        <nav className="mobile-drawer-nav" aria-label="Expanded mobile navigation">
+        <nav className="mobile-drawer-nav" aria-label="Điều hướng mở rộng trên di động">
           {customerNavigation.map((item) => <Link key={item.href} href={item.href} className={cn("mobile-drawer-link")} onClick={() => setMobileMenuOpen(false)}><NavigationIcon icon={item.icon} /><span>{item.label}</span></Link>)}
         </nav>
       </Drawer>

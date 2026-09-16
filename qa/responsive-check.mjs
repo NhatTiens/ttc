@@ -21,7 +21,7 @@ expect('mobile hides sidebars', css.includes('.app-shell__desktop-sidebar, .app-
 expect('mobile bottom navigation', css.includes('.mobile-navigation { display: grid; grid-template-columns: repeat(5, 1fr);'));
 expect('small-phone breakpoint', css.includes('@media (max-width: 389px)'));
 expect('responsive table desktop/mobile switch', css.includes('.responsive-table__desktop { display: none; }') && css.includes('.responsive-table__mobile { display: grid; gap: 10px; }'));
-expect('mobile has dedicated component', shell.includes('<MobileNavigation />') && mobileNav.includes('aria-label="Mobile navigation"'));
+expect('mobile has dedicated component', shell.includes('<MobileNavigation />') && mobileNav.includes('className="mobile-navigation"'));
 expect('app shell has skip link', shell.includes('href="#main-content"'));
 expect('main content landmark', shell.includes('id="main-content"'));
 expect('responsive table renders separate mobile items', table.includes('responsive-table__mobile'));

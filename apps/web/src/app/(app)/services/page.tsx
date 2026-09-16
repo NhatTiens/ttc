@@ -24,12 +24,12 @@ const platforms: Array<{ value: SocialPlatform | "all"; label: string }> = [
 ];
 
 const columns: TableColumn<Service>[] = [
-  { key: "service", header: "Service", render: (row) => <div className="table-primary"><strong>{row.name}</strong><small>{row.code} - {row.description}</small></div> },
-  { key: "platform", header: "Platform", render: (row) => <PlatformLabel platform={row.platform} compact /> },
-  { key: "price", header: "Price / 1K", render: (row) => <strong>{formatCurrency(row.ratePerThousand)}</strong> },
-  { key: "range", header: "Min / Max", render: (row) => <span>{formatNumber(row.min)} / {formatNumber(row.max)}</span> },
-  { key: "speed", header: "ETA", render: (row) => row.averageTime },
-  { key: "status", header: "Status", render: (row) => <ServiceStatusBadge status={row.status} /> },
+  { key: "service", header: "Dịch vụ", render: (row) => <div className="table-primary"><strong>{row.name}</strong><small>{row.code} - {row.description}</small></div> },
+  { key: "platform", header: "Nền tảng", render: (row) => <PlatformLabel platform={row.platform} compact /> },
+  { key: "price", header: "Giá / 1.000", render: (row) => <strong>{formatCurrency(row.ratePerThousand)}</strong> },
+  { key: "range", header: "Tối thiểu / Tối đa", render: (row) => <span>{formatNumber(row.min)} / {formatNumber(row.max)}</span> },
+  { key: "speed", header: "Thời gian dự kiến", render: (row) => row.averageTime },
+  { key: "status", header: "Trạng thái", render: (row) => <ServiceStatusBadge status={row.status} /> },
   { key: "action", header: "", render: (row) => row.status === "Active" ? <Link href={`/order/new?service=${row.id}`} className="button button--outline button--sm">Đặt dịch vụ</Link> : <span className="button button--secondary button--sm is-disabled-link" aria-disabled="true">Tạm dừng</span> }
 ];
 
@@ -53,19 +53,19 @@ function ServicesPageContent() {
     });
   }, [resource.data, search, platform, category]);
 
-  if (resource.loading) return <LoadingState label="Loading services..." />;
-  if (resource.error) return <ErrorState title="Services could not be loaded" description={resource.error} onRetry={resource.reload} />;
-  if (!resource.data) return <EmptyState title="No services available" description="Services will appear here after the catalog is configured." />;
+  if (resource.loading) return <LoadingState label="Đang tải dịch vụ..." />;
+  if (resource.error) return <ErrorState title="Không thể tải danh sách dịch vụ" description={resource.error} onRetry={resource.reload} />;
+  if (!resource.data) return <EmptyState title="Chưa có dịch vụ khả dụng" description="Dịch vụ sẽ xuất hiện tại đây sau khi danh mục được cấu hình." />;
 
   return (
     <div className="customer-page">
-      <PageHeader eyebrow="Catalog" title="Dịch vụ" description="Tìm dịch vụ theo nền tảng, nhóm dịch vụ và mức giá. Giá hiển thị là giá bán hiện tại." actions={<Link href="/pricing" className="button button--outline button--md">Xem bảng giá</Link>} />
+      <PageHeader eyebrow="Danh mục" title="Dịch vụ" description="Tìm dịch vụ theo nền tảng, nhóm dịch vụ và mức giá. Giá hiển thị là giá bán hiện tại." actions={<Link href="/pricing" className="button button--outline button--md">Xem bảng giá</Link>} />
 
       <Card className="filter-card">
         <div className="filter-grid filter-grid--services">
-          <SearchInput value={search} onChange={(event) => setSearch(event.currentTarget.value)} placeholder="Tìm theo tên hoặc mã dịch vụ..." aria-label="Search services" />
-          <Select value={platform} onChange={(event) => setPlatform(event.currentTarget.value as SocialPlatform | "all")} options={platforms} aria-label="Filter by platform" />
-          <Select value={category} onChange={(event) => setCategory(event.currentTarget.value)} options={[{ value: "all", label: "Tất cả danh mục" }, ...resource.data.categories.map((item) => ({ value: item.id, label: item.name }))]} aria-label="Filter by category" />
+          <SearchInput value={search} onChange={(event) => setSearch(event.currentTarget.value)} placeholder="Tìm theo tên hoặc mã dịch vụ..." aria-label="Tìm kiếm dịch vụ" />
+          <Select value={platform} onChange={(event) => setPlatform(event.currentTarget.value as SocialPlatform | "all")} options={platforms} aria-label="Lọc theo nền tảng" />
+          <Select value={category} onChange={(event) => setCategory(event.currentTarget.value)} options={[{ value: "all", label: "Tất cả danh mục" }, ...resource.data.categories.map((item) => ({ value: item.id, label: item.name }))]} aria-label="Lọc theo danh mục" />
         </div>
       </Card>
 
@@ -73,12 +73,12 @@ function ServicesPageContent() {
       {filtered.length === 0 ? (
         <EmptyState title="Không tìm thấy dịch vụ" description="Thử đổi từ khóa hoặc bớt bộ lọc." />
       ) : (
-        <ResponsiveTable columns={columns} rows={filtered} getRowKey={(row) => row.id} caption="Service catalog" renderMobileItem={(row) => (
+        <ResponsiveTable columns={columns} rows={filtered} getRowKey={(row) => row.id} caption="Danh mục dịch vụ" renderMobileItem={(row) => (
           <Card className="service-mobile-card">
             <div className="service-mobile-card__head"><PlatformLabel platform={row.platform} /><ServiceStatusBadge status={row.status} /></div>
             <div><strong>{row.name}</strong><p>{row.description}</p><small>{row.code}</small></div>
-            <div className="service-mobile-card__metrics"><span><small>Giá / 1K</small><strong>{formatCurrency(row.ratePerThousand)}</strong></span><span><small>Min / Max</small><strong>{formatNumber(row.min)} / {formatNumber(row.max)}</strong></span></div>
-            <div className="service-mobile-card__footer"><span>ETA {row.averageTime}</span>{row.status === "Active" ? <Link href={`/order/new?service=${row.id}`} className="button button--primary button--sm">Đặt dịch vụ</Link> : null}</div>
+            <div className="service-mobile-card__metrics"><span><small>Giá / 1.000</small><strong>{formatCurrency(row.ratePerThousand)}</strong></span><span><small>Tối thiểu / Tối đa</small><strong>{formatNumber(row.min)} / {formatNumber(row.max)}</strong></span></div>
+            <div className="service-mobile-card__footer"><span>Dự kiến {row.averageTime}</span>{row.status === "Active" ? <Link href={`/order/new?service=${row.id}`} className="button button--primary button--sm">Đặt dịch vụ</Link> : null}</div>
           </Card>
         )} />
       )}
@@ -89,7 +89,7 @@ function ServicesPageContent() {
 
 export default function ServicesPage() {
   return (
-    <Suspense fallback={<LoadingState label="Loading services..." />}>
+    <Suspense fallback={<LoadingState label="Đang tải dịch vụ..." />}>
       <ServicesPageContent />
     </Suspense>
   );

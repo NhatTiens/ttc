@@ -15,36 +15,36 @@ import { useAsyncResource } from "@/hooks/use-async-resource";
 import { formatCurrency, formatDateTime, formatNumber } from "@/lib/format";
 
 const orderColumns: TableColumn<Order>[] = [
-  { key: "id", header: "Order", render: (row) => <TextLink href={`/orders/${row.id}`}>{row.id}</TextLink> },
-  { key: "service", header: "Service", render: (row) => <div className="table-primary"><strong>{row.serviceName}</strong><small>{row.targetUrl}</small></div> },
-  { key: "platform", header: "Platform", render: (row) => <PlatformLabel platform={row.platform} compact /> },
-  { key: "quantity", header: "Quantity", render: (row) => formatNumber(row.quantity) },
-  { key: "charge", header: "Charge", render: (row) => formatCurrency(row.charge) },
-  { key: "status", header: "Status", render: (row) => <OrderStatus status={row.status} /> }
+  { key: "id", header: "Mã đơn", render: (row) => <TextLink href={`/orders/${row.id}`}>{row.id}</TextLink> },
+  { key: "service", header: "Dịch vụ", render: (row) => <div className="table-primary"><strong>{row.serviceName}</strong><small>{row.targetUrl}</small></div> },
+  { key: "platform", header: "Nền tảng", render: (row) => <PlatformLabel platform={row.platform} compact /> },
+  { key: "quantity", header: "Số lượng", render: (row) => formatNumber(row.quantity) },
+  { key: "charge", header: "Chi phí", render: (row) => formatCurrency(row.charge) },
+  { key: "status", header: "Trạng thái", render: (row) => <OrderStatus status={row.status} /> }
 ];
 
 export default function DashboardPage() {
   const resource = useAsyncResource(() => customerService.getDashboard());
 
-  if (resource.loading) return <LoadingState label="Loading dashboard..." />;
-  if (resource.error) return <ErrorState title="Dashboard could not be loaded" description={resource.error} onRetry={resource.reload} />;
-  if (!resource.data) return <EmptyState title="No dashboard data" description="Dashboard information will appear here when available." />;
+  if (resource.loading) return <LoadingState label="Đang tải tổng quan..." />;
+  if (resource.error) return <ErrorState title="Không thể tải trang tổng quan" description={resource.error} onRetry={resource.reload} />;
+  if (!resource.data) return <EmptyState title="Chưa có dữ liệu tổng quan" description="Thông tin tổng quan sẽ xuất hiện tại đây khi có dữ liệu." />;
 
   const data = resource.data;
   return (
     <div className="customer-page">
       <PageHeader
-        eyebrow="Customer overview"
+        eyebrow="Tổng quan tài khoản"
         title={`Xin chào, ${data.profile.name}`}
         description="Theo dõi số dư, đơn hàng đang chạy và các dịch vụ bạn dùng nhiều nhất."
         actions={<Link className="button button--primary button--md" href="/order/new">Tạo đơn mới</Link>}
       />
 
-      <section className="stats-grid" aria-label="Account summary">
-        <StatCard label="Số dư" value={formatCurrency(data.wallet.balance)} hint="Available balance" icon={<WalletIcon size={19} />} />
-        <StatCard label="Đơn đang chạy" value={formatNumber(data.runningOrders)} hint="Processing / pending" icon={<ClockIcon size={19} />} />
-        <StatCard label="Đơn hoàn thành" value={formatNumber(data.completedOrders)} hint="Completed orders" icon={<CheckCircleIcon size={19} />} />
-        <StatCard label="Tổng chi tiêu" value={formatCurrency(data.totalSpent)} hint="Captured purchases" icon={<TrendIcon size={19} />} />
+      <section className="stats-grid" aria-label="Tóm tắt tài khoản">
+        <StatCard label="Số dư" value={formatCurrency(data.wallet.balance)} hint="Số dư khả dụng" icon={<WalletIcon size={19} />} />
+        <StatCard label="Đơn đang chạy" value={formatNumber(data.runningOrders)} hint="Đang xử lý / đang chờ" icon={<ClockIcon size={19} />} />
+        <StatCard label="Đơn hoàn thành" value={formatNumber(data.completedOrders)} hint="Đơn đã hoàn thành" icon={<CheckCircleIcon size={19} />} />
+        <StatCard label="Tổng chi tiêu" value={formatCurrency(data.totalSpent)} hint="Chi tiêu đã ghi nhận" icon={<TrendIcon size={19} />} />
       </section>
 
       <section className="dashboard-overview-grid">
@@ -78,7 +78,7 @@ export default function DashboardPage() {
             <Card key={service.id} className="compact-service-card">
               <div className="compact-service-card__top"><PlatformLabel platform={service.platform} /><span className="compact-service-card__code">{service.code}</span></div>
               <div><h3>{service.name}</h3><p>{service.description}</p></div>
-              <div className="compact-service-card__bottom"><span><small>Từ</small><strong>{formatCurrency(service.ratePerThousand)} / 1K</strong></span><Link href={`/order/new?service=${service.id}`} className="button button--outline button--sm">Đặt ngay</Link></div>
+              <div className="compact-service-card__bottom"><span><small>Từ</small><strong>{formatCurrency(service.ratePerThousand)} / 1.000</strong></span><Link href={`/order/new?service=${service.id}`} className="button button--outline button--sm">Đặt ngay</Link></div>
             </Card>
           ))}
         </div>
@@ -89,7 +89,7 @@ export default function DashboardPage() {
         {data.recentOrders.length === 0 ? (
           <EmptyState title="Chưa có đơn hàng" description="Đơn hàng mới sẽ xuất hiện tại đây." action={<Link href="/order/new" className="button button--primary button--sm">Tạo đơn đầu tiên</Link>} />
         ) : (
-          <ResponsiveTable columns={orderColumns} rows={data.recentOrders} getRowKey={(row) => row.id} caption="Recent orders" renderMobileItem={(row) => (
+          <ResponsiveTable columns={orderColumns} rows={data.recentOrders} getRowKey={(row) => row.id} caption="Đơn hàng gần đây" renderMobileItem={(row) => (
             <Card className="mobile-list-card">
               <div className="mobile-list-card__head"><TextLink href={`/orders/${row.id}`}>{row.id}</TextLink><OrderStatus status={row.status} /></div>
               <strong>{row.serviceName}</strong>

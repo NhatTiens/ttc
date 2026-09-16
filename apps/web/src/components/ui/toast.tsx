@@ -18,7 +18,7 @@ export function Toast({ title, description, tone, onDismiss }: ToastProps) {
     <div className={cn("toast", `toast--${tone}`)} role={tone === "error" ? "alert" : "status"}>
       <span className="toast__icon">{tone === "success" ? <CheckIcon size={18} /> : <InfoIcon size={18} />}</span>
       <div className="toast__copy"><strong>{title}</strong>{description ? <span>{description}</span> : null}</div>
-      {onDismiss ? <IconButton label="Dismiss notification" size="sm" onClick={onDismiss}><XIcon size={16} /></IconButton> : null}
+      {onDismiss ? <IconButton label="Đóng thông báo" size="sm" onClick={onDismiss}><XIcon size={16} /></IconButton> : null}
     </div>
   );
 }

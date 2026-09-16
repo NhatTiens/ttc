@@ -96,23 +96,23 @@ function NewOrderPageContent() {
       setConfirmOpen(false);
       refreshSession();
       resource.reload();
-      toast({ tone: "success", title: "Order created", description: `${order.id} has been queued for processing.` });
+      toast({ tone: "success", title: "Đơn hàng đã tạo", description: `${order.id} đã được đưa vào hàng chờ xử lý.` });
     } catch (reason) {
       const message = reason instanceof Error ? reason.message : "Không thể tạo đơn hàng.";
-      toast({ tone: "error", title: "Order failed", description: message });
+      toast({ tone: "error", title: "Không thể tạo đơn", description: message });
     } finally {
       setSubmitting(false);
     }
   }
 
-  if (resource.loading) return <LoadingState label="Preparing order form..." />;
-  if (resource.error) return <ErrorState title="Order form could not be loaded" description={resource.error} onRetry={resource.reload} />;
-  if (!resource.data) return <EmptyState title="Order form unavailable" description="Service and wallet data are required before an order can be created." />;
+  if (resource.loading) return <LoadingState label="Đang chuẩn bị biểu mẫu tạo đơn..." />;
+  if (resource.error) return <ErrorState title="Không thể tải biểu mẫu tạo đơn" description={resource.error} onRetry={resource.reload} />;
+  if (!resource.data) return <EmptyState title="Biểu mẫu tạo đơn chưa khả dụng" description="Cần có dữ liệu dịch vụ và số dư ví trước khi tạo đơn." />;
 
   if (createdOrderId) {
     return (
       <div className="customer-page narrow-page">
-        <PageHeader eyebrow="Order created" title="Đơn hàng đã được tạo" description="Đơn đang ở trạng thái chờ xử lý và sẽ được gửi qua provider layer khi backend thật được kết nối." />
+        <PageHeader eyebrow="Đơn hàng đã tạo" title="Đơn hàng đã được tạo" description="Đơn đang ở trạng thái chờ xử lý. Bạn có thể theo dõi tiến trình trong lịch sử đơn hàng." />
         <Card className="success-panel">
           <span className="success-panel__mark" aria-hidden="true">OK</span>
           <h2>{createdOrderId}</h2>
@@ -125,43 +125,43 @@ function NewOrderPageContent() {
 
   return (
     <div className="customer-page">
-      <PageHeader eyebrow="New order" title="Tạo đơn mới" description="Chọn nền tảng, dịch vụ, link và số lượng. Hệ thống tính chi phí trước khi bạn xác nhận." />
+      <PageHeader eyebrow="Tạo đơn" title="Tạo đơn mới" description="Chọn nền tảng, dịch vụ, link và số lượng. Hệ thống tính chi phí trước khi bạn xác nhận." />
       <div className="order-builder-grid">
         <div className="order-builder-main">
           <Card className="form-card">
-            <div className="form-section"><span className="step-badge">1</span><div><h2>Chọn nền tảng</h2><p>Chỉ hiển thị các nền tảng được hỗ trợ trong catalog.</p></div></div>
-            <div className="platform-picker" role="radiogroup" aria-label="Select platform">
+            <div className="form-section"><span className="step-badge">1</span><div><h2>Chọn nền tảng</h2><p>Chọn nền tảng bạn muốn sử dụng.</p></div></div>
+            <div className="platform-picker" role="radiogroup" aria-label="Chọn nền tảng">
               {platforms.map((item) => <button key={item} type="button" role="radio" aria-checked={activePlatform === item} className={cn("platform-picker__item", activePlatform === item && "platform-picker__item--active")} onClick={() => changePlatform(item)}><PlatformIcon platform={item} size="md" /><span>{platformLabels[item]}</span></button>)}
             </div>
           </Card>
 
           <Card className="form-card">
-            <div className="form-section"><span className="step-badge">2</span><div><h2>Chọn dịch vụ</h2><p>Giá bán và giới hạn số lượng được lấy từ service layer.</p></div></div>
-            <Select label="Dịch vụ" required value={activeServiceId} error={errors.service} onChange={(event) => changeService(event.currentTarget.value)} options={[{ value: "", label: "Chọn dịch vụ", disabled: true }, ...platformServices.map((service) => ({ value: service.id, label: `${service.name} - ${formatCurrency(service.ratePerThousand)}/1K`, disabled: service.status !== "Active" }))]} />
-            {selectedService ? <div className="selected-service-summary"><div><PlatformLabel platform={selectedService.platform} /><ServiceStatusBadge status={selectedService.status} /></div><p>{selectedService.description}</p><div className="selected-service-summary__meta"><span>Rate <strong>{formatCurrency(selectedService.ratePerThousand)} / 1K</strong></span><span>Min <strong>{formatNumber(selectedService.min)}</strong></span><span>Max <strong>{formatNumber(selectedService.max)}</strong></span><span>ETA <strong>{selectedService.averageTime}</strong></span></div></div> : null}
+            <div className="form-section"><span className="step-badge">2</span><div><h2>Chọn dịch vụ</h2><p>Chọn dịch vụ phù hợp và kiểm tra giá cùng giới hạn số lượng.</p></div></div>
+            <Select label="Dịch vụ" required value={activeServiceId} error={errors.service} onChange={(event) => changeService(event.currentTarget.value)} options={[{ value: "", label: "Chọn dịch vụ", disabled: true }, ...platformServices.map((service) => ({ value: service.id, label: `${service.name} - ${formatCurrency(service.ratePerThousand)}/1.000`, disabled: service.status !== "Active" }))]} />
+            {selectedService ? <div className="selected-service-summary"><div><PlatformLabel platform={selectedService.platform} /><ServiceStatusBadge status={selectedService.status} /></div><p>{selectedService.description}</p><div className="selected-service-summary__meta"><span>Giá <strong>{formatCurrency(selectedService.ratePerThousand)} / 1.000</strong></span><span>Tối thiểu <strong>{formatNumber(selectedService.min)}</strong></span><span>Tối đa <strong>{formatNumber(selectedService.max)}</strong></span><span>Thời gian dự kiến <strong>{selectedService.averageTime}</strong></span></div></div> : null}
           </Card>
 
           <Card className="form-card">
             <div className="form-section"><span className="step-badge">3</span><div><h2>Nhập thông tin đơn</h2><p>Kiểm tra link công khai và số lượng trước khi xác nhận.</p></div></div>
             <div className="form-stack">
-              <Input label="Link" required value={targetUrl} onChange={(event) => { setTargetUrl(event.currentTarget.value); setErrors((current) => ({ ...current, targetUrl: undefined })); }} error={errors.targetUrl} placeholder="https://..." inputMode="url" />
-              <NumberInput label="Quantity" required value={activeQuantity} min={selectedService?.min} max={selectedService?.max} step={selectedService ? Math.max(1, Math.min(100, selectedService.min)) : 1} onValueChange={(value) => { setQuantity(value); setErrors((current) => ({ ...current, quantity: undefined })); }} error={errors.quantity} hint={selectedService ? `Allowed: ${formatNumber(selectedService.min)} - ${formatNumber(selectedService.max)}` : "Choose a service first."} disabled={!selectedService} />
+              <Input label="URL" required value={targetUrl} onChange={(event) => { setTargetUrl(event.currentTarget.value); setErrors((current) => ({ ...current, targetUrl: undefined })); }} error={errors.targetUrl} placeholder="https://..." inputMode="url" />
+              <NumberInput label="Số lượng" required value={activeQuantity} min={selectedService?.min} max={selectedService?.max} step={selectedService ? Math.max(1, Math.min(100, selectedService.min)) : 1} onValueChange={(value) => { setQuantity(value); setErrors((current) => ({ ...current, quantity: undefined })); }} error={errors.quantity} hint={selectedService ? `Cho phép: ${formatNumber(selectedService.min)} - ${formatNumber(selectedService.max)}` : "Vui lòng chọn dịch vụ trước."} disabled={!selectedService} />
             </div>
           </Card>
         </div>
 
-        <aside className="order-summary-column" aria-label="Order summary">
+        <aside className="order-summary-column" aria-label="Tóm tắt đơn hàng">
           <Card className="order-summary-card">
-            <h2>Tom tat đơn hàng</h2>
+            <h2>Tóm tắt đơn hàng</h2>
             <dl className="order-summary-list">
-              <div><dt>Service</dt><dd>{selectedService?.name ?? "--"}</dd></div>
-              <div><dt>Rate</dt><dd>{selectedService ? `${formatCurrency(selectedService.ratePerThousand)} / 1K` : "--"}</dd></div>
-              <div><dt>Quantity</dt><dd>{formatNumber(activeQuantity)}</dd></div>
-              <div className="order-summary-list__total"><dt>Estimated cost</dt><dd>{formatCurrency(estimatedCost)}</dd></div>
-              <div><dt>Current wallet</dt><dd>{formatCurrency(resource.data.wallet.balance)}</dd></div>
-              <div><dt>After order</dt><dd>{formatCurrency(Math.max(0, resource.data.wallet.balance - estimatedCost))}</dd></div>
+              <div><dt>Dịch vụ</dt><dd>{selectedService?.name ?? "--"}</dd></div>
+              <div><dt>Đơn giá</dt><dd>{selectedService ? `${formatCurrency(selectedService.ratePerThousand)} / 1.000` : "--"}</dd></div>
+              <div><dt>Số lượng</dt><dd>{formatNumber(activeQuantity)}</dd></div>
+              <div className="order-summary-list__total"><dt>Chi phí dự kiến</dt><dd>{formatCurrency(estimatedCost)}</dd></div>
+              <div><dt>Số dư hiện tại</dt><dd>{formatCurrency(resource.data.wallet.balance)}</dd></div>
+              <div><dt>Số dư sau đơn</dt><dd>{formatCurrency(Math.max(0, resource.data.wallet.balance - estimatedCost))}</dd></div>
             </dl>
-            {insufficientBalance ? <div className="inline-alert inline-alert--error" role="alert">Số dư không du. Vui long nap them tien truoc khi tạo đơn.</div> : null}
+            {insufficientBalance ? <div className="inline-alert inline-alert--error" role="alert">Số dư không đủ. Vui lòng nạp thêm tiền trước khi tạo đơn.</div> : null}
             <Button size="lg" className="full-width" disabled={!selectedService || selectedService.status !== "Active" || insufficientBalance} onClick={requestConfirmation}>Kiểm tra & xác nhận</Button>
             {insufficientBalance ? <Link href="/wallet/deposit" className="button button--outline button--md full-width">Nạp tiền</Link> : null}
           </Card>
@@ -169,7 +169,7 @@ function NewOrderPageContent() {
       </div>
 
       <Modal open={confirmOpen} onOpenChange={setConfirmOpen} title="Xác nhận tạo đơn" description="Kiểm tra lại thông tin trước khi gửi yêu cầu." footer={<><Button variant="outline" onClick={() => setConfirmOpen(false)} disabled={submitting}>Quay lại</Button><Button onClick={submitOrder} loading={submitting}>Tạo đơn</Button></>}>
-        <dl className="confirm-summary"><div><dt>Service</dt><dd>{selectedService?.name}</dd></div><div><dt>Link</dt><dd className="break-text">{targetUrl}</dd></div><div><dt>Quantity</dt><dd>{formatNumber(activeQuantity)}</dd></div><div><dt>Estimated cost</dt><dd><strong>{formatCurrency(estimatedCost)}</strong></dd></div><div><dt>Wallet balance</dt><dd>{formatCurrency(resource.data.wallet.balance)}</dd></div></dl>
+        <dl className="confirm-summary"><div><dt>Dịch vụ</dt><dd>{selectedService?.name}</dd></div><div><dt>URL</dt><dd className="break-text">{targetUrl}</dd></div><div><dt>Số lượng</dt><dd>{formatNumber(activeQuantity)}</dd></div><div><dt>Chi phí dự kiến</dt><dd><strong>{formatCurrency(estimatedCost)}</strong></dd></div><div><dt>Số dư ví</dt><dd>{formatCurrency(resource.data.wallet.balance)}</dd></div></dl>
       </Modal>
     </div>
   );
@@ -178,7 +178,7 @@ function NewOrderPageContent() {
 
 export default function NewOrderPage() {
   return (
-    <Suspense fallback={<LoadingState label="Preparing order form..." />}>
+    <Suspense fallback={<LoadingState label="Đang chuẩn bị biểu mẫu tạo đơn..." />}>
       <NewOrderPageContent />
     </Suspense>
   );

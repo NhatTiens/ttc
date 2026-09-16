@@ -71,7 +71,7 @@ export function SearchInput({ className, ...props }: InputHTMLAttributes<HTMLInp
   return (
     <label className={cn("search-input", className)}>
       <SearchIcon size={18} />
-      <span className="sr-only">Search</span>
+      <span className="sr-only">Tìm kiếm</span>
       <input type="search" {...props} />
     </label>
   );
@@ -93,9 +93,9 @@ export function NumberInput({ value, min, max, step = 1, onValueChange, label, h
     <div className="field">
       <FieldMeta id={id} label={label} hint={hint} error={error} required={required} />
       <div className={cn("number-input", error && "input--error")}>
-        <IconButton label="Decrease" size="sm" variant="ghost" onClick={() => onValueChange(clamp(value - step))} disabled={min !== undefined && value <= min}>-</IconButton>
+        <IconButton label="Giảm" size="sm" variant="ghost" onClick={() => onValueChange(clamp(value - step))} disabled={min !== undefined && value <= min}>-</IconButton>
         <input id={id} type="number" value={value} min={min} max={max} step={step} onChange={(event: ChangeEvent<HTMLInputElement>) => onValueChange(clamp(Number(event.currentTarget.value)))} aria-invalid={Boolean(error)} {...props} />
-        <IconButton label="Increase" size="sm" variant="ghost" onClick={() => onValueChange(clamp(value + step))} disabled={max !== undefined && value >= max}><PlusIcon size={16} /></IconButton>
+        <IconButton label="Tăng" size="sm" variant="ghost" onClick={() => onValueChange(clamp(value + step))} disabled={max !== undefined && value >= max}><PlusIcon size={16} /></IconButton>
       </div>
     </div>
   );

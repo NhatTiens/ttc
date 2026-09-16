@@ -33,15 +33,15 @@ function PersonalForm({ profile, onSaved }: { profile: CustomerProfile; onSaved:
     try {
       const updated = await customerService.updateProfile({ name: name.trim(), email: email.trim(), phone: phone.trim() });
       onSaved(updated);
-      toast({ tone: "success", title: "Profile updated" });
+      toast({ tone: "success", title: "Đã cập nhật hồ sơ" });
     } catch (reason) {
-      toast({ tone: "error", title: "Profile update failed", description: reason instanceof Error ? reason.message : "Vui lòng thử lại." });
+      toast({ tone: "error", title: "Không thể cập nhật hồ sơ", description: reason instanceof Error ? reason.message : "Vui lòng thử lại." });
     } finally {
       setSaving(false);
     }
   }
 
-  return <Card className="form-card"><div className="profile-identity"><UserAvatar name={name} size="lg" /><div><strong>{name}</strong><span>Customer since {formatDateTime(profile.joinedAt)}</span></div></div><div className="profile-form-grid"><Input label="Full name" value={name} error={errors.name} onChange={(event) => { setName(event.currentTarget.value); setErrors((current) => ({ ...current, name: undefined })); }} /><Input label="Email" type="email" value={email} error={errors.email} onChange={(event) => { setEmail(event.currentTarget.value); setErrors((current) => ({ ...current, email: undefined })); }} /><Input label="Phone" value={phone} onChange={(event) => setPhone(event.currentTarget.value)} /></div><div className="form-actions"><Button onClick={save} loading={saving}>Lưu thay đổi</Button></div></Card>;
+  return <Card className="form-card"><div className="profile-identity"><UserAvatar name={name} size="lg" /><div><strong>{name}</strong><span>Khách hàng từ {formatDateTime(profile.joinedAt)}</span></div></div><div className="profile-form-grid"><Input label="Họ và tên" value={name} error={errors.name} onChange={(event) => { setName(event.currentTarget.value); setErrors((current) => ({ ...current, name: undefined })); }} /><Input label="Email" type="email" value={email} error={errors.email} onChange={(event) => { setEmail(event.currentTarget.value); setErrors((current) => ({ ...current, email: undefined })); }} /><Input label="Số điện thoại" value={phone} onChange={(event) => setPhone(event.currentTarget.value)} /></div><div className="form-actions"><Button onClick={save} loading={saving}>Lưu thay đổi</Button></div></Card>;
 }
 
 function SecurityForm({ profile, onReload }: { profile: CustomerProfile; onReload: () => void }) {
@@ -63,13 +63,13 @@ function SecurityForm({ profile, onReload }: { profile: CustomerProfile; onReloa
       await customerService.changePassword(currentPassword, nextPassword);
       setCurrentPassword(""); setNextPassword(""); setConfirmPassword("");
       onReload();
-      toast({ tone: "success", title: "Password changed" });
+      toast({ tone: "success", title: "Đã đổi mật khẩu" });
     } catch (reason) {
-      toast({ tone: "error", title: "Password change failed", description: reason instanceof Error ? reason.message : "Vui lòng thử lại." });
+      toast({ tone: "error", title: "Không thể đổi mật khẩu", description: reason instanceof Error ? reason.message : "Vui lòng thử lại." });
     } finally { setSaving(false); }
   }
 
-  return <div className="profile-security-grid"><Card className="form-card"><h2>Đổi mật khẩu</h2><div className="form-stack"><Input label="Current password" type="password" value={currentPassword} onChange={(event) => { setCurrentPassword(event.currentTarget.value); setError(""); }} /><Input label="New password" type="password" value={nextPassword} onChange={(event) => { setNextPassword(event.currentTarget.value); setError(""); }} /><Input label="Confirm new password" type="password" value={confirmPassword} error={error} onChange={(event) => { setConfirmPassword(event.currentTarget.value); setError(""); }} /><div className="form-actions"><Button onClick={changePassword} loading={saving}>Cập nhật mật khẩu</Button></div></div></Card><Card className="security-card"><div><h2>Two-factor authentication</h2>{profile.security.twoFactorEnabled ? <Badge tone="green">Enabled</Badge> : <Badge tone="amber">Not enabled</Badge>}</div><p>2FA workflow will be connected to the authentication backend. The customer UI is ready for the configuration state.</p><span>Last password change: {formatDateTime(profile.security.lastPasswordChange)}</span><Button variant="outline" disabled>Configure 2FA</Button></Card></div>;
+  return <div className="profile-security-grid"><Card className="form-card"><h2>Đổi mật khẩu</h2><div className="form-stack"><Input label="Mật khẩu hiện tại" type="password" value={currentPassword} onChange={(event) => { setCurrentPassword(event.currentTarget.value); setError(""); }} /><Input label="Mật khẩu mới" type="password" value={nextPassword} onChange={(event) => { setNextPassword(event.currentTarget.value); setError(""); }} /><Input label="Xác nhận mật khẩu mới" type="password" value={confirmPassword} error={error} onChange={(event) => { setConfirmPassword(event.currentTarget.value); setError(""); }} /><div className="form-actions"><Button onClick={changePassword} loading={saving}>Cập nhật mật khẩu</Button></div></div></Card><Card className="security-card"><div><h2>Xác thực hai yếu tố</h2>{profile.security.twoFactorEnabled ? <Badge tone="green">Đã bật</Badge> : <Badge tone="amber">Chưa bật</Badge>}</div><p>Xác thực hai yếu tố giúp tăng bảo mật cho tài khoản. Tính năng này hiện chưa khả dụng.</p><span>Đổi mật khẩu lần cuối: {formatDateTime(profile.security.lastPasswordChange)}</span><Button variant="outline" disabled>Cấu hình 2FA</Button></Card></div>;
 }
 
 function NotificationForm({ profile, onSaved }: { profile: CustomerProfile; onSaved: (profile: CustomerProfile) => void }) {
@@ -77,10 +77,10 @@ function NotificationForm({ profile, onSaved }: { profile: CustomerProfile; onSa
   const [preferences, setPreferences] = useState(profile.notifications);
   const [saving, setSaving] = useState(false);
   const items: Array<{ key: keyof CustomerProfile["notifications"]; title: string; description: string }> = [
-    { key: "orderUpdates", title: "Order updates", description: "Status changes, partials, failures and completion." },
-    { key: "walletUpdates", title: "Wallet updates", description: "Deposits, refunds and wallet adjustments." },
-    { key: "supportReplies", title: "Support replies", description: "New responses from the support team." },
-    { key: "promotions", title: "Promotions", description: "Service announcements and promotional offers." }
+    { key: "orderUpdates", title: "Cập nhật đơn hàng", description: "Thay đổi trạng thái, hoàn thành một phần, thất bại và hoàn tất." },
+    { key: "walletUpdates", title: "Cập nhật ví", description: "Nạp tiền, hoàn tiền và điều chỉnh số dư." },
+    { key: "supportReplies", title: "Phản hồi hỗ trợ", description: "Phản hồi mới từ bộ phận hỗ trợ." },
+    { key: "promotions", title: "Khuyến mãi", description: "Thông báo dịch vụ và ưu đãi khuyến mãi." }
   ];
 
   async function save() {
@@ -88,9 +88,9 @@ function NotificationForm({ profile, onSaved }: { profile: CustomerProfile; onSa
     try {
       const updated = await customerService.updateNotificationPreferences(preferences);
       onSaved(updated);
-      toast({ tone: "success", title: "Notification preferences saved" });
+      toast({ tone: "success", title: "Đã lưu tùy chọn thông báo" });
     } catch (reason) {
-      toast({ tone: "error", title: "Could not save preferences", description: reason instanceof Error ? reason.message : "Vui lòng thử lại." });
+      toast({ tone: "error", title: "Không thể lưu tùy chọn thông báo", description: reason instanceof Error ? reason.message : "Vui lòng thử lại." });
     } finally { setSaving(false); }
   }
 
@@ -102,11 +102,11 @@ export default function ProfilePage() {
   const { refresh: refreshSession } = useCustomerSession();
   const [profileOverride, setProfileOverride] = useState<CustomerProfile | null>(null);
 
-  if (resource.loading) return <LoadingState label="Loading profile..." />;
-  if (resource.error) return <ErrorState title="Profile could not be loaded" description={resource.error} onRetry={resource.reload} />;
-  if (!resource.data) return <ErrorState title="Profile not found" description="The current customer profile is unavailable." />;
+  if (resource.loading) return <LoadingState label="Đang tải hồ sơ..." />;
+  if (resource.error) return <ErrorState title="Không thể tải hồ sơ" description={resource.error} onRetry={resource.reload} />;
+  if (!resource.data) return <ErrorState title="Không tìm thấy hồ sơ" description="Hồ sơ khách hàng hiện tại chưa khả dụng." />;
   const profile = profileOverride ?? resource.data;
   const handleSaved = (updated: CustomerProfile) => { setProfileOverride(updated); refreshSession(); };
 
-  return <div className="customer-page"><PageHeader eyebrow="Account" title="Hồ sơ & bảo mật" description="Quản lý thông tin cá nhân, mật khẩu và tùy chọn thông báo." /><Tabs items={[{ value: "personal", label: "Thông tin cá nhân", content: <PersonalForm profile={profile} onSaved={handleSaved} /> }, { value: "security", label: "Bảo mật", content: <SecurityForm profile={profile} onReload={resource.reload} /> }, { value: "notifications", label: "Thông báo", content: <NotificationForm profile={profile} onSaved={handleSaved} /> }]} /></div>;
+  return <div className="customer-page"><PageHeader eyebrow="Tài khoản" title="Hồ sơ & bảo mật" description="Quản lý thông tin cá nhân, mật khẩu và tùy chọn thông báo." /><Tabs items={[{ value: "personal", label: "Thông tin cá nhân", content: <PersonalForm profile={profile} onSaved={handleSaved} /> }, { value: "security", label: "Bảo mật", content: <SecurityForm profile={profile} onReload={resource.reload} /> }, { value: "notifications", label: "Thông báo", content: <NotificationForm profile={profile} onSaved={handleSaved} /> }]} /></div>;
 }

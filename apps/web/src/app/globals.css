@@ -764,6 +764,8 @@ img { max-width: 100%; display: block; }
 
 @media (max-width: 430px) {
   .stats-grid { grid-template-columns: 1fr 1fr; }
+  .platform-picker { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; overflow-x: visible; }
+  .platform-picker__item { min-width: 0; padding-inline: 2px; font-size: 9px; }
   .stat-card { min-height: 132px; }
   .stat-card__value { font-size: 20px; overflow-wrap: anywhere; }
   .form-card, .order-summary-card { padding: 16px; }
@@ -774,7 +776,7 @@ img { max-width: 100%; display: block; }
 
 @media (max-width: 389px) {
   .stats-grid { grid-template-columns: 1fr; }
-  .platform-picker { grid-template-columns: repeat(5, 62px); }
+  .platform-picker { grid-template-columns: repeat(5, minmax(0, 1fr)); }
   .service-mobile-card__metrics { grid-template-columns: 1fr; }
   .auth-page__form-panel { padding-inline: 14px; }
   .auth-form__row { align-items: flex-start; flex-direction: column; }

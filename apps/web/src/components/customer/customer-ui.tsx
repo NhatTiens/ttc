@@ -23,22 +23,32 @@ export function PlatformLabel({ platform, compact = false }: { platform: SocialP
 
 export function ServiceStatusBadge({ status }: { status: ServiceStatus }) {
   const tone = status === "Active" ? "green" : status === "Paused" ? "amber" : "neutral";
-  return <Badge tone={tone}>{status}</Badge>;
+  const labels: Record<ServiceStatus, string> = { Active: "Đang hoạt động", Paused: "Tạm dừng", Maintenance: "Bảo trì" };
+  return <Badge tone={tone}>{labels[status]}</Badge>;
 }
 
 export function TicketStatusBadge({ status }: { status: TicketStatus }) {
   const tone = status === "Resolved" ? "green" : status === "Waiting" ? "amber" : status === "Open" ? "blue" : "neutral";
-  return <Badge tone={tone}>{status}</Badge>;
+  const labels: Record<TicketStatus, string> = { Open: "Đang mở", Waiting: "Đang chờ", Resolved: "Đã xử lý", Closed: "Đã đóng" };
+  return <Badge tone={tone}>{labels[status]}</Badge>;
 }
 
 export function TransactionStatusBadge({ status }: { status: TransactionStatus }) {
   const tone = status === "Completed" ? "green" : status === "Pending" ? "amber" : "red";
-  return <Badge tone={tone}>{status}</Badge>;
+  const labels: Record<TransactionStatus, string> = { Completed: "Hoàn thành", Pending: "Đang chờ", Failed: "Thất bại" };
+  return <Badge tone={tone}>{labels[status]}</Badge>;
 }
 
 export function TransactionTypeBadge({ type }: { type: TransactionType }) {
   const tone = type === "Deposit" ? "blue" : type === "Purchase" ? "neutral" : type === "Refund" ? "green" : "purple";
-  return <Badge tone={tone}>{type}</Badge>;
+  const labels: Record<TransactionType, string> = { Deposit: "Nạp tiền", Purchase: "Mua dịch vụ", Refund: "Hoàn tiền", Adjustment: "Điều chỉnh" };
+  return <Badge tone={tone}>{labels[type]}</Badge>;
+}
+
+
+export function supportCategoryLabel(category: string) {
+  const labels: Record<string, string> = { Order: "Đơn hàng", Wallet: "Ví / Nạp tiền", Service: "Dịch vụ", Account: "Tài khoản", Other: "Khác" };
+  return labels[category] ?? category;
 }
 
 export function SectionHeader({ title, description, action }: { title: string; description?: string; action?: ReactNode }) {

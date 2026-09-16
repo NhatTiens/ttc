@@ -19,8 +19,22 @@ const statusTone: Record<OrderStatusValue, BadgeTone> = {
   Refunded: "purple"
 };
 
+const statusLabel: Record<OrderStatusValue, string> = {
+  Processing: "Đang xử lý",
+  Completed: "Hoàn thành",
+  Pending: "Đang chờ",
+  Failed: "Thất bại",
+  Cancelled: "Đã hủy",
+  Partial: "Hoàn thành một phần",
+  Refunded: "Đã hoàn tiền"
+};
+
+export function orderStatusLabel(status: OrderStatusValue) {
+  return statusLabel[status];
+}
+
 export function StatusBadge({ status }: { status: OrderStatusValue }) {
-  return <Badge tone={statusTone[status]} className="status-badge"><span className="status-dot" aria-hidden="true" />{status}</Badge>;
+  return <Badge tone={statusTone[status]} className="status-badge"><span className="status-dot" aria-hidden="true" />{statusLabel[status]}</Badge>;
 }
 
 export function OrderStatus({ status }: { status: OrderStatusValue }) {

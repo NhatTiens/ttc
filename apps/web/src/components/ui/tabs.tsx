@@ -30,7 +30,7 @@ export function Tabs({ items, defaultValue, className }: { items: TabItem[]; def
 
   return (
     <div className={cn("tabs", className)}>
-      <div className="tabs__list" role="tablist" aria-label="Tabs">
+      <div className="tabs__list" role="tablist" aria-label="Các tab">
         {items.map((item, index) => (
           <button
             key={item.value}

@@ -34,10 +34,10 @@ export function ResponsiveTable<T>({ columns, rows, getRowKey, renderMobileItem,
 export function Pagination({ page, pageCount, onPageChange, className }: { page: number; pageCount: number; onPageChange?: (page: number) => void; className?: string }) {
   const pages = Array.from({ length: Math.min(pageCount, 5) }, (_, index) => index + 1);
   return (
-    <nav className={cn("pagination", className)} aria-label="Pagination">
-      <IconButton label="Previous page" variant="outline" size="sm" disabled={page <= 1} onClick={() => onPageChange?.(page - 1)}><ChevronLeftIcon size={16} /></IconButton>
+    <nav className={cn("pagination", className)} aria-label="Phân trang">
+      <IconButton label="Trang trước" variant="outline" size="sm" disabled={page <= 1} onClick={() => onPageChange?.(page - 1)}><ChevronLeftIcon size={16} /></IconButton>
       <div className="pagination__pages">{pages.map((item) => <button key={item} type="button" className={cn("pagination__page", item === page && "pagination__page--active")} aria-current={item === page ? "page" : undefined} onClick={() => onPageChange?.(item)}>{item}</button>)}</div>
-      <IconButton label="Next page" variant="outline" size="sm" disabled={page >= pageCount} onClick={() => onPageChange?.(page + 1)}><ChevronRightIcon size={16} /></IconButton>
+      <IconButton label="Trang sau" variant="outline" size="sm" disabled={page >= pageCount} onClick={() => onPageChange?.(page + 1)}><ChevronRightIcon size={16} /></IconButton>
     </nav>
   );
 }

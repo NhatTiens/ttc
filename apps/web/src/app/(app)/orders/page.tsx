@@ -16,13 +16,13 @@ import { formatCurrency, formatDateTime, formatNumber } from "@/lib/format";
 
 const statuses: Array<{ value: OrderStatusValue | "all"; label: string }> = [
   { value: "all", label: "Tất cả trạng thái" },
-  { value: "Processing", label: "Processing" },
-  { value: "Completed", label: "Completed" },
-  { value: "Pending", label: "Pending" },
-  { value: "Failed", label: "Failed" },
-  { value: "Cancelled", label: "Cancelled" },
-  { value: "Partial", label: "Partial" },
-  { value: "Refunded", label: "Refunded" }
+  { value: "Processing", label: "Đang xử lý" },
+  { value: "Completed", label: "Hoàn thành" },
+  { value: "Pending", label: "Đang chờ" },
+  { value: "Failed", label: "Thất bại" },
+  { value: "Cancelled", label: "Đã hủy" },
+  { value: "Partial", label: "Hoàn thành một phần" },
+  { value: "Refunded", label: "Đã hoàn tiền" }
 ];
 
 const platformOptions: Array<{ value: SocialPlatform | "all"; label: string }> = [
@@ -30,13 +30,13 @@ const platformOptions: Array<{ value: SocialPlatform | "all"; label: string }> =
 ];
 
 const columns: TableColumn<Order>[] = [
-  { key: "id", header: "Order", render: (row) => <TextLink href={`/orders/${row.id}`}>{row.id}</TextLink> },
-  { key: "service", header: "Service", render: (row) => <div className="table-primary"><strong>{row.serviceName}</strong><small>{row.targetUrl}</small></div> },
-  { key: "platform", header: "Platform", render: (row) => <PlatformLabel platform={row.platform} compact /> },
-  { key: "quantity", header: "Quantity", render: (row) => formatNumber(row.quantity) },
-  { key: "charge", header: "Charge", render: (row) => formatCurrency(row.charge) },
-  { key: "status", header: "Status", render: (row) => <OrderStatus status={row.status} /> },
-  { key: "date", header: "Created", render: (row) => <span className="table-date">{formatDateTime(row.createdAt)}</span> }
+  { key: "id", header: "Mã đơn", render: (row) => <TextLink href={`/orders/${row.id}`}>{row.id}</TextLink> },
+  { key: "service", header: "Dịch vụ", render: (row) => <div className="table-primary"><strong>{row.serviceName}</strong><small>{row.targetUrl}</small></div> },
+  { key: "platform", header: "Nền tảng", render: (row) => <PlatformLabel platform={row.platform} compact /> },
+  { key: "quantity", header: "Số lượng", render: (row) => formatNumber(row.quantity) },
+  { key: "charge", header: "Chi phí", render: (row) => formatCurrency(row.charge) },
+  { key: "status", header: "Trạng thái", render: (row) => <OrderStatus status={row.status} /> },
+  { key: "date", header: "Ngày tạo", render: (row) => <span className="table-date">{formatDateTime(row.createdAt)}</span> }
 ];
 
 export default function OrdersPage() {
@@ -66,25 +66,25 @@ export default function OrdersPage() {
   const pagedRows = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
   const resetPage = () => setPage(1);
 
-  if (resource.loading) return <LoadingState label="Loading orders..." />;
-  if (resource.error) return <ErrorState title="Orders could not be loaded" description={resource.error} onRetry={resource.reload} />;
-  if (!resource.data) return <EmptyState title="No order data" description="Order history will appear here." />;
+  if (resource.loading) return <LoadingState label="Đang tải đơn hàng..." />;
+  if (resource.error) return <ErrorState title="Không thể tải danh sách đơn hàng" description={resource.error} onRetry={resource.reload} />;
+  if (!resource.data) return <EmptyState title="Chưa có dữ liệu đơn hàng" description="Lịch sử đơn hàng sẽ xuất hiện tại đây." />;
 
   return (
     <div className="customer-page">
-      <PageHeader eyebrow="Orders" title="Đơn hàng" description="Tìm, lọc và theo dõi toàn bộ đơn hàng đã tạo." actions={<Link href="/order/new" className="button button--primary button--md">Tạo đơn mới</Link>} />
+      <PageHeader eyebrow="Đơn hàng" title="Đơn hàng" description="Tìm, lọc và theo dõi toàn bộ đơn hàng đã tạo." actions={<Link href="/order/new" className="button button--primary button--md">Tạo đơn mới</Link>} />
       <Card className="filter-card">
         <div className="filter-grid filter-grid--orders">
-          <SearchInput value={search} onChange={(event) => { setSearch(event.currentTarget.value); resetPage(); }} placeholder="Tìm mã đơn, dịch vụ, link..." aria-label="Search orders" />
-          <Select value={status} onChange={(event) => { setStatus(event.currentTarget.value as OrderStatusValue | "all"); resetPage(); }} options={statuses} aria-label="Filter by status" />
-          <Select value={platform} onChange={(event) => { setPlatform(event.currentTarget.value as SocialPlatform | "all"); resetPage(); }} options={platformOptions} aria-label="Filter by platform" />
-          <Select value={dateRange} onChange={(event) => { setDateRange(event.currentTarget.value as typeof dateRange); resetPage(); }} options={[{ value: "all", label: "Tất cả thời gian" }, { value: "7d", label: "7 ngày" }, { value: "30d", label: "30 ngày" }, { value: "90d", label: "90 ngày" }]} aria-label="Filter by date" />
+          <SearchInput value={search} onChange={(event) => { setSearch(event.currentTarget.value); resetPage(); }} placeholder="Tìm mã đơn, dịch vụ, URL..." aria-label="Tìm kiếm đơn hàng" />
+          <Select value={status} onChange={(event) => { setStatus(event.currentTarget.value as OrderStatusValue | "all"); resetPage(); }} options={statuses} aria-label="Lọc theo trạng thái" />
+          <Select value={platform} onChange={(event) => { setPlatform(event.currentTarget.value as SocialPlatform | "all"); resetPage(); }} options={platformOptions} aria-label="Lọc theo nền tảng" />
+          <Select value={dateRange} onChange={(event) => { setDateRange(event.currentTarget.value as typeof dateRange); resetPage(); }} options={[{ value: "all", label: "Tất cả thời gian" }, { value: "7d", label: "7 ngày" }, { value: "30d", label: "30 ngày" }, { value: "90d", label: "90 ngày" }]} aria-label="Lọc theo thời gian" />
         </div>
       </Card>
 
       {filtered.length === 0 ? <EmptyState title="Không có đơn phù hợp" description="Thử đổi điều kiện lọc hoặc tạo đơn mới." action={<Link href="/order/new" className="button button--primary button--sm">Tạo đơn</Link>} /> : (
         <>
-          <ResponsiveTable columns={columns} rows={pagedRows} getRowKey={(row) => row.id} caption="Order history" renderMobileItem={(row) => (
+          <ResponsiveTable columns={columns} rows={pagedRows} getRowKey={(row) => row.id} caption="Lịch sử đơn hàng" renderMobileItem={(row) => (
             <Card className="mobile-list-card">
               <div className="mobile-list-card__head"><TextLink href={`/orders/${row.id}`}>{row.id}</TextLink><OrderStatus status={row.status} /></div>
               <strong>{row.serviceName}</strong>

@@ -31,7 +31,7 @@ export function Modal({ open, onOpenChange, title, description, children, footer
   return (
     <dialog ref={ref} className={cn("dialog", `dialog--${size}`)} aria-labelledby={titleId} aria-describedby={description ? descriptionId : undefined} onCancel={(event: SyntheticEvent<HTMLDialogElement>) => { event.preventDefault(); onOpenChange(false); }} onClick={(event: MouseEvent<HTMLDialogElement>) => { if (event.target === event.currentTarget) onOpenChange(false); }}>
       <div className="dialog__surface">
-        <div className="dialog__head"><div><h2 id={titleId}>{title}</h2>{description ? <p id={descriptionId}>{description}</p> : null}</div><IconButton label="Close dialog" onClick={() => onOpenChange(false)}><XIcon size={18} /></IconButton></div>
+        <div className="dialog__head"><div><h2 id={titleId}>{title}</h2>{description ? <p id={descriptionId}>{description}</p> : null}</div><IconButton label="Đóng hộp thoại" onClick={() => onOpenChange(false)}><XIcon size={18} /></IconButton></div>
         {children ? <div className="dialog__content">{children}</div> : null}
         {footer ? <div className="dialog__footer">{footer}</div> : null}
       </div>
@@ -45,14 +45,14 @@ export function Drawer({ open, onOpenChange, title, children, side = "right" }: 
   return (
     <dialog ref={ref} className={cn("drawer", `drawer--${side}`)} aria-labelledby={titleId} onCancel={(event: SyntheticEvent<HTMLDialogElement>) => { event.preventDefault(); onOpenChange(false); }} onClick={(event: MouseEvent<HTMLDialogElement>) => { if (event.target === event.currentTarget) onOpenChange(false); }}>
       <div className="drawer__surface">
-        <div className="drawer__head"><h2 id={titleId}>{title}</h2><IconButton label="Close drawer" onClick={() => onOpenChange(false)}><XIcon size={18} /></IconButton></div>
+        <div className="drawer__head"><h2 id={titleId}>{title}</h2><IconButton label="Đóng ngăn điều hướng" onClick={() => onOpenChange(false)}><XIcon size={18} /></IconButton></div>
         <div className="drawer__content">{children}</div>
       </div>
     </dialog>
   );
 }
 
-export function ConfirmDialog({ open, onOpenChange, title, description, confirmLabel = "Confirm", cancelLabel = "Cancel", destructive = false, onConfirm }: { open: boolean; onOpenChange: (open: boolean) => void; title: string; description: string; confirmLabel?: string; cancelLabel?: string; destructive?: boolean; onConfirm: () => void }) {
+export function ConfirmDialog({ open, onOpenChange, title, description, confirmLabel = "Xác nhận", cancelLabel = "Hủy", destructive = false, onConfirm }: { open: boolean; onOpenChange: (open: boolean) => void; title: string; description: string; confirmLabel?: string; cancelLabel?: string; destructive?: boolean; onConfirm: () => void }) {
   return (
     <Modal
       open={open}

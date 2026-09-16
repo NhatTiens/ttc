@@ -109,7 +109,7 @@ export const mockCustomerRepository: CustomerRepository = {
     };
     mockWallet.balance -= charge;
     mockOrders.unshift(order);
-    mockTransactions.unshift({ id: `TXN-MOCK-${orderSerial}`, type: "Purchase", description: `Order ${order.id}`, amount: -charge, balanceAfter: mockWallet.balance, date: now, status: "Completed", reference: order.id });
+    mockTransactions.unshift({ id: `TXN-MOCK-${orderSerial}`, type: "Purchase", description: `Đơn hàng ${order.id}`, amount: -charge, balanceAfter: mockWallet.balance, date: now, status: "Completed", reference: order.id });
     return { ...order };
   },
 
@@ -134,7 +134,19 @@ export const mockCustomerRepository: CustomerRepository = {
     if (!method) throw new Error("Phương thức nạp tiền này hiện không khả dụng.");
     if (amount < method.min || amount > method.max) throw new Error(`Số tiền nạp phải từ ${method.min} đến ${method.max}.`);
     depositSerial += 1;
-    return { id: `DEP-MOCK-${depositSerial}`, methodId, amount, status: "Pending" as const, createdAt: new Date().toISOString() };
+    const id = `DEP-MOCK-${depositSerial}`;
+    const createdAt = new Date().toISOString();
+    mockTransactions.unshift({
+      id: `TXN-MOCK-DEP-${depositSerial}`,
+      type: "Deposit",
+      description: `Yêu cầu nạp tiền ${id}`,
+      amount,
+      balanceAfter: mockWallet.balance,
+      date: createdAt,
+      status: "Pending",
+      reference: id
+    });
+    return { id, methodId, amount, status: "Pending" as const, createdAt };
   },
 
   async listTickets() {
@@ -162,7 +174,7 @@ export const mockCustomerRepository: CustomerRepository = {
   async sendSupportMessage(ticketId: string, body: string) {
     await delay(360);
     const ticket = mockTickets.find((item) => item.id === ticketId);
-    if (!ticket) throw new Error("Không tìm thấy ticket.");
+    if (!ticket) throw new Error("Không tìm thấy yêu cầu hỗ trợ.");
     const message = { id: `MSG-MOCK-${Date.now()}`, ticketId, sender: "customer" as const, senderName: mockProfile.name, body, createdAt: new Date().toISOString() };
     mockSupportMessages.push(message);
     ticket.lastMessage = body;

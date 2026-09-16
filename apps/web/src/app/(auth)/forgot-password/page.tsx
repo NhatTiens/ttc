@@ -25,11 +25,11 @@ export default function ForgotPasswordPage() {
     try {
       await customerService.requestPasswordReset(email.trim());
       setSent(true);
-      toast({ tone: "success", title: "Reset request sent" });
+      toast({ tone: "success", title: "Đã gửi yêu cầu đặt lại mật khẩu" });
     } catch (reason) {
-      toast({ tone: "error", title: "Request failed", description: reason instanceof Error ? reason.message : "Vui lòng thử lại." });
+      toast({ tone: "error", title: "Không thể gửi yêu cầu", description: reason instanceof Error ? reason.message : "Vui lòng thử lại." });
     } finally { setSubmitting(false); }
   }
 
-  return <AuthShell title="Quên mật khẩu" description="Nhập email đã đăng ký để tạo yêu cầu đặt lại mật khẩu." footer={<Link href="/login" className="text-link">Quay lại đăng nhập</Link>}>{sent ? <Card className="auth-success"><strong>Kiểm tra email của bạn</strong><p>Mock service đã ghi nhận yêu cầu đặt lại mật khẩu cho {email}. Backend gửi email sẽ được nối sau.</p><Link href="/login" className="button button--primary button--md">Về đăng nhập</Link></Card> : <div className="auth-form"><Input label="Email" type="email" autoComplete="email" value={email} error={error} onChange={(event) => { setEmail(event.currentTarget.value); setError(""); }} placeholder="you@example.com" /><Button size="lg" className="full-width" onClick={submit} loading={submitting}>Gửi yêu cầu</Button></div>}</AuthShell>;
+  return <AuthShell title="Quên mật khẩu" description="Nhập email đã đăng ký để tạo yêu cầu đặt lại mật khẩu." footer={<Link href="/login" className="text-link">Quay lại đăng nhập</Link>}>{sent ? <Card className="auth-success"><strong>Kiểm tra email của bạn</strong><p>Yêu cầu đặt lại mật khẩu đã được ghi nhận cho {email}. Vui lòng làm theo hướng dẫn trong email khi hệ thống gửi liên kết đặt lại mật khẩu.</p><Link href="/login" className="button button--primary button--md">Về đăng nhập</Link></Card> : <div className="auth-form"><Input label="Email" type="email" autoComplete="email" value={email} error={error} onChange={(event) => { setEmail(event.currentTarget.value); setError(""); }} placeholder="you@example.com" /><Button size="lg" className="full-width" onClick={submit} loading={submitting}>Gửi yêu cầu</Button></div>}</AuthShell>;
 }

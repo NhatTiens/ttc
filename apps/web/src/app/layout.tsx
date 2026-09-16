@@ -6,7 +6,7 @@ import { APP_NAME } from "@/content/navigation";
 
 export const metadata: Metadata = {
   title: APP_NAME,
-  description: "Customer dashboard for social media services, orders, wallet and support."
+  description: "Bảng điều khiển khách hàng cho dịch vụ mạng xã hội, đơn hàng, ví và hỗ trợ."
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
