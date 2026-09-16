@@ -28,6 +28,7 @@ type TTCProviderConfig = {
   apiKey?: string;
   timeoutMs?: number;
   xuToVndRate?: string;
+  rateInputUnit?: number;
   rateUnit?: number;
 };
 
@@ -87,10 +88,19 @@ function ceilDiv(numerator: bigint, denominator: bigint): bigint {
   return (numerator + denominator - 1n) / denominator;
 }
 
-function convertXuRateToVnd(rate: unknown, xuToVndRate: string): bigint {
+function convertXuRateToVnd(rate: unknown, xuToVndRate: string, rateInputUnit: number, rateUnit: number): bigint {
   const source = parseNonNegativeDecimal(rate, "service rate");
   const conversion = parsePositiveDecimal(xuToVndRate, "TTC_XU_TO_VND_RATE");
-  return ceilDiv(source.numerator * conversion.numerator, source.denominator * conversion.denominator);
+  if (!Number.isInteger(rateInputUnit) || rateInputUnit <= 0) {
+    throw new ProviderAdapterError("PROVIDER_CONFIGURATION_MISSING", "TTC_RATE_INPUT_UNIT must be a positive integer.");
+  }
+  if (!Number.isInteger(rateUnit) || rateUnit <= 0) {
+    throw new ProviderAdapterError("PROVIDER_CONFIGURATION_MISSING", "TTC_RATE_UNIT must be a positive integer.");
+  }
+  return ceilDiv(
+    source.numerator * conversion.numerator * BigInt(rateUnit),
+    source.denominator * conversion.denominator * BigInt(rateInputUnit)
+  );
 }
 
 function parseWholeBalance(value: unknown): bigint {
@@ -138,6 +148,7 @@ function normalizePlatform(name: string, category: string): NormalizedProviderSe
   if (haystack.includes("instagram")) return "INSTAGRAM";
   if (haystack.includes("youtube")) return "YOUTUBE";
   if (haystack.includes("thread")) return "THREADS";
+  if (haystack.includes("google")) return "GOOGLE";
   return undefined;
 }
 
@@ -169,6 +180,7 @@ export class TTCProviderAdapter implements ProviderAdapter {
   private readonly apiKey: string;
   private readonly timeoutMs: number;
   private readonly xuToVndRate: string;
+  private readonly rateInputUnit: number;
   private readonly rateUnit: number;
 
   constructor(config: TTCProviderConfig = {}) {
@@ -176,6 +188,7 @@ export class TTCProviderAdapter implements ProviderAdapter {
     this.apiKey = (config.apiKey ?? process.env.TTC_API_KEY ?? "").trim();
     this.timeoutMs = config.timeoutMs ?? Number(process.env.TTC_HTTP_TIMEOUT_MS || DEFAULT_TIMEOUT_MS);
     this.xuToVndRate = (config.xuToVndRate ?? process.env.TTC_XU_TO_VND_RATE ?? "").trim();
+    this.rateInputUnit = config.rateInputUnit ?? Number(process.env.TTC_RATE_INPUT_UNIT || "");
     this.rateUnit = config.rateUnit ?? Number(process.env.TTC_RATE_UNIT || DEFAULT_RATE_UNIT);
   }
 
@@ -260,6 +273,12 @@ export class TTCProviderAdapter implements ProviderAdapter {
       );
     }
     parsePositiveDecimal(this.xuToVndRate, "TTC_XU_TO_VND_RATE");
+    if (!Number.isInteger(this.rateInputUnit) || this.rateInputUnit <= 0) {
+      throw new ProviderAdapterError(
+        "PROVIDER_CONFIGURATION_MISSING",
+        "TTC_RATE_INPUT_UNIT is required and must be a positive integer before service sync."
+      );
+    }
     const payload = await this.post("services");
     const error = responseError(payload);
     if (error) throw error;
@@ -283,19 +302,22 @@ export class TTCProviderAdapter implements ProviderAdapter {
         name,
         category: category || undefined,
         platform: normalizePlatform(name, category),
-        providerRateMinor: convertXuRateToVnd(item.rate, this.xuToVndRate),
+        providerRateMinor: convertXuRateToVnd(item.rate, this.xuToVndRate, this.rateInputUnit, this.rateUnit),
         rateUnit: this.rateUnit,
         currency: "VND",
         min,
         max,
         supportsRefill: booleanValue(item.refill),
-        supportsCancel: false,
+        supportsCancel: booleanValue(item.cancel),
         status: supportedOrderType ? "AVAILABLE" : "UNAVAILABLE",
         rawMetadata: {
           type,
           providerCurrency: "XU",
           providerRate: stringValue(item.rate) ?? null,
           refill: booleanValue(item.refill),
+          cancel: booleanValue(item.cancel),
+          rateInputUnit: this.rateInputUnit,
+          normalizedRateUnit: this.rateUnit,
           orderTypeSupported: supportedOrderType
         }
       } satisfies NormalizedProviderService;

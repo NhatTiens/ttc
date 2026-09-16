@@ -9,9 +9,20 @@ if (!testUrl) {
   process.exit(1);
 }
 
-const command = process.platform === "win32" ? "npm.cmd" : "npm";
-const result = spawnSync(command, ["--workspace", "@tuong-tac-pro/db", "run", "db:migrate"], {
+const isWindows = process.platform === "win32";
+const command = isWindows ? (process.env.ComSpec || "cmd.exe") : "npm";
+const args = isWindows
+  ? ["/d", "/s", "/c", "npm --workspace @tuong-tac-pro/db run db:migrate"]
+  : ["--workspace", "@tuong-tac-pro/db", "run", "db:migrate"];
+
+const result = spawnSync(command, args, {
   stdio: "inherit",
   env: { ...process.env, DATABASE_URL: testUrl }
 });
+
+if (result.error) {
+  console.error("Failed to prepare TEST_DATABASE_URL:", result.error);
+  process.exit(1);
+}
+
 process.exit(result.status ?? 1);

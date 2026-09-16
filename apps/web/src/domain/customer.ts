@@ -1,4 +1,4 @@
-export type SocialPlatform = "facebook" | "tiktok" | "instagram" | "youtube" | "threads";
+export type SocialPlatform = "facebook" | "tiktok" | "instagram" | "youtube" | "threads" | "google";
 export type CustomerOrderStatus = "Processing" | "Completed" | "Pending" | "Failed" | "Cancelled" | "Partial" | "Refunded";
 export type ServiceStatus = "Active" | "Paused" | "Maintenance";
 export type TicketStatus = "Open" | "Waiting" | "Resolved" | "Closed";

@@ -93,24 +93,26 @@ export async function enqueueProviderJob(
     maxAttempts?: number;
   }
 ) {
-  try {
-    return await tx.providerJob.create({
-      data: {
-        type: input.type,
-        status: ProviderJobStatus.PENDING,
-        dedupeKey: input.dedupeKey,
-        providerId: input.providerId ?? null,
-        orderId: input.orderId ?? null,
-        providerOrderId: input.providerOrderId ?? null,
-        payload: input.payload,
-        runAt: input.runAt ?? new Date(),
-        maxAttempts: input.maxAttempts ?? Number(process.env.PROVIDER_MAX_ATTEMPTS || 6)
-      }
-    });
-  } catch (error) {
-    if (errorCode(error) !== "P2002") throw error;
-    return tx.providerJob.findUniqueOrThrow({ where: { dedupeKey: input.dedupeKey } });
-  }
+  // Do not implement dedupe as create -> catch P2002 -> query again.
+  // On PostgreSQL, a unique violation aborts the current transaction (25P02),
+  // so the fallback query cannot run inside the same transaction.
+  // Atomic upsert preserves the first durable job and returns it on replay
+  // without poisoning the surrounding transaction.
+  return tx.providerJob.upsert({
+    where: { dedupeKey: input.dedupeKey },
+    create: {
+      type: input.type,
+      status: ProviderJobStatus.PENDING,
+      dedupeKey: input.dedupeKey,
+      providerId: input.providerId ?? null,
+      orderId: input.orderId ?? null,
+      providerOrderId: input.providerOrderId ?? null,
+      payload: input.payload,
+      runAt: input.runAt ?? new Date(),
+      maxAttempts: input.maxAttempts ?? Number(process.env.PROVIDER_MAX_ATTEMPTS || 6)
+    },
+    update: {}
+  });
 }
 
 export async function enqueueOrderSubmissionIfEnabled(tx: Prisma.TransactionClient, orderId: string, publicId: string) {

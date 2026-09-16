@@ -27,6 +27,7 @@ enum SocialPlatform {
   INSTAGRAM
   YOUTUBE
   THREADS
+  GOOGLE
 }
 
 enum ServiceStatus {

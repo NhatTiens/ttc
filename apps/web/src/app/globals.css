@@ -61,6 +61,7 @@
   --platform-instagram: #df3e7b;
   --platform-youtube: #ff0033;
   --platform-threads: #111111;
+  --platform-google: #4285f4;
   --color-shadow: 15 23 42;
   --shadow-card: 0 1px 2px rgb(var(--color-shadow) / 0.04), 0 8px 24px rgb(var(--color-shadow) / 0.025);
   --shadow-float: 0 16px 40px rgb(var(--color-shadow) / 0.13);
@@ -211,6 +212,7 @@ img { max-width: 100%; display: block; }
 .platform-icon--instagram { background: var(--platform-instagram); color: var(--color-on-strong); }
 .platform-icon--youtube { background: var(--platform-youtube); color: var(--color-on-strong); }
 .platform-icon--threads { background: var(--platform-threads); color: var(--color-on-strong); }
+.platform-icon--google { background: var(--platform-google); color: var(--color-on-strong); }
 .platform-glyph { font-weight: 800; line-height: 1; }
 .platform-icon--sm .platform-glyph { font-size: 15px; }
 .platform-icon--md .platform-glyph { font-size: 19px; }

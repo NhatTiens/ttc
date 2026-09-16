@@ -20,8 +20,8 @@ import { calculateOrderCost, formatCurrency, formatNumber } from "@/lib/format";
 import { validUrl } from "@/validation/customer";
 import { cn } from "@/lib/cn";
 
-const platforms: SocialPlatform[] = ["facebook", "tiktok", "instagram", "youtube", "threads"];
-const platformLabels: Record<SocialPlatform, string> = { facebook: "Facebook", tiktok: "TikTok", instagram: "Instagram", youtube: "YouTube", threads: "Threads" };
+const platforms: SocialPlatform[] = ["facebook", "tiktok", "instagram", "youtube", "threads", "google"];
+const platformLabels: Record<SocialPlatform, string> = { facebook: "Facebook", tiktok: "TikTok", instagram: "Instagram", youtube: "YouTube", threads: "Threads", google: "Google Maps" };
 
 function NewOrderPageContent() {
   const searchParams = useSearchParams();

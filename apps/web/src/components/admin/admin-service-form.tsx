@@ -6,7 +6,7 @@ import { Input, Select, Textarea } from "@/components/ui/form-controls";
 import { ConfirmDialog } from "@/components/ui/overlays";
 import type { AdminCategory, AdminServiceInput } from "@/domain/admin";
 
-const platforms = ["FACEBOOK", "TIKTOK", "INSTAGRAM", "YOUTUBE", "THREADS"] as const;
+const platforms = ["FACEBOOK", "TIKTOK", "INSTAGRAM", "YOUTUBE", "THREADS", "GOOGLE"] as const;
 const statuses = ["ACTIVE", "MAINTENANCE", "DISABLED"] as const;
 
 export function AdminServiceForm({ initial, categories, submitLabel, busy, onSubmit }: { initial?: AdminServiceInput; categories: AdminCategory[]; submitLabel: string; busy?: boolean; onSubmit: (input: AdminServiceInput) => void }) {

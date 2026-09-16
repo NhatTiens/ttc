@@ -37,6 +37,10 @@ process.env.DATABASE_URL = testDatabaseUrl;
 
 async function reset() {
   const db = getDb();
+
+  // Keep Work 06 tests isolated from Work 04/05 because all backend test files
+  // intentionally share TEST_DATABASE_URL with test-concurrency=1.
+  // Delete children before parents so FK constraints cannot leak state between suites.
   await db.providerRequestLease.deleteMany();
   await db.providerJob.deleteMany();
   await db.providerOperationLog.deleteMany();
@@ -47,15 +51,27 @@ async function reset() {
   await db.providerPriceHistory.deleteMany();
   await db.providerService.deleteMany();
   await db.provider.deleteMany();
+
   await db.adminAuditLog.deleteMany();
+  await db.servicePriceHistory.deleteMany();
+  await db.paymentEvent.deleteMany();
+  await db.payment.deleteMany();
   await db.walletTransaction.deleteMany();
   await db.orderLog.deleteMany();
+  await db.supportMessage.deleteMany();
+  await db.deposit.deleteMany();
   await db.order.deleteMany();
-  await db.wallet.deleteMany();
+  await db.supportTicket.deleteMany();
+  await db.passwordResetToken.deleteMany();
+  await db.session.deleteMany();
+  await db.account.deleteMany();
   await db.notificationPreference.deleteMany();
+  await db.wallet.deleteMany();
   await db.user.deleteMany();
+
   await db.service.deleteMany();
   await db.serviceCategory.deleteMany();
+  await db.depositMethod.deleteMany();
   await db.systemSetting.deleteMany();
 
   await db.serviceCategory.create({ data: { id: "work6-cat", name: "Work 06", enabled: true } });

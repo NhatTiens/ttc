@@ -9,7 +9,7 @@ import { SearchInput, Select } from "@/components/ui/form-controls";
 import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
 import { Pagination, ResponsiveTable, type TableColumn } from "@/components/ui/table";
 import { useAsyncResource } from "@/hooks/use-async-resource";
-import { formatCurrency, formatDateTime, formatProviderMoney } from "@/lib/format";
+import { formatDateTime, formatProviderMoney } from "@/lib/format";
 import { adminService } from "@/services/admin-service";
 import type { AdminProvider } from "@/domain/admin";
 

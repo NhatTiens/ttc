@@ -20,7 +20,8 @@ const platforms: Array<{ value: SocialPlatform | "all"; label: string }> = [
   { value: "tiktok", label: "TikTok" },
   { value: "instagram", label: "Instagram" },
   { value: "youtube", label: "YouTube" },
-  { value: "threads", label: "Threads" }
+  { value: "threads", label: "Threads" },
+  { value: "google", label: "Google Maps" }
 ];
 
 const columns: TableColumn<Service>[] = [

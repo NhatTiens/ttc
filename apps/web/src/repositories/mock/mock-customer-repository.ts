@@ -28,8 +28,8 @@ export const mockCustomerRepository: CustomerRepository = {
     const counts = mockOrders.reduce<Record<SocialPlatform, number>>((result, order) => {
       result[order.platform] += 1;
       return result;
-    }, { facebook: 0, tiktok: 0, instagram: 0, youtube: 0, threads: 0 });
-    const popularPlatform = (Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "facebook") as SocialPlatform;
+    }, { facebook: 0, tiktok: 0, instagram: 0, youtube: 0, threads: 0, google: 0 });
+    const popularPlatform = ((Object.entries(counts) as Array<[SocialPlatform, number]>).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "facebook") as SocialPlatform;
     return {
       profile: { ...mockProfile },
       wallet: { ...mockWallet },

@@ -47,7 +47,7 @@ test("TTC service sync uses documented services form action and converts XU rate
     ]), { status: 200, headers: { "Content-Type": "application/json" } });
   };
   try {
-    const adapter = new TTCProviderAdapter({ apiKey: "fake-key", xuToVndRate: "1000" });
+    const adapter = new TTCProviderAdapter({ apiKey: "fake-key", xuToVndRate: "1000", rateInputUnit: 1000, rateUnit: 1000 });
     const services = await adapter.getServices();
     assert.match(requestBody, /(^|&)key=fake-key(&|$)/);
     assert.match(requestBody, /(^|&)action=services(&|$)/);
@@ -58,6 +58,27 @@ test("TTC service sync uses documented services form action and converts XU rate
     assert.equal(services[0]?.platform, "YOUTUBE");
     assert.equal(services[0]?.status, "AVAILABLE");
     assert.equal(services[1]?.status, "UNAVAILABLE");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("TTC per-item XU rate normalizes to VND per 1000", async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify([
+    { service: 23, name: "Tăng like fanpage Facebook", type: "Default", category: "Facebook", rate: "1800", min: "50", max: "10000000", refill: false, cancel: true }
+  ]), { status: 200, headers: { "Content-Type": "application/json" } });
+  try {
+    const adapter = new TTCProviderAdapter({
+      apiKey: "fake-key",
+      xuToVndRate: "0.0175",
+      rateInputUnit: 1,
+      rateUnit: 1000
+    });
+    const [service] = await adapter.getServices();
+    assert.equal(service?.providerRateMinor, 31_500n);
+    assert.equal(service?.rateUnit, 1000);
+    assert.equal(service?.supportsCancel, true);
   } finally {
     globalThis.fetch = originalFetch;
   }

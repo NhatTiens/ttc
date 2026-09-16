@@ -10,7 +10,8 @@ const platformNames: Record<SocialPlatform, string> = {
   tiktok: "TikTok",
   instagram: "Instagram",
   youtube: "YouTube",
-  threads: "Threads"
+  threads: "Threads",
+  google: "Google Maps"
 };
 
 export function platformName(platform: SocialPlatform) {

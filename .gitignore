@@ -8,3 +8,5 @@ coverage
 .DS_Store
 *.log
 qa/screenshots/*.png
+qa/ttc-services-raw.json
+qa/ttc-services-raw.tsv

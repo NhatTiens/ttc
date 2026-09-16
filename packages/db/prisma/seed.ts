@@ -18,19 +18,33 @@ const categories = [
 ] as const;
 
 const services = [
-  ["svc_fb_follow_01", "FB-FOLLOW-01", SocialPlatform.FACEBOOK, "followers", "Người theo dõi Facebook - Tiêu chuẩn", "Tăng người theo dõi ổn định cho trang cá nhân và fanpage công khai.", 32000n, 100, 100000, "0–24 giờ", ServiceStatus.ACTIVE, true],
-  ["svc_fb_like_01", "FB-LIKE-01", SocialPlatform.FACEBOOK, "likes", "Lượt thích bài viết Facebook", "Tăng lượt thích và cảm xúc cho bài viết Facebook công khai.", 18000n, 50, 50000, "0–6 giờ", ServiceStatus.ACTIVE, true],
-  ["svc_fb_comment_01", "FB-CMT-01", SocialPlatform.FACEBOOK, "comments", "Bình luận Facebook tùy chỉnh", "Bình luận theo nội dung tùy chỉnh được gửi cùng đơn hàng.", 145000n, 10, 2000, "0–24 giờ", ServiceStatus.DISABLED, false],
-  ["svc_tt_follow_01", "TT-FOLLOW-01", SocialPlatform.TIKTOK, "followers", "Người theo dõi TikTok - Nhanh", "Tăng người theo dõi nhanh, hỗ trợ bù dần theo cấu hình.", 29000n, 100, 200000, "0–12 giờ", ServiceStatus.ACTIVE, true],
-  ["svc_tt_like_01", "TT-LIKE-01", SocialPlatform.TIKTOK, "likes", "Lượt thích video TikTok", "Tăng lượt thích cho video TikTok công khai.", 9500n, 100, 500000, "0–4 giờ", ServiceStatus.ACTIVE, true],
-  ["svc_tt_view_01", "TT-VIEW-01", SocialPlatform.TIKTOK, "views", "Lượt xem video TikTok", "Tăng lượt xem số lượng lớn cho video TikTok công khai.", 1800n, 1000, 5000000, "0–3 giờ", ServiceStatus.ACTIVE, true],
-  ["svc_ig_follow_01", "IG-FOLLOW-01", SocialPlatform.INSTAGRAM, "followers", "Người theo dõi Instagram", "Tăng người theo dõi cho tài khoản Instagram công khai.", 42000n, 100, 100000, "0–24 giờ", ServiceStatus.ACTIVE, false],
-  ["svc_ig_like_01", "IG-LIKE-01", SocialPlatform.INSTAGRAM, "likes", "Lượt thích bài viết Instagram", "Tăng lượt thích cho bài viết và Reels công khai.", 12000n, 50, 100000, "0–6 giờ", ServiceStatus.ACTIVE, false],
-  ["svc_ig_view_01", "IG-VIEW-01", SocialPlatform.INSTAGRAM, "views", "Lượt xem Instagram Reels", "Tăng lượt xem cho Instagram Reels công khai.", 4500n, 500, 1000000, "0–12 giờ", ServiceStatus.MAINTENANCE, false],
-  ["svc_yt_sub_01", "YT-SUB-01", SocialPlatform.YOUTUBE, "followers", "Người đăng ký YouTube", "Tăng người đăng ký cho kênh YouTube công khai.", 168000n, 50, 50000, "1–3 ngày", ServiceStatus.ACTIVE, false],
-  ["svc_yt_view_01", "YT-VIEW-01", SocialPlatform.YOUTUBE, "views", "Lượt xem video YouTube", "Tăng lượt xem cho video YouTube công khai.", 26000n, 500, 1000000, "0–48 giờ", ServiceStatus.ACTIVE, false],
-  ["svc_th_follow_01", "TH-FOLLOW-01", SocialPlatform.THREADS, "followers", "Người theo dõi Threads", "Tăng người theo dõi cho tài khoản Threads công khai.", 56000n, 100, 50000, "0–24 giờ", ServiceStatus.ACTIVE, false],
-  ["svc_th_like_01", "TH-LIKE-01", SocialPlatform.THREADS, "likes", "Lượt thích bài viết Threads", "Tăng lượt thích cho bài viết Threads công khai.", 17000n, 50, 50000, "0–8 giờ", ServiceStatus.ACTIVE, false]
+  ["svc_fb_like_01", "FB-LIKE-01", SocialPlatform.FACEBOOK, "likes", "Like bài viết Facebook - Chất lượng cao", "Tăng LIKE cho bài viết Facebook công khai bằng dịch vụ TTC chất lượng cao.", 43000n, 50, 10000000, "0–6 giờ", ServiceStatus.ACTIVE, true],
+  ["svc_fb_comment_like_01", "FB-CMT-LIKE-01", SocialPlatform.FACEBOOK, "likes", "Like bình luận Facebook", "Tăng LIKE cho bình luận Facebook công khai.", 26000n, 50, 10000000, "0–6 giờ", ServiceStatus.ACTIVE, false],
+  ["svc_fb_comment_01", "FB-CMT-01", SocialPlatform.FACEBOOK, "comments", "Bình luận Facebook tùy chỉnh", "Dịch vụ TTC Custom Comments; chờ bổ sung trường nội dung bình luận vào đơn hàng.", 71000n, 10, 10000000, "0–24 giờ", ServiceStatus.DISABLED, false],
+  ["svc_fb_page_like_01", "FB-PAGE-LIKE-01", SocialPlatform.FACEBOOK, "likes", "Like Fanpage Facebook", "Tăng lượt thích cho Fanpage Facebook công khai.", 43000n, 50, 10000000, "0–24 giờ", ServiceStatus.ACTIVE, true],
+  ["svc_fb_follow_01", "FB-FOLLOW-01", SocialPlatform.FACEBOOK, "followers", "Theo dõi Facebook", "Tăng người theo dõi Facebook bằng TTC.", 31000n, 50, 10000000, "0–24 giờ", ServiceStatus.ACTIVE, true],
+  ["svc_fb_follow_vip_01", "FB-FOLLOW-VIP-01", SocialPlatform.FACEBOOK, "followers", "Theo dõi Facebook VIP", "Tăng người theo dõi Facebook VIP.", 45000n, 50, 10000000, "0–24 giờ", ServiceStatus.ACTIVE, true],
+  ["svc_fb_group_member_01", "FB-GROUP-MEMBER-01", SocialPlatform.FACEBOOK, "followers", "Thành viên nhóm Facebook", "Tăng thành viên cho nhóm Facebook.", 47500n, 50, 10000000, "0–24 giờ", ServiceStatus.ACTIVE, false],
+  ["svc_fb_page_review_01", "FB-PAGE-REVIEW-01", SocialPlatform.FACEBOOK, "comments", "Đánh giá Page Facebook", "Dịch vụ TTC Custom Comments; chờ bổ sung nội dung đánh giá vào đơn hàng.", 59500n, 20, 10000000, "0–24 giờ", ServiceStatus.DISABLED, false],
+
+  ["svc_tt_like_01", "TT-LIKE-01", SocialPlatform.TIKTOK, "likes", "Like video TikTok", "Tăng TYM TikTok chất lượng cao.", 24000n, 50, 10000000, "0–4 giờ", ServiceStatus.ACTIVE, true],
+  ["svc_tt_save_01", "TT-SAVE-01", SocialPlatform.TIKTOK, "likes", "Lưu / Yêu thích video TikTok", "Tăng SAVE video TikTok.", 20500n, 50, 10000000, "0–4 giờ", ServiceStatus.ACTIVE, false],
+  ["svc_tt_share_01", "TT-SHARE-01", SocialPlatform.TIKTOK, "shares", "Chia sẻ video TikTok", "Tăng SHARE video TikTok.", 25000n, 50, 10000000, "0–4 giờ", ServiceStatus.ACTIVE, false],
+  ["svc_tt_view_01", "TT-VIEW-01", SocialPlatform.TIKTOK, "views", "Lượt xem video TikTok", "Tăng VIEW TikTok số lượng lớn.", 6000n, 1000, 10000000, "0–3 giờ", ServiceStatus.ACTIVE, true],
+  ["svc_tt_comment_01", "TT-CMT-01", SocialPlatform.TIKTOK, "comments", "Bình luận TikTok tùy chỉnh", "Dịch vụ TTC Custom Comments; chờ bổ sung trường nội dung bình luận vào đơn hàng.", 83000n, 10, 10000000, "0–24 giờ", ServiceStatus.DISABLED, false],
+  ["svc_tt_follow_01", "TT-FOLLOW-01", SocialPlatform.TIKTOK, "followers", "Theo dõi TikTok - Chất lượng cao nhất", "Tăng follow TikTok chất lượng cao nhất, ít tụt.", 83000n, 50, 10000000, "0–12 giờ", ServiceStatus.ACTIVE, true],
+
+  ["svc_yt_comment_01", "YT-CMT-01", SocialPlatform.YOUTUBE, "comments", "Bình luận YouTube tùy chỉnh", "Dịch vụ TTC Custom Comments; chờ bổ sung trường nội dung bình luận vào đơn hàng.", 83000n, 15, 10000000, "0–48 giờ", ServiceStatus.DISABLED, false],
+  ["svc_google_review_01", "GOOGLE-REVIEW-01", SocialPlatform.GOOGLE, "comments", "Đánh giá Google Maps", "Dịch vụ TTC Custom Comments; chờ bổ sung nội dung đánh giá vào đơn hàng.", 2362500n, 5, 10000000, "0–48 giờ", ServiceStatus.DISABLED, false],
+
+  // Legacy/mock catalog retained as disabled so old orders keep valid foreign keys/history.
+  ["svc_ig_follow_01", "IG-FOLLOW-01", SocialPlatform.INSTAGRAM, "followers", "Người theo dõi Instagram", "Legacy catalog - không có mapping TTC hiện tại.", 42000n, 100, 100000, "0–24 giờ", ServiceStatus.DISABLED, false],
+  ["svc_ig_like_01", "IG-LIKE-01", SocialPlatform.INSTAGRAM, "likes", "Lượt thích bài viết Instagram", "Legacy catalog - không có mapping TTC hiện tại.", 12000n, 50, 100000, "0–6 giờ", ServiceStatus.DISABLED, false],
+  ["svc_ig_view_01", "IG-VIEW-01", SocialPlatform.INSTAGRAM, "views", "Lượt xem Instagram Reels", "Legacy catalog - không có mapping TTC hiện tại.", 4500n, 500, 1000000, "0–12 giờ", ServiceStatus.DISABLED, false],
+  ["svc_yt_sub_01", "YT-SUB-01", SocialPlatform.YOUTUBE, "followers", "Người đăng ký YouTube", "Không có dịch vụ Subscriber tương ứng trong TTC API hiện tại.", 168000n, 50, 50000, "1–3 ngày", ServiceStatus.DISABLED, false],
+  ["svc_yt_view_01", "YT-VIEW-01", SocialPlatform.YOUTUBE, "views", "Lượt xem video YouTube", "Legacy catalog - không có mapping TTC hiện tại.", 26000n, 500, 1000000, "0–48 giờ", ServiceStatus.DISABLED, false],
+  ["svc_th_follow_01", "TH-FOLLOW-01", SocialPlatform.THREADS, "followers", "Người theo dõi Threads", "Legacy catalog - không có mapping TTC hiện tại.", 56000n, 100, 50000, "0–24 giờ", ServiceStatus.DISABLED, false],
+  ["svc_th_like_01", "TH-LIKE-01", SocialPlatform.THREADS, "likes", "Lượt thích bài viết Threads", "Legacy catalog - không có mapping TTC hiện tại.", 17000n, 50, 50000, "0–8 giờ", ServiceStatus.DISABLED, false]
 ] as const;
 
 async function main() {
@@ -174,7 +188,7 @@ async function main() {
     if (!existingOrder) {
       await db.$transaction(async (tx) => {
         const currentWallet = await tx.wallet.findUniqueOrThrow({ where: { id: wallet.id } });
-        const charge = 3200n;
+        const charge = 3100n;
         const order = await tx.order.create({
           data: {
             publicId: sampleOrderPublicId,

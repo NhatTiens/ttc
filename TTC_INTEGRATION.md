@@ -132,3 +132,17 @@ npm run qa:ttc:order
 ```
 
 This can spend TTC provider balance. It must not be used with production customer data unintentionally.
+
+
+## TTC raw-rate normalization (verified 2026-09)
+
+Live TTC service audit returned rates such as Facebook Like = 1800 XU and TikTok View = 250 XU for one requested unit.
+For this deployment:
+
+- `TTC_XU_TO_VND_RATE=0.0175`
+- `TTC_RATE_INPUT_UNIT=1`
+- `TTC_RATE_UNIT=1000`
+
+The adapter normalizes provider cost to VND per 1,000 internal units before ProviderService persistence.
+Example: 1800 XU x 0.0175 VND/XU x 1000 = 31,500 VND per 1,000.
+Custom Comments services are synced but remain unavailable for automatic ordering until the customer Order input model carries the required comments/text payload.

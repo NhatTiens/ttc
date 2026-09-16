@@ -48,7 +48,7 @@ export interface NormalizedProviderService {
   externalServiceId: string;
   name: string;
   category?: string;
-  platform?: "FACEBOOK" | "TIKTOK" | "INSTAGRAM" | "YOUTUBE" | "THREADS";
+  platform?: "FACEBOOK" | "TIKTOK" | "INSTAGRAM" | "YOUTUBE" | "THREADS" | "GOOGLE";
   providerRateMinor: bigint;
   rateUnit: number;
   currency: string;

@@ -1,13 +1,14 @@
 import { cn } from "@/lib/cn";
 
-export type Platform = "facebook" | "tiktok" | "instagram" | "youtube" | "threads";
+export type Platform = "facebook" | "tiktok" | "instagram" | "youtube" | "threads" | "google";
 
 const labels: Record<Platform, string> = {
   facebook: "Facebook",
   tiktok: "TikTok",
   instagram: "Instagram",
   youtube: "YouTube",
-  threads: "Threads"
+  threads: "Threads",
+  google: "Google Maps"
 };
 
 export function PlatformIcon({ platform, size = "md", className }: { platform: Platform; size?: "sm" | "md" | "lg"; className?: string }) {
@@ -18,6 +19,7 @@ export function PlatformIcon({ platform, size = "md", className }: { platform: P
       {platform === "instagram" && <span className="platform-glyph platform-glyph--instagram">◎</span>}
       {platform === "youtube" && <span className="platform-glyph platform-glyph--youtube">▶</span>}
       {platform === "threads" && <span className="platform-glyph platform-glyph--threads">@</span>}
+      {platform === "google" && <span className="platform-glyph platform-glyph--google">G</span>}
     </span>
   );
 }

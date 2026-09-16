@@ -4,7 +4,7 @@ import type {
 } from "@tuong-tac-pro/db";
 import { moneyToSafeNumber } from "@tuong-tac-pro/domain";
 
-const platformMap = { FACEBOOK: "facebook", TIKTOK: "tiktok", INSTAGRAM: "instagram", YOUTUBE: "youtube", THREADS: "threads" } as const;
+const platformMap = { FACEBOOK: "facebook", TIKTOK: "tiktok", INSTAGRAM: "instagram", YOUTUBE: "youtube", THREADS: "threads", GOOGLE: "google" } as const;
 const serviceStatusMap = { ACTIVE: "Active", MAINTENANCE: "Maintenance", DISABLED: "Paused" } as const;
 const orderStatusMap = {
   PENDING: "Pending", VALIDATING: "Processing", SUBMITTED: "Processing", PROCESSING: "Processing", COMPLETED: "Completed",

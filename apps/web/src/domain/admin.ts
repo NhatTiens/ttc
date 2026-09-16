@@ -2,7 +2,7 @@ export type AdminPage<T> = { items: T[]; page: number; pageSize: number; total: 
 export type AdminUserStatus = "ACTIVE" | "SUSPENDED";
 export type AdminOrderStatus = "PENDING" | "VALIDATING" | "SUBMITTED" | "PROCESSING" | "COMPLETED" | "PARTIAL" | "FAILED" | "CANCELLED" | "REFUNDED";
 export type AdminServiceStatus = "ACTIVE" | "MAINTENANCE" | "DISABLED";
-export type AdminPlatform = "FACEBOOK" | "TIKTOK" | "INSTAGRAM" | "YOUTUBE" | "THREADS";
+export type AdminPlatform = "FACEBOOK" | "TIKTOK" | "INSTAGRAM" | "YOUTUBE" | "THREADS" | "GOOGLE";
 export type AdminDepositStatus = "PENDING" | "CONFIRMED" | "FAILED" | "CANCELLED" | "REFUNDED";
 export type AdminSupportStatus = "OPEN" | "WAITING_CUSTOMER" | "WAITING_SUPPORT" | "RESOLVED" | "CLOSED";
 
