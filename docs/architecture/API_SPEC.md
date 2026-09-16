@@ -371,3 +371,17 @@ Cursor pagination preferred for orders/transactions/logs:
 ```
 
 Admin analytics may use date-range aggregation endpoints.
+
+---
+
+## Work 04 implementation note
+
+Work 04 implements the customer subset at `/api/v1` using the response envelope defined above. Current implemented endpoints are documented in root `API_IMPLEMENTATION.md`.
+
+For Work 04 customer lists, `services` and `orders` validate optional `page`/`pageSize` with a maximum page size of 200 while preserving the Work 03 array response expected by the accepted UI. A later API evolution may introduce cursor pagination with a versioned response without silently breaking the customer repository contract.
+
+`POST /api/v1/orders` and `POST /api/v1/deposits` require `Idempotency-Key`. Customer ownership is always derived from the authenticated Auth.js session, never request `userId`.
+
+Credentials auth in Work 04 uses Auth.js JWT sessions plus database `sessionVersion` revalidation. See `AUTH_IMPLEMENTATION.md` for the controlled deviation from the earlier database-session preference.
+
+The architecture's future `/orders/quote`/price-version workflow is not activated in Work 04. Work 04 `POST /api/v1/orders` resolves the current Service price and calculates the charge on the server inside the order transaction. Quote/version behavior belongs to the later pricing/provider expansion and is not simulated here.

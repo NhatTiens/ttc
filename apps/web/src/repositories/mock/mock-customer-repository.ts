@@ -223,5 +223,7 @@ export const mockCustomerRepository: CustomerRepository = {
   async requestPasswordReset(email: string) {
     await delay(480);
     if (!email) throw new Error("Vui lòng nhập email.");
-  }
+  },
+
+  async logout() { await delay(80); }
 };

@@ -1,8 +1,47 @@
-# Tương Tác Pro — Customer Application
+# Tương Tác Pro
 
-Work 3 builds the complete customer-facing application on top of the approved Architecture and Work 2 Design System/AppShell. The existing design tokens, shell behavior, shared components, responsive breakpoints, and `/design-system` route are preserved.
+Work 03 Customer Application is accepted. Work 04 integrates that UI with a real REST backend and PostgreSQL while keeping Admin, provider integration, Tương Tác Chéo, and real payment gateways out of scope.
 
-This checkpoint intentionally does **not** implement the Admin application, real provider API adapters, a real payment gateway, or production deployment.
+## Current architecture
+
+```text
+Next.js Customer UI
+  -> CustomerService
+    -> CustomerRepository
+      -> RESTCustomerRepository
+        -> /api/v1
+          -> Auth / Zod / Domain rules
+            -> Prisma
+              -> PostgreSQL
+```
+
+`MockCustomerRepository` remains for isolated preview/test purposes only. Production/default `CustomerService` uses `RESTCustomerRepository`.
+
+## Workspaces
+
+```text
+apps/web                 Next.js customer UI + Auth.js + REST API
+packages/db              Prisma schema/client/migrations/seed
+packages/domain          money/order/wallet/support business rules
+docs/architecture        approved architecture documents
+qa                       Work 03 + Work 04 contract/runtime scripts
+```
+
+## Work 04 implemented areas
+
+- register/login/logout with Argon2id credentials and Auth.js session;
+- server-side session revalidation using user status/role/sessionVersion;
+- protected customer routes;
+- customer profile/password/notification preferences in PostgreSQL;
+- service catalog seeded from Work 03;
+- atomic order creation, server-side price calculation, wallet debit, PURCHASE ledger and OrderLog;
+- Serializable/conditional-update concurrency protection;
+- order and deposit idempotency keys;
+- real wallet and transaction history;
+- PENDING deposit requests without wallet credit;
+- support tickets/messages with ownership checks;
+- `RESTCustomerRepository` without page rewrites;
+- Payment/PaymentEvent schema readiness only, with no fake gateway behavior.
 
 ## Customer routes
 
@@ -23,100 +62,118 @@ This checkpoint intentionally does **not** implement the Admin application, real
 /login
 /register
 /forgot-password
+/design-system
 ```
 
-Compatibility aliases retained from the architecture checkpoint:
+Compatibility redirects from Work 03 remain in place.
+
+## Requirements
+
+- Node.js 22+
+- npm
+- PostgreSQL, or Docker with Compose
+
+## Environment
+
+Copy the example file and replace `AUTH_SECRET`:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+At minimum configure:
 
 ```text
-/orders/new           -> /order/new
-/wallet               -> /wallet/history
-/wallet/transactions  -> /wallet/history
-/account               -> /profile
-/account/security      -> /profile
-/account/sessions      -> /profile
+DATABASE_URL
+TEST_DATABASE_URL
+AUTH_SECRET
 ```
 
-## Data architecture
+`.env` and other secret env files are ignored by Git.
 
-Customer pages do not import mock records directly. The dependency direction is:
+## Local PostgreSQL
 
-```text
-Page / reusable customer component
-  -> CustomerService
-    -> CustomerRepository interface
-      -> MockCustomerRepository (Work 3)
-      -> RESTCustomerRepository (future backend adapter)
+```bash
+docker compose -f docker-compose.work4.yml up -d
 ```
 
-The mock implementation lives under `src/repositories/mock/`. When the real REST API is ready, UI pages can keep the same service/domain contracts and swap the repository implementation.
+The compose setup creates `tuong_tac_pro`; on a fresh volume its init script also creates `tuong_tac_pro_test` for backend integration tests.
 
-## What is implemented
-
-- Dashboard with balance, order KPIs, spend, popular platform/services, and recent orders.
-- Searchable/filterable services catalog for Facebook, TikTok, Instagram, YouTube, and Threads.
-- New-order workflow with platform/service selection, link validation, quantity min/max validation, calculated cost, balance check, confirmation modal, submit loading state, and success state.
-- Order history with search, status/platform/date filters, pagination, responsive table/cards.
-- Order detail with financial/quantity fields and status timeline.
-- Config-driven wallet deposit UI without a real payment provider.
-- Wallet transaction history covering deposit, purchase, refund, and adjustment.
-- Full pricing view.
-- Support ticket list, ticket creation, and customer/admin conversation thread.
-- Profile page with personal details, password/security state, and notification preferences.
-- Login, register, and forgot-password flows backed by the mock service layer.
-- Loading, empty, error, disabled/submitting, and success states where applicable.
-- Responsive behavior for 1440, 1280, 1024, 768, 430, 390, and 375 px.
-
-## Important source areas
-
-```text
-apps/web/src/
-  app/
-    (app)/             customer pages + preserved /design-system
-    (auth)/            authentication pages
-  components/
-    customer/          customer-specific reusable composition
-    layout/            existing AppShell/Sidebar/Topbar/MobileNavigation
-    ui/                approved design-system primitives
-  domain/customer.ts
-  repositories/
-    customer-repository.ts
-    mock/
-  services/customer-service.ts
-  validation/customer.ts
-  hooks/use-async-resource.ts
-  lib/format.ts
-```
-
-## Commands
-
-When dependencies are installed:
+## Install and database setup
 
 ```bash
 npm install
+npm run db:validate
+npm run db:migrate
+npm run db:seed
+```
+
+`npm install` runs Prisma client generation. Production migration strategy is `prisma migrate deploy`; do not replace it with `db push`.
+
+Development seed defaults (development only):
+
+```text
+minh@example.com
+demo1234
+```
+
+Override them with `SEED_DEVELOPMENT_EMAIL` and `SEED_DEVELOPMENT_PASSWORD`.
+
+## Run
+
+```bash
 npm run dev:web
+```
+
+Open `http://localhost:3000`.
+
+## Work 04 test/QA commands
+
+```bash
+npm run test:backend
 npm run lint:web
 npm run typecheck:web
 npm run build:web
-```
-
-Dependency-free checks used in this execution environment:
-
-```bash
 npm run check:offline
 ```
 
-A static dashboard visual harness is also included at:
+With the dev server running:
 
-```text
-preview/customer-app/dashboard.html
+```bash
+npm run qa:work4:api
 ```
 
-It is only a visual/runtime fallback for environments without Next.js dependencies; the real implementation remains the Next.js source under `apps/web`.
+For the required persistence-after-restart checkpoint, restart Next.js, set `WORK4_EXPECT_ORDER`, `WORK4_EXPECT_DEPOSIT`, `WORK4_EXPECT_TICKET`, and `WORK4_EXPECT_PHONE` to values produced by the smoke test, then run:
+
+```bash
+npm run qa:work4:persistence
+```
+
+## Database scripts
+
+```text
+npm run db:generate
+npm run db:validate
+npm run db:migrate
+npm run db:migrate:dev
+npm run db:seed
+npm run db:studio
+```
+
+## Documentation
+
+```text
+WORK4_BACKEND.md
+DATABASE_IMPLEMENTATION.md
+API_IMPLEMENTATION.md
+AUTH_IMPLEMENTATION.md
+WALLET_LEDGER.md
+WORK4_QA_REPORT.md
+
+docs/architecture/API_SPEC.md
+docs/architecture/DATABASE_SCHEMA.md
+```
 
 ## Scope boundary
 
-Do not treat this checkpoint as authorization to start `/admin`, connect a live provider, connect a live payment gateway, or deploy production infrastructure. Those remain later phases.
-
-### Luu y ve `check:offline`
-
-`check:offline` khong goi backend/provider/payment services, nhung van can `npm install` de co TypeScript va type definitions cua React/Next.js. File `src/validation/framework-stubs.d.ts` chi la fallback phuc vu validation trong moi truong dong goi, va duoc loai khoi `tsconfig.offline.json` de tranh xung dot voi `@types/react`/Next.js sau khi dependencies da duoc cai.
+Work 04 does not add `/admin`, call any social engagement provider, connect Tương Tác Chéo, simulate provider completion, or confirm a payment. A new order remains `PENDING`; a new deposit remains `PENDING` and does not credit the wallet.

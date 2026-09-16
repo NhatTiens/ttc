@@ -19,6 +19,9 @@ export function CustomerSessionProvider({ children }: { children: ReactNode }) {
     customerService.getShellData().then((value) => {
       if (!active) return;
       setSession({ profile: value.profile, wallet: value.wallet, settledRevision: revision });
+    }).catch(() => {
+      if (!active) return;
+      setSession({ profile: null, wallet: null, settledRevision: revision });
     });
     return () => { active = false; };
   }, [revision]);

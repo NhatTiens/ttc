@@ -6,11 +6,10 @@ import { Card } from "@/components/ui/card";
 import { OrderStatus, orderStatusLabel } from "@/components/ui/badge";
 import { ErrorState, LoadingState } from "@/components/ui/states";
 import { DetailGrid, PlatformLabel } from "@/components/customer/customer-ui";
-import { CheckIcon, ClockIcon, ExternalLinkIcon } from "@/components/ui/icons";
+import { CheckIcon, ExternalLinkIcon } from "@/components/ui/icons";
 import { customerService } from "@/services/customer-service";
 import { useAsyncResource } from "@/hooks/use-async-resource";
 import { formatCurrency, formatDateTime, formatNumber } from "@/lib/format";
-import { cn } from "@/lib/cn";
 
 export function OrderDetailView({ orderId }: { orderId: string }) {
   const resource = useAsyncResource(() => customerService.getOrder(orderId), orderId);
@@ -19,15 +18,12 @@ export function OrderDetailView({ orderId }: { orderId: string }) {
   if (!resource.data) return <ErrorState title="Không tìm thấy đơn hàng" description="Mã đơn này không tồn tại trong dữ liệu hiện tại." />;
 
   const order = resource.data;
-  const submitted = order.status !== "Pending" && order.status !== "Failed";
-  const processing = ["Processing", "Completed", "Partial", "Refunded"].includes(order.status);
-  const terminal = ["Completed", "Failed", "Cancelled", "Partial", "Refunded"].includes(order.status);
-  const timeline = [
-    { label: "Đã tạo", done: true, detail: formatDateTime(order.createdAt) },
-    { label: "Đã gửi", done: submitted, detail: submitted ? "Nhà cung cấp đã xác nhận tiếp nhận" : "Đang chờ gửi tới nhà cung cấp" },
-    { label: "Đang xử lý", done: processing, detail: processing ? "Nhà cung cấp đang xử lý đơn hàng" : "Chưa bắt đầu" },
-    { label: terminal ? orderStatusLabel(order.status) : "Trạng thái cuối", done: terminal, detail: terminal ? formatDateTime(order.updatedAt) : "Đang chờ hoàn tất" }
-  ];
+  const timeline = order.timeline?.length
+    ? order.timeline.map((event) => ({
+        label: orderStatusLabel(event.status),
+        detail: `${event.message} · ${formatDateTime(event.createdAt)}`
+      }))
+    : [{ label: orderStatusLabel(order.status), detail: `Đơn hàng được tạo lúc ${formatDateTime(order.createdAt)}` }];
 
   return (
     <div className="customer-page">
@@ -52,7 +48,7 @@ export function OrderDetailView({ orderId }: { orderId: string }) {
           <Card className="timeline-card">
             <h2>Tiến trình</h2>
             <ol className="order-timeline">
-              {timeline.map((item, index) => <li key={`${item.label}-${index}`} className={cn(item.done && "order-timeline__item--done")}><span className="order-timeline__icon">{item.done ? <CheckIcon size={15} /> : <ClockIcon size={15} />}</span><div><strong>{item.label}</strong><span>{item.detail}</span></div></li>)}
+              {timeline.map((item, index) => <li key={`${item.label}-${index}`} className="order-timeline__item--done"><span className="order-timeline__icon"><CheckIcon size={15} /></span><div><strong>{item.label}</strong><span>{item.detail}</span></div></li>)}
             </ol>
           </Card>
           <Card className="help-card"><h3>Cần hỗ trợ?</h3><p>Nếu đơn dừng ở một trạng thái quá lâu, hãy tạo yêu cầu hỗ trợ và kèm mã đơn để bộ phận hỗ trợ kiểm tra.</p><Link href="/support/new" className="button button--outline button--sm">Tạo yêu cầu hỗ trợ</Link></Card>

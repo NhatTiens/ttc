@@ -201,3 +201,7 @@ The Work 3 source is complete for customer application review. The remaining blo
 - Fixed `tsconfig.offline.json` so it no longer compiles `src/validation/framework-stubs.d.ts` together with the real React/Next.js type packages.
 - Root cause: the fallback declarations intentionally used `unknown` for `ReactNode`/JSX and a simplified `next/link` signature. Once `npm install` provided real framework types, declaration merging caused cascading JSX errors.
 - `check:offline` now uses installed React/Next.js typings while keeping the Next TypeScript plugin disabled and avoiding external/backend dependencies.
+
+## v3.0.3 build hotfix
+
+A real Next.js 16.3.5 build on Windows compiled and completed TypeScript, then failed while prerendering `/order/new` because `useSearchParams()` was outside a `Suspense` boundary. v3.0.3 wraps both app routes that use `useSearchParams()` (`/order/new` and `/services`) and updates the `typedRoutes` configuration. Offline lint and customer/responsive/component contract checks pass after the patch. A full framework build should be rerun on the dependency-installed machine.

@@ -43,7 +43,8 @@ for (const file of Object.values(requiredRoutes)) {
 }
 
 const service = read("services/customer-service.ts");
-expect("service does not use repository abstraction", service.includes("CustomerRepository") && service.includes("mockCustomerRepository"));
+expect("service does not use repository abstraction", service.includes("CustomerRepository") && service.includes("restCustomerRepository"));
+expect("production service still defaults to mock repository", !service.includes("mockCustomerRepository"));
 
 const navigation = read("content/navigation.ts");
 for (const href of ["/dashboard", "/services", "/pricing", "/order/new", "/orders", "/wallet", "/support", "/profile"]) expect(`sidebar navigation missing ${href}`, navigation.includes(`href: "${href}"`));

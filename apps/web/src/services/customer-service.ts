@@ -1,6 +1,6 @@
 import type { CustomerRepository } from "@/repositories/customer-repository";
 import type { OrderFilters, ServiceFilters } from "@/domain/customer";
-import { mockCustomerRepository } from "@/repositories/mock/mock-customer-repository";
+import { restCustomerRepository } from "@/repositories/rest-customer-repository";
 
 export class CustomerService {
   constructor(private readonly repository: CustomerRepository) {}
@@ -28,6 +28,7 @@ export class CustomerService {
   login(email: string, password: string) { return this.repository.login(email, password); }
   register(name: string, email: string, password: string) { return this.repository.register(name, email, password); }
   requestPasswordReset(email: string) { return this.repository.requestPasswordReset(email); }
+  logout() { return this.repository.logout(); }
 }
 
-export const customerService = new CustomerService(mockCustomerRepository);
+export const customerService = new CustomerService(restCustomerRepository);

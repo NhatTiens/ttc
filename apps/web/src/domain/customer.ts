@@ -37,6 +37,8 @@ export type Service = {
   popular?: boolean;
 };
 
+export type OrderTimelineEvent = { status: CustomerOrderStatus; message: string; createdAt: string };
+
 export type Order = {
   id: string;
   serviceId: string;
@@ -50,6 +52,7 @@ export type Order = {
   status: CustomerOrderStatus;
   createdAt: string;
   updatedAt: string;
+  timeline?: OrderTimelineEvent[];
 };
 
 export type DashboardData = {
@@ -109,7 +112,7 @@ export type DepositRequest = {
   id: string;
   methodId: string;
   amount: number;
-  status: "Pending";
+  status: "Pending" | "Confirmed" | "Failed" | "Cancelled" | "Refunded";
   createdAt: string;
 };
 

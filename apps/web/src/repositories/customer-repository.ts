@@ -42,4 +42,5 @@ export interface CustomerRepository {
   login(email: string, password: string): Promise<AuthResult>;
   register(name: string, email: string, password: string): Promise<AuthResult>;
   requestPasswordReset(email: string): Promise<void>;
+  logout(): Promise<void>;
 }

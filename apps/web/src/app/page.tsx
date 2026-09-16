@@ -1,2 +1,9 @@
 import { redirect } from "next/navigation";
-export default function HomePage() { redirect("/login"); }
+import { getOptionalAuthenticatedCustomer } from "@/server/auth-user";
+
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const user = await getOptionalAuthenticatedCustomer();
+  redirect(user ? "/dashboard" : "/login");
+}

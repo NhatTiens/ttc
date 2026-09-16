@@ -1,0 +1,402 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  CUSTOMER
+  SUPPORT
+  FINANCE
+  ADMIN
+}
+
+enum UserStatus {
+  PENDING_VERIFICATION
+  ACTIVE
+  SUSPENDED
+  CLOSED
+}
+
+enum SocialPlatform {
+  FACEBOOK
+  TIKTOK
+  INSTAGRAM
+  YOUTUBE
+  THREADS
+}
+
+enum ServiceStatus {
+  ACTIVE
+  MAINTENANCE
+  DISABLED
+}
+
+enum OrderStatus {
+  PENDING
+  VALIDATING
+  SUBMITTED
+  PROCESSING
+  COMPLETED
+  PARTIAL
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+enum WalletTransactionType {
+  DEPOSIT
+  PURCHASE
+  REFUND
+  ADJUSTMENT
+}
+
+enum WalletTransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum DepositMethodType {
+  BANK
+  QR
+  MANUAL
+}
+
+enum DepositStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+  REFUNDED
+}
+
+enum SupportTicketStatus {
+  OPEN
+  WAITING_CUSTOMER
+  WAITING_SUPPORT
+  RESOLVED
+  CLOSED
+}
+
+enum SupportSenderType {
+  CUSTOMER
+  ADMIN
+}
+
+model User {
+  id                       String                 @id @default(uuid()) @db.Uuid
+  email                    String                 @unique @db.VarChar(320)
+  passwordHash             String                 @map("password_hash") @db.Text
+  name                     String                 @db.VarChar(120)
+  phone                    String?                @db.VarChar(32)
+  role                     UserRole               @default(CUSTOMER)
+  status                   UserStatus             @default(ACTIVE)
+  emailVerifiedAt          DateTime?              @map("email_verified_at") @db.Timestamptz(3)
+  twoFactorEnabled         Boolean                @default(false) @map("two_factor_enabled")
+  lastPasswordChangeAt     DateTime               @default(now()) @map("last_password_change_at") @db.Timestamptz(3)
+  sessionVersion           Int                    @default(1) @map("session_version")
+  createdAt                DateTime               @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt                DateTime               @updatedAt @map("updated_at") @db.Timestamptz(3)
+  accounts                 Account[]
+  sessions                 Session[]
+  wallet                   Wallet?
+  notificationPreference   NotificationPreference?
+  orders                   Order[]
+  deposits                 Deposit[]
+  supportTickets           SupportTicket[]
+  supportMessages          SupportMessage[]       @relation("SupportMessageSender")
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(uuid()) @db.Uuid
+  userId            String  @map("user_id") @db.Uuid
+  type              String  @db.VarChar(64)
+  provider          String  @db.VarChar(128)
+  providerAccountId String  @map("provider_account_id") @db.VarChar(255)
+  refreshToken      String? @map("refresh_token") @db.Text
+  accessToken       String? @map("access_token") @db.Text
+  expiresAt         Int?    @map("expires_at")
+  tokenType         String? @map("token_type") @db.VarChar(64)
+  scope             String? @db.Text
+  idToken           String? @map("id_token") @db.Text
+  sessionState      String? @map("session_state") @db.VarChar(255)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(uuid()) @db.Uuid
+  sessionToken String   @unique @map("session_token") @db.VarChar(255)
+  userId       String   @map("user_id") @db.Uuid
+  expires      DateTime @db.Timestamptz(3)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String   @db.VarChar(320)
+  token      String   @unique @db.VarChar(255)
+  expires    DateTime @db.Timestamptz(3)
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  email     String    @db.VarChar(320)
+  tokenHash String    @unique @map("token_hash") @db.VarChar(255)
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz(3)
+  usedAt    DateTime? @map("used_at") @db.Timestamptz(3)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([email, expiresAt])
+  @@map("password_reset_tokens")
+}
+
+model Wallet {
+  id            String              @id @default(uuid()) @db.Uuid
+  userId        String              @unique @map("user_id") @db.Uuid
+  balanceMinor  BigInt              @default(0) @map("balance_minor")
+  reservedMinor BigInt              @default(0) @map("reserved_minor")
+  currency      String              @default("VND") @db.Char(3)
+  createdAt     DateTime            @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt     DateTime            @updatedAt @map("updated_at") @db.Timestamptz(3)
+  user          User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions  WalletTransaction[]
+
+  @@map("wallets")
+}
+
+model WalletTransaction {
+  id                 String                  @id @default(uuid()) @db.Uuid
+  walletId           String                  @map("wallet_id") @db.Uuid
+  type               WalletTransactionType
+  status             WalletTransactionStatus
+  amountMinor        BigInt                  @map("amount_minor")
+  balanceBeforeMinor BigInt                  @map("balance_before_minor")
+  balanceAfterMinor  BigInt                  @map("balance_after_minor")
+  referenceType      String?                 @map("reference_type") @db.VarChar(64)
+  referenceId        String?                 @map("reference_id") @db.VarChar(128)
+  description        String                  @db.VarChar(255)
+  idempotencyKey     String?                 @map("idempotency_key") @db.VarChar(128)
+  createdAt          DateTime                @default(now()) @map("created_at") @db.Timestamptz(3)
+  wallet             Wallet                  @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  @@unique([walletId, idempotencyKey])
+  @@index([walletId, createdAt(sort: Desc)])
+  @@index([referenceType, referenceId])
+  @@map("wallet_transactions")
+}
+
+model ServiceCategory {
+  id        String    @id @db.VarChar(64)
+  name      String    @db.VarChar(120)
+  sortOrder Int       @default(0) @map("sort_order")
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  services  Service[]
+
+  @@map("service_categories")
+}
+
+model Service {
+  id                   String          @id @db.VarChar(64)
+  code                 String          @unique @db.VarChar(64)
+  name                 String          @db.VarChar(180)
+  description          String          @db.Text
+  platform             SocialPlatform
+  categoryId           String          @map("category_id") @db.VarChar(64)
+  ratePerThousandMinor BigInt          @map("rate_per_thousand_minor")
+  min                  Int
+  max                  Int
+  averageTime          String          @map("average_time") @db.VarChar(80)
+  status               ServiceStatus   @default(ACTIVE)
+  popular              Boolean         @default(false)
+  createdAt            DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt            DateTime        @updatedAt @map("updated_at") @db.Timestamptz(3)
+  category             ServiceCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  orders               Order[]
+
+  @@index([platform, status])
+  @@index([categoryId, status])
+  @@map("services")
+}
+
+model Order {
+  id             String      @id @default(uuid()) @db.Uuid
+  publicId       String      @unique @map("public_id") @db.VarChar(32)
+  userId         String      @map("user_id") @db.Uuid
+  serviceId      String      @map("service_id") @db.VarChar(64)
+  targetUrl      String      @map("target_url") @db.Text
+  quantity       Int
+  chargeMinor    BigInt      @map("charge_minor")
+  startCount     Int?        @map("start_count")
+  remaining      Int
+  status         OrderStatus @default(PENDING)
+  idempotencyKey String      @map("idempotency_key") @db.VarChar(128)
+  requestFingerprint String  @map("request_fingerprint") @db.VarChar(64)
+  createdAt      DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime    @updatedAt @map("updated_at") @db.Timestamptz(3)
+  user           User        @relation(fields: [userId], references: [id], onDelete: Restrict)
+  service        Service     @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  logs           OrderLog[]
+
+  @@unique([userId, idempotencyKey])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([userId, status, createdAt(sort: Desc)])
+  @@index([serviceId, createdAt(sort: Desc)])
+  @@map("orders")
+}
+
+model OrderLog {
+  id         String       @id @default(uuid()) @db.Uuid
+  orderId    String       @map("order_id") @db.Uuid
+  fromStatus OrderStatus? @map("from_status")
+  toStatus   OrderStatus  @map("to_status")
+  message    String       @db.VarChar(255)
+  metadata   Json?
+  createdAt  DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  order      Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId, createdAt])
+  @@map("order_logs")
+}
+
+model DepositMethod {
+  id           String            @id @db.VarChar(64)
+  name         String            @db.VarChar(120)
+  type         DepositMethodType
+  description  String            @db.Text
+  minMinor     BigInt            @map("min_minor")
+  maxMinor     BigInt            @map("max_minor")
+  feeLabel     String            @map("fee_label") @db.VarChar(120)
+  enabled      Boolean           @default(true)
+  instructions Json
+  createdAt    DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deposits     Deposit[]
+
+  @@map("deposit_methods")
+}
+
+model Deposit {
+  id             String        @id @default(uuid()) @db.Uuid
+  publicId       String        @unique @map("public_id") @db.VarChar(32)
+  userId         String        @map("user_id") @db.Uuid
+  methodId       String        @map("method_id") @db.VarChar(64)
+  amountMinor    BigInt        @map("amount_minor")
+  status         DepositStatus @default(PENDING)
+  reference      String?       @db.VarChar(128)
+  idempotencyKey String        @map("idempotency_key") @db.VarChar(128)
+  createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
+  user           User          @relation(fields: [userId], references: [id], onDelete: Restrict)
+  method         DepositMethod @relation(fields: [methodId], references: [id], onDelete: Restrict)
+  payments       Payment[]
+
+  @@unique([userId, idempotencyKey])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([status, createdAt(sort: Desc)])
+  @@map("deposits")
+}
+
+model Payment {
+  id                String        @id @default(uuid()) @db.Uuid
+  depositId         String        @map("deposit_id") @db.Uuid
+  gateway           String        @db.VarChar(64)
+  externalPaymentId String?       @map("external_payment_id") @db.VarChar(255)
+  amountMinor       BigInt        @map("amount_minor")
+  currency          String        @default("VND") @db.Char(3)
+  status            PaymentStatus @default(PENDING)
+  idempotencyKey    String?       @unique @map("idempotency_key") @db.VarChar(128)
+  createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deposit           Deposit       @relation(fields: [depositId], references: [id], onDelete: Restrict)
+  events            PaymentEvent[]
+
+  @@unique([gateway, externalPaymentId])
+  @@index([depositId, createdAt(sort: Desc)])
+  @@map("payments")
+}
+
+model PaymentEvent {
+  id              String   @id @default(uuid()) @db.Uuid
+  paymentId       String?  @map("payment_id") @db.Uuid
+  gateway         String   @db.VarChar(64)
+  externalEventId String   @map("external_event_id") @db.VarChar(255)
+  payloadHash     String   @map("payload_hash") @db.VarChar(128)
+  payload         Json?
+  signatureValid  Boolean  @default(false) @map("signature_valid")
+  processedAt     DateTime? @map("processed_at") @db.Timestamptz(3)
+  errorCode       String?  @map("error_code") @db.VarChar(80)
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  payment         Payment? @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+
+  @@unique([gateway, externalEventId])
+  @@index([paymentId])
+  @@map("payment_events")
+}
+
+model SupportTicket {
+  id        String              @id @default(uuid()) @db.Uuid
+  publicId  String              @unique @map("public_id") @db.VarChar(32)
+  userId    String              @map("user_id") @db.Uuid
+  subject   String              @db.VarChar(180)
+  category  String              @db.VarChar(80)
+  status    SupportTicketStatus @default(OPEN)
+  createdAt DateTime            @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime            @updatedAt @map("updated_at") @db.Timestamptz(3)
+  user      User                @relation(fields: [userId], references: [id], onDelete: Restrict)
+  messages  SupportMessage[]
+
+  @@index([userId, updatedAt(sort: Desc)])
+  @@index([status, updatedAt(sort: Desc)])
+  @@map("support_tickets")
+}
+
+model SupportMessage {
+  id           String            @id @default(uuid()) @db.Uuid
+  ticketId     String            @map("ticket_id") @db.Uuid
+  senderType   SupportSenderType @map("sender_type")
+  senderUserId String?           @map("sender_user_id") @db.Uuid
+  body         String            @db.Text
+  createdAt    DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  ticket       SupportTicket     @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  senderUser   User?             @relation("SupportMessageSender", fields: [senderUserId], references: [id], onDelete: SetNull)
+
+  @@index([ticketId, createdAt])
+  @@index([senderUserId])
+  @@map("support_messages")
+}
+
+model NotificationPreference {
+  userId         String   @id @map("user_id") @db.Uuid
+  orderUpdates   Boolean  @default(true) @map("order_updates")
+  walletUpdates  Boolean  @default(true) @map("wallet_updates")
+  promotions     Boolean  @default(false)
+  supportReplies Boolean  @default(true) @map("support_replies")
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notification_preferences")
+}

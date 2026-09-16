@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -44,7 +45,8 @@ function PersonalForm({ profile, onSaved }: { profile: CustomerProfile; onSaved:
   return <Card className="form-card"><div className="profile-identity"><UserAvatar name={name} size="lg" /><div><strong>{name}</strong><span>Khách hàng từ {formatDateTime(profile.joinedAt)}</span></div></div><div className="profile-form-grid"><Input label="Họ và tên" value={name} error={errors.name} onChange={(event) => { setName(event.currentTarget.value); setErrors((current) => ({ ...current, name: undefined })); }} /><Input label="Email" type="email" value={email} error={errors.email} onChange={(event) => { setEmail(event.currentTarget.value); setErrors((current) => ({ ...current, email: undefined })); }} /><Input label="Số điện thoại" value={phone} onChange={(event) => setPhone(event.currentTarget.value)} /></div><div className="form-actions"><Button onClick={save} loading={saving}>Lưu thay đổi</Button></div></Card>;
 }
 
-function SecurityForm({ profile, onReload }: { profile: CustomerProfile; onReload: () => void }) {
+function SecurityForm({ profile }: { profile: CustomerProfile }) {
+  const router = useRouter();
   const { toast } = useToast();
   const [currentPassword, setCurrentPassword] = useState("");
   const [nextPassword, setNextPassword] = useState("");
@@ -62,8 +64,10 @@ function SecurityForm({ profile, onReload }: { profile: CustomerProfile; onReloa
     try {
       await customerService.changePassword(currentPassword, nextPassword);
       setCurrentPassword(""); setNextPassword(""); setConfirmPassword("");
-      onReload();
-      toast({ tone: "success", title: "Đã đổi mật khẩu" });
+      toast({ tone: "success", title: "Đã đổi mật khẩu", description: "Vui lòng đăng nhập lại bằng mật khẩu mới." });
+      await customerService.logout();
+      router.replace("/login?passwordChanged=1");
+      router.refresh();
     } catch (reason) {
       toast({ tone: "error", title: "Không thể đổi mật khẩu", description: reason instanceof Error ? reason.message : "Vui lòng thử lại." });
     } finally { setSaving(false); }
@@ -98,6 +102,7 @@ function NotificationForm({ profile, onSaved }: { profile: CustomerProfile; onSa
 }
 
 export default function ProfilePage() {
+  const router = useRouter();
   const resource = useAsyncResource(() => customerService.getProfile());
   const { refresh: refreshSession } = useCustomerSession();
   const [profileOverride, setProfileOverride] = useState<CustomerProfile | null>(null);
@@ -107,6 +112,11 @@ export default function ProfilePage() {
   if (!resource.data) return <ErrorState title="Không tìm thấy hồ sơ" description="Hồ sơ khách hàng hiện tại chưa khả dụng." />;
   const profile = profileOverride ?? resource.data;
   const handleSaved = (updated: CustomerProfile) => { setProfileOverride(updated); refreshSession(); };
+  async function logout() {
+    await customerService.logout();
+    router.replace("/login");
+    router.refresh();
+  }
 
-  return <div className="customer-page"><PageHeader eyebrow="Tài khoản" title="Hồ sơ & bảo mật" description="Quản lý thông tin cá nhân, mật khẩu và tùy chọn thông báo." /><Tabs items={[{ value: "personal", label: "Thông tin cá nhân", content: <PersonalForm profile={profile} onSaved={handleSaved} /> }, { value: "security", label: "Bảo mật", content: <SecurityForm profile={profile} onReload={resource.reload} /> }, { value: "notifications", label: "Thông báo", content: <NotificationForm profile={profile} onSaved={handleSaved} /> }]} /></div>;
+  return <div className="customer-page"><PageHeader eyebrow="Tài khoản" title="Hồ sơ & bảo mật" description="Quản lý thông tin cá nhân, mật khẩu và tùy chọn thông báo." actions={<Button variant="outline" onClick={logout}>Đăng xuất</Button>} /><Tabs items={[{ value: "personal", label: "Thông tin cá nhân", content: <PersonalForm profile={profile} onSaved={handleSaved} /> }, { value: "security", label: "Bảo mật", content: <SecurityForm profile={profile} /> }, { value: "notifications", label: "Thông báo", content: <NotificationForm profile={profile} onSaved={handleSaved} /> }]} /></div>;
 }

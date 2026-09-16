@@ -96,3 +96,9 @@ When backend endpoints become available:
 6. remove mock credentials and mock records from production builds.
 
 The provider remains server-side behind the backend architecture; no future repository implementation should call an external provider directly from the browser.
+
+---
+
+## Work 04 runtime update
+
+The Work 03 UI/repository contract is preserved, but the production/default repository is now `RESTCustomerRepository`. `MockCustomerRepository` is no longer an automatic runtime fallback. Customer mutations/read models are persisted by the `/api/v1` backend in PostgreSQL.

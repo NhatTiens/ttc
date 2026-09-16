@@ -601,3 +601,15 @@ provider order ID is unique within provider
 ```
 
 Mismatch generates high-severity alert and blocks automated money actions for the affected entity until resolved.
+
+---
+
+## Work 04 implementation note
+
+The concrete Prisma schema now lives at `packages/db/prisma/schema.prisma` with baseline migration `202609160001_work4_backend`.
+
+Work 04 intentionally debits an order at creation and leaves the order `PENDING`, because no provider call exists in this Work. The earlier reservation/capture model remains the target for the provider-integration Work, where ambiguous external side effects matter. `wallets.reserved_minor` remains in the physical schema but Work 04 create-order does not reserve funds.
+
+Work 04 VND uses PostgreSQL `BIGINT`; one stored unit equals one VND. Service rates are VND per 1,000 units and order charge is integer-ceiling arithmetic.
+
+Database-level Work 04 protections include unique normalized email, public IDs, `(user_id, idempotency_key)` for order/deposit, money/range checks, FKs, and customer-history indexes. `WalletTransaction` remains the audit trail for every Work 04 balance change.
