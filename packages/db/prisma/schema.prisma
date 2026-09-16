@@ -117,6 +117,10 @@ model User {
   deposits                 Deposit[]
   supportTickets           SupportTicket[]
   supportMessages          SupportMessage[]       @relation("SupportMessageSender")
+  adminWalletTransactions  WalletTransaction[]    @relation("WalletTransactionAdmin")
+  adminAuditLogs            AdminAuditLog[]         @relation("AdminAuditActor")
+  servicePriceChanges       ServicePriceHistory[]   @relation("ServicePriceHistoryAdmin")
+  systemSettingsUpdated     SystemSetting[]         @relation("SystemSettingUpdater")
 
   @@map("users")
 }
@@ -199,12 +203,16 @@ model WalletTransaction {
   referenceId        String?                 @map("reference_id") @db.VarChar(128)
   description        String                  @db.VarChar(255)
   idempotencyKey     String?                 @map("idempotency_key") @db.VarChar(128)
+  adminUserId        String?                 @map("admin_user_id") @db.Uuid
+  reason             String?                 @db.VarChar(255)
   createdAt          DateTime                @default(now()) @map("created_at") @db.Timestamptz(3)
   wallet             Wallet                  @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  adminUser          User?                   @relation("WalletTransactionAdmin", fields: [adminUserId], references: [id], onDelete: SetNull)
 
   @@unique([walletId, idempotencyKey])
   @@index([walletId, createdAt(sort: Desc)])
   @@index([referenceType, referenceId])
+  @@index([adminUserId, createdAt(sort: Desc)])
   @@map("wallet_transactions")
 }
 
@@ -212,6 +220,7 @@ model ServiceCategory {
   id        String    @id @db.VarChar(64)
   name      String    @db.VarChar(120)
   sortOrder Int       @default(0) @map("sort_order")
+  enabled   Boolean   @default(true)
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
   services  Service[]
@@ -236,6 +245,7 @@ model Service {
   updatedAt            DateTime        @updatedAt @map("updated_at") @db.Timestamptz(3)
   category             ServiceCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   orders               Order[]
+  priceHistory         ServicePriceHistory[]
 
   @@index([platform, status])
   @@index([categoryId, status])
@@ -399,4 +409,57 @@ model NotificationPreference {
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("notification_preferences")
+}
+
+
+model ServicePriceHistory {
+  id                   String   @id @default(uuid()) @db.Uuid
+  serviceId            String   @map("service_id") @db.VarChar(64)
+  previousRateMinor    BigInt   @map("previous_rate_minor")
+  newRateMinor         BigInt   @map("new_rate_minor")
+  adminUserId          String   @map("admin_user_id") @db.Uuid
+  reason               String?  @db.VarChar(255)
+  createdAt            DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  service              Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  adminUser            User     @relation("ServicePriceHistoryAdmin", fields: [adminUserId], references: [id], onDelete: Restrict)
+
+  @@index([serviceId, createdAt(sort: Desc)])
+  @@index([adminUserId, createdAt(sort: Desc)])
+  @@map("service_price_history")
+}
+
+model AdminAuditLog {
+  id          String   @id @default(uuid()) @db.Uuid
+  adminUserId String   @map("admin_user_id") @db.Uuid
+  action      String   @db.VarChar(80)
+  entityType  String   @map("entity_type") @db.VarChar(80)
+  entityId    String   @map("entity_id") @db.VarChar(128)
+  before      Json?
+  after       Json?
+  metadata    Json?
+  ipAddress   String?  @map("ip_address") @db.VarChar(64)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  adminUser   User     @relation("AdminAuditActor", fields: [adminUserId], references: [id], onDelete: Restrict)
+
+  @@index([createdAt(sort: Desc)])
+  @@index([adminUserId, createdAt(sort: Desc)])
+  @@index([action, createdAt(sort: Desc)])
+  @@index([entityType, entityId, createdAt(sort: Desc)])
+  @@map("admin_audit_logs")
+}
+
+model SystemSetting {
+  id                    String   @id @default("default") @db.VarChar(32)
+  siteName              String   @default("Tương Tác Pro") @map("site_name") @db.VarChar(120)
+  supportEmail          String   @default("support@example.com") @map("support_email") @db.VarChar(320)
+  maintenanceMode       Boolean  @default(false) @map("maintenance_mode")
+  minimumDepositMinor   BigInt   @default(50000) @map("minimum_deposit_minor")
+  orderCreationEnabled  Boolean  @default(true) @map("order_creation_enabled")
+  supportEnabled        Boolean  @default(true) @map("support_enabled")
+  updatedByUserId       String?  @map("updated_by_user_id") @db.Uuid
+  createdAt             DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt             DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  updatedByUser         User?    @relation("SystemSettingUpdater", fields: [updatedByUserId], references: [id], onDelete: SetNull)
+
+  @@map("system_settings")
 }

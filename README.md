@@ -177,3 +177,51 @@ docs/architecture/DATABASE_SCHEMA.md
 ## Scope boundary
 
 Work 04 does not add `/admin`, call any social engagement provider, connect Tương Tác Chéo, simulate provider completion, or confirm a payment. A new order remains `PENDING`; a new deposit remains `PENDING` and does not credit the wallet.
+
+---
+
+# Work 05 — Admin Dashboard & Operations
+
+Work 05 adds a real-data Admin Console on top of the accepted Work 04 PostgreSQL/REST backend. Admin pages live under `/admin`; API endpoints live under `/api/v1/admin/*`. Customer runtime remains REST-backed and no provider integration is enabled.
+
+Development seed now includes the existing customer plus development-only ADMIN/secondary-customer accounts configurable with:
+
+```text
+SEED_ADMIN_EMAIL
+SEED_ADMIN_PASSWORD
+SEED_DEVELOPMENT_SECOND_EMAIL
+SEED_DEVELOPMENT_SECOND_PASSWORD
+```
+
+After applying the Work 05 migration:
+
+```powershell
+npm run db:generate
+npm run db:validate
+npm run db:migrate
+npm run db:seed
+npm run db:seed
+npm run test:backend
+npm run lint:web
+npm run typecheck:web
+npm run build:web
+npm run check:offline
+```
+
+With the app running, execute:
+
+```powershell
+npm run qa:work5:api
+```
+
+Work 05 documentation:
+
+```text
+WORK5_ADMIN.md
+ADMIN_API.md
+ADMIN_SECURITY.md
+ADMIN_OPERATIONS.md
+WORK5_QA_REPORT.md
+```
+
+Work 05 explicitly does not connect providers, Tương Tác Chéo, or an automatic payment gateway. `/admin/providers` is a non-calling placeholder for the next integration work.

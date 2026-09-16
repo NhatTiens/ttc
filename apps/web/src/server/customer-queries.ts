@@ -73,7 +73,7 @@ export async function readDashboard(userId: string) {
 }
 
 export async function readCategories() {
-  const categories = await getDb().serviceCategory.findMany({ orderBy: [{ sortOrder: "asc" }, { name: "asc" }] });
+  const categories = await getDb().serviceCategory.findMany({ where: { enabled: true }, orderBy: [{ sortOrder: "asc" }, { name: "asc" }] });
   return categories.map(toCategory);
 }
 

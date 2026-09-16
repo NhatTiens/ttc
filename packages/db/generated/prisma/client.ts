@@ -131,3 +131,18 @@ export type SupportMessage = Prisma.SupportMessageModel
  * 
  */
 export type NotificationPreference = Prisma.NotificationPreferenceModel
+/**
+ * Model ServicePriceHistory
+ * 
+ */
+export type ServicePriceHistory = Prisma.ServicePriceHistoryModel
+/**
+ * Model AdminAuditLog
+ * 
+ */
+export type AdminAuditLog = Prisma.AdminAuditLogModel
+/**
+ * Model SystemSetting
+ * 
+ */
+export type SystemSetting = Prisma.SystemSettingModel

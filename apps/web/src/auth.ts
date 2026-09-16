@@ -10,7 +10,7 @@ const credentialsSchema = z.object({
 });
 
 function isUserRole(value: unknown): value is UserRole {
-  return value === UserRole.CUSTOMER || value === UserRole.ADMIN;
+  return value === UserRole.CUSTOMER || value === UserRole.SUPPORT || value === UserRole.FINANCE || value === UserRole.ADMIN;
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({

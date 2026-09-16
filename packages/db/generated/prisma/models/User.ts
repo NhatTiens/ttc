@@ -288,6 +288,10 @@ export type UserWhereInput = {
   deposits?: Prisma.DepositListRelationFilter
   supportTickets?: Prisma.SupportTicketListRelationFilter
   supportMessages?: Prisma.SupportMessageListRelationFilter
+  adminWalletTransactions?: Prisma.WalletTransactionListRelationFilter
+  adminAuditLogs?: Prisma.AdminAuditLogListRelationFilter
+  servicePriceChanges?: Prisma.ServicePriceHistoryListRelationFilter
+  systemSettingsUpdated?: Prisma.SystemSettingListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -312,6 +316,10 @@ export type UserOrderByWithRelationInput = {
   deposits?: Prisma.DepositOrderByRelationAggregateInput
   supportTickets?: Prisma.SupportTicketOrderByRelationAggregateInput
   supportMessages?: Prisma.SupportMessageOrderByRelationAggregateInput
+  adminWalletTransactions?: Prisma.WalletTransactionOrderByRelationAggregateInput
+  adminAuditLogs?: Prisma.AdminAuditLogOrderByRelationAggregateInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryOrderByRelationAggregateInput
+  systemSettingsUpdated?: Prisma.SystemSettingOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -339,6 +347,10 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   deposits?: Prisma.DepositListRelationFilter
   supportTickets?: Prisma.SupportTicketListRelationFilter
   supportMessages?: Prisma.SupportMessageListRelationFilter
+  adminWalletTransactions?: Prisma.WalletTransactionListRelationFilter
+  adminAuditLogs?: Prisma.AdminAuditLogListRelationFilter
+  servicePriceChanges?: Prisma.ServicePriceHistoryListRelationFilter
+  systemSettingsUpdated?: Prisma.SystemSettingListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -403,6 +415,10 @@ export type UserCreateInput = {
   deposits?: Prisma.DepositCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  adminWalletTransactions?: Prisma.WalletTransactionCreateNestedManyWithoutAdminUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogCreateNestedManyWithoutAdminUserInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryCreateNestedManyWithoutAdminUserInput
+  systemSettingsUpdated?: Prisma.SystemSettingCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -427,6 +443,10 @@ export type UserUncheckedCreateInput = {
   deposits?: Prisma.DepositUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  adminWalletTransactions?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedCreateNestedManyWithoutAdminUserInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedCreateNestedManyWithoutAdminUserInput
+  systemSettingsUpdated?: Prisma.SystemSettingUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUpdateInput = {
@@ -451,6 +471,10 @@ export type UserUpdateInput = {
   deposits?: Prisma.DepositUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  adminWalletTransactions?: Prisma.WalletTransactionUpdateManyWithoutAdminUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUpdateManyWithoutAdminUserNestedInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUpdateManyWithoutAdminUserNestedInput
+  systemSettingsUpdated?: Prisma.SystemSettingUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -475,6 +499,10 @@ export type UserUncheckedUpdateInput = {
   deposits?: Prisma.DepositUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  adminWalletTransactions?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminUserNestedInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedUpdateManyWithoutAdminUserNestedInput
+  systemSettingsUpdated?: Prisma.SystemSettingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -669,6 +697,22 @@ export type UserUpdateOneRequiredWithoutWalletNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutWalletInput, Prisma.UserUpdateWithoutWalletInput>, Prisma.UserUncheckedUpdateWithoutWalletInput>
 }
 
+export type UserCreateNestedOneWithoutAdminWalletTransactionsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAdminWalletTransactionsInput, Prisma.UserUncheckedCreateWithoutAdminWalletTransactionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAdminWalletTransactionsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutAdminWalletTransactionsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAdminWalletTransactionsInput, Prisma.UserUncheckedCreateWithoutAdminWalletTransactionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAdminWalletTransactionsInput
+  upsert?: Prisma.UserUpsertWithoutAdminWalletTransactionsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAdminWalletTransactionsInput, Prisma.UserUpdateWithoutAdminWalletTransactionsInput>, Prisma.UserUncheckedUpdateWithoutAdminWalletTransactionsInput>
+}
+
 export type UserCreateNestedOneWithoutOrdersInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutOrdersInput, Prisma.UserUncheckedCreateWithoutOrdersInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutOrdersInput
@@ -741,6 +785,50 @@ export type UserUpdateOneRequiredWithoutNotificationPreferenceNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutNotificationPreferenceInput, Prisma.UserUpdateWithoutNotificationPreferenceInput>, Prisma.UserUncheckedUpdateWithoutNotificationPreferenceInput>
 }
 
+export type UserCreateNestedOneWithoutServicePriceChangesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutServicePriceChangesInput, Prisma.UserUncheckedCreateWithoutServicePriceChangesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutServicePriceChangesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutServicePriceChangesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutServicePriceChangesInput, Prisma.UserUncheckedCreateWithoutServicePriceChangesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutServicePriceChangesInput
+  upsert?: Prisma.UserUpsertWithoutServicePriceChangesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutServicePriceChangesInput, Prisma.UserUpdateWithoutServicePriceChangesInput>, Prisma.UserUncheckedUpdateWithoutServicePriceChangesInput>
+}
+
+export type UserCreateNestedOneWithoutAdminAuditLogsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAdminAuditLogsInput, Prisma.UserUncheckedCreateWithoutAdminAuditLogsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAdminAuditLogsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutAdminAuditLogsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAdminAuditLogsInput, Prisma.UserUncheckedCreateWithoutAdminAuditLogsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAdminAuditLogsInput
+  upsert?: Prisma.UserUpsertWithoutAdminAuditLogsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAdminAuditLogsInput, Prisma.UserUpdateWithoutAdminAuditLogsInput>, Prisma.UserUncheckedUpdateWithoutAdminAuditLogsInput>
+}
+
+export type UserCreateNestedOneWithoutSystemSettingsUpdatedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSystemSettingsUpdatedInput, Prisma.UserUncheckedCreateWithoutSystemSettingsUpdatedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSystemSettingsUpdatedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutSystemSettingsUpdatedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSystemSettingsUpdatedInput, Prisma.UserUncheckedCreateWithoutSystemSettingsUpdatedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSystemSettingsUpdatedInput
+  upsert?: Prisma.UserUpsertWithoutSystemSettingsUpdatedInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSystemSettingsUpdatedInput, Prisma.UserUpdateWithoutSystemSettingsUpdatedInput>, Prisma.UserUncheckedUpdateWithoutSystemSettingsUpdatedInput>
+}
+
 export type UserCreateWithoutAccountsInput = {
   id?: string
   email: string
@@ -762,6 +850,10 @@ export type UserCreateWithoutAccountsInput = {
   deposits?: Prisma.DepositCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  adminWalletTransactions?: Prisma.WalletTransactionCreateNestedManyWithoutAdminUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogCreateNestedManyWithoutAdminUserInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryCreateNestedManyWithoutAdminUserInput
+  systemSettingsUpdated?: Prisma.SystemSettingCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutAccountsInput = {
@@ -785,6 +877,10 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   deposits?: Prisma.DepositUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  adminWalletTransactions?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedCreateNestedManyWithoutAdminUserInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedCreateNestedManyWithoutAdminUserInput
+  systemSettingsUpdated?: Prisma.SystemSettingUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutAccountsInput = {
@@ -824,6 +920,10 @@ export type UserUpdateWithoutAccountsInput = {
   deposits?: Prisma.DepositUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  adminWalletTransactions?: Prisma.WalletTransactionUpdateManyWithoutAdminUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUpdateManyWithoutAdminUserNestedInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUpdateManyWithoutAdminUserNestedInput
+  systemSettingsUpdated?: Prisma.SystemSettingUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -847,6 +947,10 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   deposits?: Prisma.DepositUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  adminWalletTransactions?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminUserNestedInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedUpdateManyWithoutAdminUserNestedInput
+  systemSettingsUpdated?: Prisma.SystemSettingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutSessionsInput = {
@@ -870,6 +974,10 @@ export type UserCreateWithoutSessionsInput = {
   deposits?: Prisma.DepositCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  adminWalletTransactions?: Prisma.WalletTransactionCreateNestedManyWithoutAdminUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogCreateNestedManyWithoutAdminUserInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryCreateNestedManyWithoutAdminUserInput
+  systemSettingsUpdated?: Prisma.SystemSettingCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -893,6 +1001,10 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   deposits?: Prisma.DepositUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  adminWalletTransactions?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedCreateNestedManyWithoutAdminUserInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedCreateNestedManyWithoutAdminUserInput
+  systemSettingsUpdated?: Prisma.SystemSettingUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -932,6 +1044,10 @@ export type UserUpdateWithoutSessionsInput = {
   deposits?: Prisma.DepositUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  adminWalletTransactions?: Prisma.WalletTransactionUpdateManyWithoutAdminUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUpdateManyWithoutAdminUserNestedInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUpdateManyWithoutAdminUserNestedInput
+  systemSettingsUpdated?: Prisma.SystemSettingUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -955,6 +1071,10 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   deposits?: Prisma.DepositUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  adminWalletTransactions?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminUserNestedInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedUpdateManyWithoutAdminUserNestedInput
+  systemSettingsUpdated?: Prisma.SystemSettingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutWalletInput = {
@@ -978,6 +1098,10 @@ export type UserCreateWithoutWalletInput = {
   deposits?: Prisma.DepositCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  adminWalletTransactions?: Prisma.WalletTransactionCreateNestedManyWithoutAdminUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogCreateNestedManyWithoutAdminUserInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryCreateNestedManyWithoutAdminUserInput
+  systemSettingsUpdated?: Prisma.SystemSettingCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutWalletInput = {
@@ -1001,6 +1125,10 @@ export type UserUncheckedCreateWithoutWalletInput = {
   deposits?: Prisma.DepositUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  adminWalletTransactions?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedCreateNestedManyWithoutAdminUserInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedCreateNestedManyWithoutAdminUserInput
+  systemSettingsUpdated?: Prisma.SystemSettingUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutWalletInput = {
@@ -1040,6 +1168,10 @@ export type UserUpdateWithoutWalletInput = {
   deposits?: Prisma.DepositUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  adminWalletTransactions?: Prisma.WalletTransactionUpdateManyWithoutAdminUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUpdateManyWithoutAdminUserNestedInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUpdateManyWithoutAdminUserNestedInput
+  systemSettingsUpdated?: Prisma.SystemSettingUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWalletInput = {
@@ -1063,6 +1195,134 @@ export type UserUncheckedUpdateWithoutWalletInput = {
   deposits?: Prisma.DepositUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  adminWalletTransactions?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminUserNestedInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedUpdateManyWithoutAdminUserNestedInput
+  systemSettingsUpdated?: Prisma.SystemSettingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserCreateWithoutAdminWalletTransactionsInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  emailVerifiedAt?: Date | string | null
+  twoFactorEnabled?: boolean
+  lastPasswordChangeAt?: Date | string
+  sessionVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  deposits?: Prisma.DepositCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogCreateNestedManyWithoutAdminUserInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryCreateNestedManyWithoutAdminUserInput
+  systemSettingsUpdated?: Prisma.SystemSettingCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserUncheckedCreateWithoutAdminWalletTransactionsInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  emailVerifiedAt?: Date | string | null
+  twoFactorEnabled?: boolean
+  lastPasswordChangeAt?: Date | string
+  sessionVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  deposits?: Prisma.DepositUncheckedCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedCreateNestedManyWithoutAdminUserInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedCreateNestedManyWithoutAdminUserInput
+  systemSettingsUpdated?: Prisma.SystemSettingUncheckedCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserCreateOrConnectWithoutAdminWalletTransactionsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAdminWalletTransactionsInput, Prisma.UserUncheckedCreateWithoutAdminWalletTransactionsInput>
+}
+
+export type UserUpsertWithoutAdminWalletTransactionsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAdminWalletTransactionsInput, Prisma.UserUncheckedUpdateWithoutAdminWalletTransactionsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAdminWalletTransactionsInput, Prisma.UserUncheckedCreateWithoutAdminWalletTransactionsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAdminWalletTransactionsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAdminWalletTransactionsInput, Prisma.UserUncheckedUpdateWithoutAdminWalletTransactionsInput>
+}
+
+export type UserUpdateWithoutAdminWalletTransactionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastPasswordChangeAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  deposits?: Prisma.DepositUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUpdateManyWithoutAdminUserNestedInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUpdateManyWithoutAdminUserNestedInput
+  systemSettingsUpdated?: Prisma.SystemSettingUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAdminWalletTransactionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastPasswordChangeAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  deposits?: Prisma.DepositUncheckedUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminUserNestedInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedUpdateManyWithoutAdminUserNestedInput
+  systemSettingsUpdated?: Prisma.SystemSettingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutOrdersInput = {
@@ -1086,6 +1346,10 @@ export type UserCreateWithoutOrdersInput = {
   deposits?: Prisma.DepositCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  adminWalletTransactions?: Prisma.WalletTransactionCreateNestedManyWithoutAdminUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogCreateNestedManyWithoutAdminUserInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryCreateNestedManyWithoutAdminUserInput
+  systemSettingsUpdated?: Prisma.SystemSettingCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutOrdersInput = {
@@ -1109,6 +1373,10 @@ export type UserUncheckedCreateWithoutOrdersInput = {
   deposits?: Prisma.DepositUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  adminWalletTransactions?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedCreateNestedManyWithoutAdminUserInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedCreateNestedManyWithoutAdminUserInput
+  systemSettingsUpdated?: Prisma.SystemSettingUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutOrdersInput = {
@@ -1148,6 +1416,10 @@ export type UserUpdateWithoutOrdersInput = {
   deposits?: Prisma.DepositUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  adminWalletTransactions?: Prisma.WalletTransactionUpdateManyWithoutAdminUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUpdateManyWithoutAdminUserNestedInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUpdateManyWithoutAdminUserNestedInput
+  systemSettingsUpdated?: Prisma.SystemSettingUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOrdersInput = {
@@ -1171,6 +1443,10 @@ export type UserUncheckedUpdateWithoutOrdersInput = {
   deposits?: Prisma.DepositUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  adminWalletTransactions?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminUserNestedInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedUpdateManyWithoutAdminUserNestedInput
+  systemSettingsUpdated?: Prisma.SystemSettingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutDepositsInput = {
@@ -1194,6 +1470,10 @@ export type UserCreateWithoutDepositsInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  adminWalletTransactions?: Prisma.WalletTransactionCreateNestedManyWithoutAdminUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogCreateNestedManyWithoutAdminUserInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryCreateNestedManyWithoutAdminUserInput
+  systemSettingsUpdated?: Prisma.SystemSettingCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutDepositsInput = {
@@ -1217,6 +1497,10 @@ export type UserUncheckedCreateWithoutDepositsInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  adminWalletTransactions?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedCreateNestedManyWithoutAdminUserInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedCreateNestedManyWithoutAdminUserInput
+  systemSettingsUpdated?: Prisma.SystemSettingUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutDepositsInput = {
@@ -1256,6 +1540,10 @@ export type UserUpdateWithoutDepositsInput = {
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  adminWalletTransactions?: Prisma.WalletTransactionUpdateManyWithoutAdminUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUpdateManyWithoutAdminUserNestedInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUpdateManyWithoutAdminUserNestedInput
+  systemSettingsUpdated?: Prisma.SystemSettingUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDepositsInput = {
@@ -1279,6 +1567,10 @@ export type UserUncheckedUpdateWithoutDepositsInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  adminWalletTransactions?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminUserNestedInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedUpdateManyWithoutAdminUserNestedInput
+  systemSettingsUpdated?: Prisma.SystemSettingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutSupportTicketsInput = {
@@ -1302,6 +1594,10 @@ export type UserCreateWithoutSupportTicketsInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  adminWalletTransactions?: Prisma.WalletTransactionCreateNestedManyWithoutAdminUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogCreateNestedManyWithoutAdminUserInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryCreateNestedManyWithoutAdminUserInput
+  systemSettingsUpdated?: Prisma.SystemSettingCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutSupportTicketsInput = {
@@ -1325,6 +1621,10 @@ export type UserUncheckedCreateWithoutSupportTicketsInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositUncheckedCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  adminWalletTransactions?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedCreateNestedManyWithoutAdminUserInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedCreateNestedManyWithoutAdminUserInput
+  systemSettingsUpdated?: Prisma.SystemSettingUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutSupportTicketsInput = {
@@ -1364,6 +1664,10 @@ export type UserUpdateWithoutSupportTicketsInput = {
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  adminWalletTransactions?: Prisma.WalletTransactionUpdateManyWithoutAdminUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUpdateManyWithoutAdminUserNestedInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUpdateManyWithoutAdminUserNestedInput
+  systemSettingsUpdated?: Prisma.SystemSettingUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSupportTicketsInput = {
@@ -1387,6 +1691,10 @@ export type UserUncheckedUpdateWithoutSupportTicketsInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUncheckedUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  adminWalletTransactions?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminUserNestedInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedUpdateManyWithoutAdminUserNestedInput
+  systemSettingsUpdated?: Prisma.SystemSettingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutSupportMessagesInput = {
@@ -1410,6 +1718,10 @@ export type UserCreateWithoutSupportMessagesInput = {
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+  adminWalletTransactions?: Prisma.WalletTransactionCreateNestedManyWithoutAdminUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogCreateNestedManyWithoutAdminUserInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryCreateNestedManyWithoutAdminUserInput
+  systemSettingsUpdated?: Prisma.SystemSettingCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutSupportMessagesInput = {
@@ -1433,6 +1745,10 @@ export type UserUncheckedCreateWithoutSupportMessagesInput = {
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+  adminWalletTransactions?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedCreateNestedManyWithoutAdminUserInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedCreateNestedManyWithoutAdminUserInput
+  systemSettingsUpdated?: Prisma.SystemSettingUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutSupportMessagesInput = {
@@ -1472,6 +1788,10 @@ export type UserUpdateWithoutSupportMessagesInput = {
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+  adminWalletTransactions?: Prisma.WalletTransactionUpdateManyWithoutAdminUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUpdateManyWithoutAdminUserNestedInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUpdateManyWithoutAdminUserNestedInput
+  systemSettingsUpdated?: Prisma.SystemSettingUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSupportMessagesInput = {
@@ -1495,6 +1815,10 @@ export type UserUncheckedUpdateWithoutSupportMessagesInput = {
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+  adminWalletTransactions?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminUserNestedInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedUpdateManyWithoutAdminUserNestedInput
+  systemSettingsUpdated?: Prisma.SystemSettingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutNotificationPreferenceInput = {
@@ -1518,6 +1842,10 @@ export type UserCreateWithoutNotificationPreferenceInput = {
   deposits?: Prisma.DepositCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  adminWalletTransactions?: Prisma.WalletTransactionCreateNestedManyWithoutAdminUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogCreateNestedManyWithoutAdminUserInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryCreateNestedManyWithoutAdminUserInput
+  systemSettingsUpdated?: Prisma.SystemSettingCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutNotificationPreferenceInput = {
@@ -1541,6 +1869,10 @@ export type UserUncheckedCreateWithoutNotificationPreferenceInput = {
   deposits?: Prisma.DepositUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  adminWalletTransactions?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedCreateNestedManyWithoutAdminUserInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedCreateNestedManyWithoutAdminUserInput
+  systemSettingsUpdated?: Prisma.SystemSettingUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutNotificationPreferenceInput = {
@@ -1580,6 +1912,10 @@ export type UserUpdateWithoutNotificationPreferenceInput = {
   deposits?: Prisma.DepositUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  adminWalletTransactions?: Prisma.WalletTransactionUpdateManyWithoutAdminUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUpdateManyWithoutAdminUserNestedInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUpdateManyWithoutAdminUserNestedInput
+  systemSettingsUpdated?: Prisma.SystemSettingUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationPreferenceInput = {
@@ -1603,6 +1939,382 @@ export type UserUncheckedUpdateWithoutNotificationPreferenceInput = {
   deposits?: Prisma.DepositUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  adminWalletTransactions?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminUserNestedInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedUpdateManyWithoutAdminUserNestedInput
+  systemSettingsUpdated?: Prisma.SystemSettingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserCreateWithoutServicePriceChangesInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  emailVerifiedAt?: Date | string | null
+  twoFactorEnabled?: boolean
+  lastPasswordChangeAt?: Date | string
+  sessionVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  deposits?: Prisma.DepositCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  adminWalletTransactions?: Prisma.WalletTransactionCreateNestedManyWithoutAdminUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogCreateNestedManyWithoutAdminUserInput
+  systemSettingsUpdated?: Prisma.SystemSettingCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserUncheckedCreateWithoutServicePriceChangesInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  emailVerifiedAt?: Date | string | null
+  twoFactorEnabled?: boolean
+  lastPasswordChangeAt?: Date | string
+  sessionVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  deposits?: Prisma.DepositUncheckedCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  adminWalletTransactions?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedCreateNestedManyWithoutAdminUserInput
+  systemSettingsUpdated?: Prisma.SystemSettingUncheckedCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserCreateOrConnectWithoutServicePriceChangesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutServicePriceChangesInput, Prisma.UserUncheckedCreateWithoutServicePriceChangesInput>
+}
+
+export type UserUpsertWithoutServicePriceChangesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutServicePriceChangesInput, Prisma.UserUncheckedUpdateWithoutServicePriceChangesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutServicePriceChangesInput, Prisma.UserUncheckedCreateWithoutServicePriceChangesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutServicePriceChangesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutServicePriceChangesInput, Prisma.UserUncheckedUpdateWithoutServicePriceChangesInput>
+}
+
+export type UserUpdateWithoutServicePriceChangesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastPasswordChangeAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  deposits?: Prisma.DepositUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  adminWalletTransactions?: Prisma.WalletTransactionUpdateManyWithoutAdminUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUpdateManyWithoutAdminUserNestedInput
+  systemSettingsUpdated?: Prisma.SystemSettingUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutServicePriceChangesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastPasswordChangeAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  deposits?: Prisma.DepositUncheckedUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  adminWalletTransactions?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminUserNestedInput
+  systemSettingsUpdated?: Prisma.SystemSettingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserCreateWithoutAdminAuditLogsInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  emailVerifiedAt?: Date | string | null
+  twoFactorEnabled?: boolean
+  lastPasswordChangeAt?: Date | string
+  sessionVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  deposits?: Prisma.DepositCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  adminWalletTransactions?: Prisma.WalletTransactionCreateNestedManyWithoutAdminUserInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryCreateNestedManyWithoutAdminUserInput
+  systemSettingsUpdated?: Prisma.SystemSettingCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserUncheckedCreateWithoutAdminAuditLogsInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  emailVerifiedAt?: Date | string | null
+  twoFactorEnabled?: boolean
+  lastPasswordChangeAt?: Date | string
+  sessionVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  deposits?: Prisma.DepositUncheckedCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  adminWalletTransactions?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminUserInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedCreateNestedManyWithoutAdminUserInput
+  systemSettingsUpdated?: Prisma.SystemSettingUncheckedCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserCreateOrConnectWithoutAdminAuditLogsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAdminAuditLogsInput, Prisma.UserUncheckedCreateWithoutAdminAuditLogsInput>
+}
+
+export type UserUpsertWithoutAdminAuditLogsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAdminAuditLogsInput, Prisma.UserUncheckedUpdateWithoutAdminAuditLogsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAdminAuditLogsInput, Prisma.UserUncheckedCreateWithoutAdminAuditLogsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAdminAuditLogsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAdminAuditLogsInput, Prisma.UserUncheckedUpdateWithoutAdminAuditLogsInput>
+}
+
+export type UserUpdateWithoutAdminAuditLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastPasswordChangeAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  deposits?: Prisma.DepositUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  adminWalletTransactions?: Prisma.WalletTransactionUpdateManyWithoutAdminUserNestedInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUpdateManyWithoutAdminUserNestedInput
+  systemSettingsUpdated?: Prisma.SystemSettingUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAdminAuditLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastPasswordChangeAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  deposits?: Prisma.DepositUncheckedUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  adminWalletTransactions?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminUserNestedInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedUpdateManyWithoutAdminUserNestedInput
+  systemSettingsUpdated?: Prisma.SystemSettingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserCreateWithoutSystemSettingsUpdatedInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  emailVerifiedAt?: Date | string | null
+  twoFactorEnabled?: boolean
+  lastPasswordChangeAt?: Date | string
+  sessionVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  deposits?: Prisma.DepositCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  adminWalletTransactions?: Prisma.WalletTransactionCreateNestedManyWithoutAdminUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogCreateNestedManyWithoutAdminUserInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryCreateNestedManyWithoutAdminUserInput
+}
+
+export type UserUncheckedCreateWithoutSystemSettingsUpdatedInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  emailVerifiedAt?: Date | string | null
+  twoFactorEnabled?: boolean
+  lastPasswordChangeAt?: Date | string
+  sessionVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  deposits?: Prisma.DepositUncheckedCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  adminWalletTransactions?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedCreateNestedManyWithoutAdminUserInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedCreateNestedManyWithoutAdminUserInput
+}
+
+export type UserCreateOrConnectWithoutSystemSettingsUpdatedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSystemSettingsUpdatedInput, Prisma.UserUncheckedCreateWithoutSystemSettingsUpdatedInput>
+}
+
+export type UserUpsertWithoutSystemSettingsUpdatedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSystemSettingsUpdatedInput, Prisma.UserUncheckedUpdateWithoutSystemSettingsUpdatedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSystemSettingsUpdatedInput, Prisma.UserUncheckedCreateWithoutSystemSettingsUpdatedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSystemSettingsUpdatedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSystemSettingsUpdatedInput, Prisma.UserUncheckedUpdateWithoutSystemSettingsUpdatedInput>
+}
+
+export type UserUpdateWithoutSystemSettingsUpdatedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastPasswordChangeAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  deposits?: Prisma.DepositUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  adminWalletTransactions?: Prisma.WalletTransactionUpdateManyWithoutAdminUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUpdateManyWithoutAdminUserNestedInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUpdateManyWithoutAdminUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSystemSettingsUpdatedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastPasswordChangeAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  deposits?: Prisma.DepositUncheckedUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  adminWalletTransactions?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminUserNestedInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedUpdateManyWithoutAdminUserNestedInput
 }
 
 
@@ -1617,6 +2329,10 @@ export type UserCountOutputType = {
   deposits: number
   supportTickets: number
   supportMessages: number
+  adminWalletTransactions: number
+  adminAuditLogs: number
+  servicePriceChanges: number
+  systemSettingsUpdated: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1626,6 +2342,10 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   deposits?: boolean | UserCountOutputTypeCountDepositsArgs
   supportTickets?: boolean | UserCountOutputTypeCountSupportTicketsArgs
   supportMessages?: boolean | UserCountOutputTypeCountSupportMessagesArgs
+  adminWalletTransactions?: boolean | UserCountOutputTypeCountAdminWalletTransactionsArgs
+  adminAuditLogs?: boolean | UserCountOutputTypeCountAdminAuditLogsArgs
+  servicePriceChanges?: boolean | UserCountOutputTypeCountServicePriceChangesArgs
+  systemSettingsUpdated?: boolean | UserCountOutputTypeCountSystemSettingsUpdatedArgs
 }
 
 /**
@@ -1680,6 +2400,34 @@ export type UserCountOutputTypeCountSupportMessagesArgs<ExtArgs extends runtime.
   where?: Prisma.SupportMessageWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAdminWalletTransactionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.WalletTransactionWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAdminAuditLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AdminAuditLogWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountServicePriceChangesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ServicePriceHistoryWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSystemSettingsUpdatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SystemSettingWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1703,6 +2451,10 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   deposits?: boolean | Prisma.User$depositsArgs<ExtArgs>
   supportTickets?: boolean | Prisma.User$supportTicketsArgs<ExtArgs>
   supportMessages?: boolean | Prisma.User$supportMessagesArgs<ExtArgs>
+  adminWalletTransactions?: boolean | Prisma.User$adminWalletTransactionsArgs<ExtArgs>
+  adminAuditLogs?: boolean | Prisma.User$adminAuditLogsArgs<ExtArgs>
+  servicePriceChanges?: boolean | Prisma.User$servicePriceChangesArgs<ExtArgs>
+  systemSettingsUpdated?: boolean | Prisma.User$systemSettingsUpdatedArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1764,6 +2516,10 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   deposits?: boolean | Prisma.User$depositsArgs<ExtArgs>
   supportTickets?: boolean | Prisma.User$supportTicketsArgs<ExtArgs>
   supportMessages?: boolean | Prisma.User$supportMessagesArgs<ExtArgs>
+  adminWalletTransactions?: boolean | Prisma.User$adminWalletTransactionsArgs<ExtArgs>
+  adminAuditLogs?: boolean | Prisma.User$adminAuditLogsArgs<ExtArgs>
+  servicePriceChanges?: boolean | Prisma.User$servicePriceChangesArgs<ExtArgs>
+  systemSettingsUpdated?: boolean | Prisma.User$systemSettingsUpdatedArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1780,6 +2536,10 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     deposits: Prisma.$DepositPayload<ExtArgs>[]
     supportTickets: Prisma.$SupportTicketPayload<ExtArgs>[]
     supportMessages: Prisma.$SupportMessagePayload<ExtArgs>[]
+    adminWalletTransactions: Prisma.$WalletTransactionPayload<ExtArgs>[]
+    adminAuditLogs: Prisma.$AdminAuditLogPayload<ExtArgs>[]
+    servicePriceChanges: Prisma.$ServicePriceHistoryPayload<ExtArgs>[]
+    systemSettingsUpdated: Prisma.$SystemSettingPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2197,6 +2957,10 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   deposits<T extends Prisma.User$depositsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$depositsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DepositPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   supportTickets<T extends Prisma.User$supportTicketsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$supportTicketsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportTicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   supportMessages<T extends Prisma.User$supportMessagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$supportMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  adminWalletTransactions<T extends Prisma.User$adminWalletTransactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$adminWalletTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WalletTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  adminAuditLogs<T extends Prisma.User$adminAuditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$adminAuditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AdminAuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  servicePriceChanges<T extends Prisma.User$servicePriceChangesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$servicePriceChangesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ServicePriceHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  systemSettingsUpdated<T extends Prisma.User$systemSettingsUpdatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$systemSettingsUpdatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SystemSettingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2811,6 +3575,102 @@ export type User$supportMessagesArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   distinct?: Prisma.SupportMessageScalarFieldEnum | Prisma.SupportMessageScalarFieldEnum[]
+}
+
+/**
+ * User.adminWalletTransactions
+ */
+export type User$adminWalletTransactionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the WalletTransaction
+   */
+  select?: Prisma.WalletTransactionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the WalletTransaction
+   */
+  omit?: Prisma.WalletTransactionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WalletTransactionInclude<ExtArgs> | null
+  where?: Prisma.WalletTransactionWhereInput
+  orderBy?: Prisma.WalletTransactionOrderByWithRelationInput | Prisma.WalletTransactionOrderByWithRelationInput[]
+  cursor?: Prisma.WalletTransactionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.WalletTransactionScalarFieldEnum | Prisma.WalletTransactionScalarFieldEnum[]
+}
+
+/**
+ * User.adminAuditLogs
+ */
+export type User$adminAuditLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AdminAuditLog
+   */
+  select?: Prisma.AdminAuditLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AdminAuditLog
+   */
+  omit?: Prisma.AdminAuditLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AdminAuditLogInclude<ExtArgs> | null
+  where?: Prisma.AdminAuditLogWhereInput
+  orderBy?: Prisma.AdminAuditLogOrderByWithRelationInput | Prisma.AdminAuditLogOrderByWithRelationInput[]
+  cursor?: Prisma.AdminAuditLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AdminAuditLogScalarFieldEnum | Prisma.AdminAuditLogScalarFieldEnum[]
+}
+
+/**
+ * User.servicePriceChanges
+ */
+export type User$servicePriceChangesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ServicePriceHistory
+   */
+  select?: Prisma.ServicePriceHistorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ServicePriceHistory
+   */
+  omit?: Prisma.ServicePriceHistoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServicePriceHistoryInclude<ExtArgs> | null
+  where?: Prisma.ServicePriceHistoryWhereInput
+  orderBy?: Prisma.ServicePriceHistoryOrderByWithRelationInput | Prisma.ServicePriceHistoryOrderByWithRelationInput[]
+  cursor?: Prisma.ServicePriceHistoryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ServicePriceHistoryScalarFieldEnum | Prisma.ServicePriceHistoryScalarFieldEnum[]
+}
+
+/**
+ * User.systemSettingsUpdated
+ */
+export type User$systemSettingsUpdatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SystemSetting
+   */
+  select?: Prisma.SystemSettingSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SystemSetting
+   */
+  omit?: Prisma.SystemSettingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SystemSettingInclude<ExtArgs> | null
+  where?: Prisma.SystemSettingWhereInput
+  orderBy?: Prisma.SystemSettingOrderByWithRelationInput | Prisma.SystemSettingOrderByWithRelationInput[]
+  cursor?: Prisma.SystemSettingWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SystemSettingScalarFieldEnum | Prisma.SystemSettingScalarFieldEnum[]
 }
 
 /**

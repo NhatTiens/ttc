@@ -385,3 +385,15 @@ For Work 04 customer lists, `services` and `orders` validate optional `page`/`pa
 Credentials auth in Work 04 uses Auth.js JWT sessions plus database `sessionVersion` revalidation. See `AUTH_IMPLEMENTATION.md` for the controlled deviation from the earlier database-session preference.
 
 The architecture's future `/orders/quote`/price-version workflow is not activated in Work 04. Work 04 `POST /api/v1/orders` resolves the current Service price and calculates the charge on the server inside the order transaction. Quote/version behavior belongs to the later pricing/provider expansion and is not simulated here.
+
+---
+
+## Work 05 Admin API implementation note
+
+Work 05 implements the operational Admin subset as versioned `/api/v1/admin/*` endpoints rather than activating the future provider-oriented `/admin/*` sketches above. See root `ADMIN_API.md` for the exact implemented contract.
+
+Implemented groups: dashboard, customers/status/wallet adjustments, orders/refund, services/categories, wallets/transactions, deposits/confirm/fail/cancel, support/reply/status, analytics, audit logs and non-secret system settings.
+
+All Admin endpoints independently require an ACTIVE `ADMIN` session. POST/PATCH routes use the same-origin guard and Zod boundary validation. The frontend never supplies authoritative resulting balances.
+
+The following remain deliberately unimplemented in Work 05: provider credentials/routes/sync/reconcile, provider-cost/profit analytics, automated payment gateway operations, arbitrary provider lifecycle transitions, and Tương Tác Chéo calls.

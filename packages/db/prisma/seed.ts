@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import argon2 from "argon2";
 import { getDb } from "../src/client";
-import { SocialPlatform, ServiceStatus, UserRole, UserStatus, DepositMethodType, WalletTransactionStatus, WalletTransactionType } from "../generated/prisma/client";
+import { DepositStatus, OrderStatus, SocialPlatform, ServiceStatus, SupportSenderType, SupportTicketStatus, UserRole, UserStatus, DepositMethodType, WalletTransactionStatus, WalletTransactionType } from "../generated/prisma/client";
 
 const rootEnvPath = fileURLToPath(new URL("../../../.env", import.meta.url));
 if (existsSync(rootEnvPath)) process.loadEnvFile(rootEnvPath);
@@ -69,6 +69,20 @@ async function main() {
     await db.depositMethod.upsert({ where: { id: method.id }, update: method, create: method });
   }
 
+  await db.systemSetting.upsert({
+    where: { id: "default" },
+    update: {},
+    create: {
+      id: "default",
+      siteName: "Tương Tác Pro",
+      supportEmail: "support@example.com",
+      maintenanceMode: false,
+      minimumDepositMinor: 50000n,
+      orderCreationEnabled: true,
+      supportEnabled: true
+    }
+  });
+
   if (process.env.SEED_DEVELOPMENT_ACCOUNT !== "false") {
     const email = (process.env.SEED_DEVELOPMENT_EMAIL ?? "minh@example.com").trim().toLowerCase();
     const password = process.env.SEED_DEVELOPMENT_PASSWORD ?? "demo1234";
@@ -111,6 +125,89 @@ async function main() {
             idempotencyKey: seedKey
           }
         });
+      });
+    }
+
+    const adminEmail = (process.env.SEED_ADMIN_EMAIL ?? "admin@example.com").trim().toLowerCase();
+    const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? "Admin1234";
+    const adminPasswordHash = await argon2.hash(adminPassword, { type: argon2.argon2id });
+    await db.user.upsert({
+      where: { email: adminEmail },
+      update: { name: "Tương Tác Pro Admin", passwordHash: adminPasswordHash, status: UserStatus.ACTIVE, role: UserRole.ADMIN },
+      create: { email: adminEmail, passwordHash: adminPasswordHash, name: "Tương Tác Pro Admin", status: UserStatus.ACTIVE, role: UserRole.ADMIN }
+    });
+
+    const secondEmail = (process.env.SEED_DEVELOPMENT_SECOND_EMAIL ?? "lan@example.com").trim().toLowerCase();
+    const secondPassword = process.env.SEED_DEVELOPMENT_SECOND_PASSWORD ?? "demo1234";
+    const secondHash = await argon2.hash(secondPassword, { type: argon2.argon2id });
+    const secondUser = await db.user.upsert({
+      where: { email: secondEmail },
+      update: { name: "Trần Lan", passwordHash: secondHash, status: UserStatus.ACTIVE, role: UserRole.CUSTOMER },
+      create: { email: secondEmail, passwordHash: secondHash, name: "Trần Lan", phone: "0902222333", status: UserStatus.ACTIVE, role: UserRole.CUSTOMER }
+    });
+    await db.notificationPreference.upsert({
+      where: { userId: secondUser.id },
+      update: {},
+      create: { userId: secondUser.id, orderUpdates: true, walletUpdates: true, promotions: false, supportReplies: true }
+    });
+    await db.wallet.upsert({ where: { userId: secondUser.id }, update: {}, create: { userId: secondUser.id, currency: "VND" } });
+
+    const sampleOrderPublicId = "TT-SEED-0001";
+    const existingOrder = await db.order.findUnique({ where: { publicId: sampleOrderPublicId } });
+    if (!existingOrder) {
+      await db.$transaction(async (tx) => {
+        const currentWallet = await tx.wallet.findUniqueOrThrow({ where: { id: wallet.id } });
+        const charge = 3200n;
+        const order = await tx.order.create({
+          data: {
+            publicId: sampleOrderPublicId,
+            userId: user.id,
+            serviceId: "svc_fb_follow_01",
+            targetUrl: "https://example.com/development-profile",
+            quantity: 100,
+            chargeMinor: charge,
+            remaining: 100,
+            status: OrderStatus.PENDING,
+            idempotencyKey: "seed:sample-order",
+            requestFingerprint: "seed-sample-order"
+          }
+        });
+        await tx.wallet.update({ where: { id: wallet.id }, data: { balanceMinor: { decrement: charge } } });
+        await tx.walletTransaction.create({
+          data: {
+            walletId: wallet.id, type: WalletTransactionType.PURCHASE, status: WalletTransactionStatus.COMPLETED, amountMinor: -charge,
+            balanceBeforeMinor: currentWallet.balanceMinor, balanceAfterMinor: currentWallet.balanceMinor - charge, referenceType: "ORDER",
+            referenceId: sampleOrderPublicId, description: `Đơn hàng development ${sampleOrderPublicId}`, idempotencyKey: "seed:sample-order-purchase"
+          }
+        });
+        await tx.orderLog.create({ data: { orderId: order.id, toStatus: OrderStatus.PENDING, message: "Đơn mẫu development đang chờ xử lý." } });
+      });
+    }
+
+    const sampleDepositPublicId = "DEP-SEED-0001";
+    if (!await db.deposit.findUnique({ where: { publicId: sampleDepositPublicId } })) {
+      await db.$transaction(async (tx) => {
+        const currentWallet = await tx.wallet.findUniqueOrThrow({ where: { id: wallet.id } });
+        await tx.deposit.create({
+          data: { publicId: sampleDepositPublicId, userId: user.id, methodId: "bank-transfer", amountMinor: 200000n, status: DepositStatus.PENDING, idempotencyKey: "seed:sample-deposit" }
+        });
+        await tx.walletTransaction.create({
+          data: {
+            walletId: wallet.id, type: WalletTransactionType.DEPOSIT, status: WalletTransactionStatus.PENDING, amountMinor: 200000n,
+            balanceBeforeMinor: currentWallet.balanceMinor, balanceAfterMinor: currentWallet.balanceMinor, referenceType: "DEPOSIT",
+            referenceId: sampleDepositPublicId, description: `Yêu cầu nạp tiền development ${sampleDepositPublicId}`, idempotencyKey: "seed:sample-deposit-ledger"
+          }
+        });
+      });
+    }
+
+    const sampleTicketPublicId = "SUP-SEED-0001";
+    if (!await db.supportTicket.findUnique({ where: { publicId: sampleTicketPublicId } })) {
+      await db.supportTicket.create({
+        data: {
+          publicId: sampleTicketPublicId, userId: user.id, subject: "Yêu cầu hỗ trợ development", category: "general", status: SupportTicketStatus.WAITING_SUPPORT,
+          messages: { create: { senderType: SupportSenderType.CUSTOMER, senderUserId: user.id, body: "Đây là yêu cầu hỗ trợ mẫu dùng cho Work 05 development." } }
+        }
       });
     }
   }

@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "typecheck:offline": "tsc --noEmit -p tsconfig.offline.json",
     "lint:offline": "node scripts/lint.mjs",
-    "test:backend": "tsx --test tests/backend/*.test.ts"
+    "test:backend": "tsx --test --test-concurrency=1 tests/backend/*.test.ts"
   },
   "dependencies": {
     "@tuong-tac-pro/db": "*",

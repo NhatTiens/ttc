@@ -1,6 +1,6 @@
 "use client";
 
-import { signIn, signOut } from "next-auth/react";
+import { getSession, signIn, signOut } from "next-auth/react";
 import type { CustomerRepository } from "./customer-repository";
 import type {
   AuthResult, CreateOrderInput, CreateTicketInput, CustomerProfile, DashboardData, DepositMethod, DepositRequest,
@@ -120,8 +120,9 @@ export const restCustomerRepository: CustomerRepository = {
   async login(email: string, password: string) {
     const result = await signIn("credentials", { email, password, redirect: false });
     if (result?.error) throw new Error("Email hoặc mật khẩu không đúng.");
-    const profile = await apiRequest<CustomerProfile>("/api/v1/me");
-    return { ok: true, user: { id: profile.id, name: profile.name, email: profile.email } } satisfies AuthResult;
+    const session = await getSession();
+    if (!session?.user?.id || !session.user.email) throw new Error("Không thể khởi tạo phiên đăng nhập.");
+    return { ok: true, user: { id: session.user.id, name: session.user.name ?? "", email: session.user.email } } satisfies AuthResult;
   },
   async register(name: string, email: string, password: string) {
     const user = await apiRequest<AuthResult["user"]>("/api/v1/auth/register", { method: "POST", body: JSON.stringify({ name, email, password }) });

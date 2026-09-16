@@ -68,7 +68,10 @@ export const ModelName = {
   PaymentEvent: 'PaymentEvent',
   SupportTicket: 'SupportTicket',
   SupportMessage: 'SupportMessage',
-  NotificationPreference: 'NotificationPreference'
+  NotificationPreference: 'NotificationPreference',
+  ServicePriceHistory: 'ServicePriceHistory',
+  AdminAuditLog: 'AdminAuditLog',
+  SystemSetting: 'SystemSetting'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -180,6 +183,8 @@ export const WalletTransactionScalarFieldEnum = {
   referenceId: 'referenceId',
   description: 'description',
   idempotencyKey: 'idempotencyKey',
+  adminUserId: 'adminUserId',
+  reason: 'reason',
   createdAt: 'createdAt'
 } as const
 
@@ -190,6 +195,7 @@ export const ServiceCategoryScalarFieldEnum = {
   id: 'id',
   name: 'name',
   sortOrder: 'sortOrder',
+  enabled: 'enabled',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -351,6 +357,51 @@ export const NotificationPreferenceScalarFieldEnum = {
 } as const
 
 export type NotificationPreferenceScalarFieldEnum = (typeof NotificationPreferenceScalarFieldEnum)[keyof typeof NotificationPreferenceScalarFieldEnum]
+
+
+export const ServicePriceHistoryScalarFieldEnum = {
+  id: 'id',
+  serviceId: 'serviceId',
+  previousRateMinor: 'previousRateMinor',
+  newRateMinor: 'newRateMinor',
+  adminUserId: 'adminUserId',
+  reason: 'reason',
+  createdAt: 'createdAt'
+} as const
+
+export type ServicePriceHistoryScalarFieldEnum = (typeof ServicePriceHistoryScalarFieldEnum)[keyof typeof ServicePriceHistoryScalarFieldEnum]
+
+
+export const AdminAuditLogScalarFieldEnum = {
+  id: 'id',
+  adminUserId: 'adminUserId',
+  action: 'action',
+  entityType: 'entityType',
+  entityId: 'entityId',
+  before: 'before',
+  after: 'after',
+  metadata: 'metadata',
+  ipAddress: 'ipAddress',
+  createdAt: 'createdAt'
+} as const
+
+export type AdminAuditLogScalarFieldEnum = (typeof AdminAuditLogScalarFieldEnum)[keyof typeof AdminAuditLogScalarFieldEnum]
+
+
+export const SystemSettingScalarFieldEnum = {
+  id: 'id',
+  siteName: 'siteName',
+  supportEmail: 'supportEmail',
+  maintenanceMode: 'maintenanceMode',
+  minimumDepositMinor: 'minimumDepositMinor',
+  orderCreationEnabled: 'orderCreationEnabled',
+  supportEnabled: 'supportEnabled',
+  updatedByUserId: 'updatedByUserId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SystemSettingScalarFieldEnum = (typeof SystemSettingScalarFieldEnum)[keyof typeof SystemSettingScalarFieldEnum]
 
 
 export const SortOrder = {

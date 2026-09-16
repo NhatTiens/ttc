@@ -13,7 +13,7 @@
     "typecheck:web": "npm --workspace @tuong-tac-pro/web run typecheck",
     "lint:web:offline": "npm --workspace @tuong-tac-pro/web run lint:offline",
     "typecheck:web:offline": "npm --workspace @tuong-tac-pro/web run typecheck:offline",
-    "qa:offline": "node qa/component-contract-check.mjs && node qa/responsive-check.mjs && node qa/customer-application-check.mjs && node qa/work4-backend-contract-check.mjs",
+    "qa:offline": "node qa/component-contract-check.mjs && node qa/responsive-check.mjs && node qa/customer-application-check.mjs && node qa/work4-backend-contract-check.mjs && node qa/work5-admin-contract-check.mjs",
     "check:offline": "npm --workspace @tuong-tac-pro/web run lint:offline && npm --workspace @tuong-tac-pro/web run typecheck:offline && npm run qa:offline",
     "qa:customer": "node qa/customer-application-check.mjs",
     "db:generate": "npm --workspace @tuong-tac-pro/db run db:generate",
@@ -27,7 +27,10 @@
     "db:test:prepare": "npm run db:generate && node qa/prepare-test-db.mjs",
     "postinstall": "npm run db:generate",
     "qa:work4:api": "node qa/work4-api-smoke.mjs",
-    "qa:work4:persistence": "node qa/work4-persistence-verify.mjs"
+    "qa:work4:persistence": "node qa/work4-persistence-verify.mjs",
+    "qa:work5:api": "node qa/work5-admin-api-smoke.mjs",
+    "qa:work5:static": "node qa/work5-admin-contract-check.mjs",
+    "check:work5": "npm run db:validate && npm run lint:web && npm run typecheck:web && npm run test:backend && npm run build:web && npm run check:offline"
   },
   "engines": {
     "node": ">=22"

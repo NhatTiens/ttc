@@ -43,6 +43,9 @@ let passwordHash = "";
 
 async function resetDatabase() {
   const db = getDb();
+  await db.adminAuditLog.deleteMany();
+  await db.servicePriceHistory.deleteMany();
+  await db.systemSetting.deleteMany();
   await db.paymentEvent.deleteMany();
   await db.payment.deleteMany();
   await db.walletTransaction.deleteMany();

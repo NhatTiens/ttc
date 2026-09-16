@@ -4,7 +4,7 @@ function compactDate(now: Date) {
   return now.toISOString().slice(2, 10).replaceAll("-", "");
 }
 
-export function createPublicId(prefix: "TT" | "DEP" | "SUP", now = new Date()) {
+export function createPublicId(prefix: "TT" | "DEP" | "SUP" | "SVC", now = new Date()) {
   const suffix = randomBytes(8).toString("hex");
   return `${prefix}${compactDate(now)}-${suffix}`;
 }

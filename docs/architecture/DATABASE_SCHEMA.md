@@ -613,3 +613,31 @@ Work 04 intentionally debits an order at creation and leaves the order `PENDING`
 Work 04 VND uses PostgreSQL `BIGINT`; one stored unit equals one VND. Service rates are VND per 1,000 units and order charge is integer-ceiling arithmetic.
 
 Database-level Work 04 protections include unique normalized email, public IDs, `(user_id, idempotency_key)` for order/deposit, money/range checks, FKs, and customer-history indexes. `WalletTransaction` remains the audit trail for every Work 04 balance change.
+
+---
+
+## Work 05 physical schema additions
+
+Migration `202609160002_work5_admin` extends the accepted Work 04 schema for safe operations without introducing provider data.
+
+### `service_categories.enabled`
+
+Boolean operational flag. A category cannot be disabled by Admin domain logic while a referenced service remains non-DISABLED.
+
+### `wallet_transactions` admin attribution
+
+Adds nullable `admin_user_id` and `reason`. Admin wallet adjustments, confirmed deposits and order refunds retain the ledger as the financial audit trail; no operation writes the wallet balance without a corresponding ledger effect.
+
+### `service_price_history`
+
+Stores service, previous/new customer rate, admin actor, optional reason and timestamp. Price is still VND per 1,000 units using BIGINT.
+
+### `admin_audit_logs`
+
+Stores admin actor, action, entity type/id, redacted before/after/metadata JSON, optional IP and timestamp. Passwords/auth secrets/integration credentials are prohibited from audit payloads.
+
+### `system_settings`
+
+Singleton operational configuration row (`id=default`) containing site name, support email, maintenance mode, minimum deposit, order-creation toggle and support toggle. It deliberately contains no provider/payment secret.
+
+Work 05 financial mutations use Serializable transactions/conditional state transitions for concurrency safety. Deposit confirmation and order refund are designed to have one financial effect even when requests race or replay.

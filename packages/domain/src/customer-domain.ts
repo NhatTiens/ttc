@@ -126,6 +126,10 @@ export async function createCustomerOrder(userId: string, input: OrderCreateInpu
         }
         return existing;
       }
+      const settings = await tx.systemSetting.findUnique({ where: { id: "default" } });
+      if (settings && !settings.orderCreationEnabled) {
+        throw new DomainError("SERVICE_UNAVAILABLE", "Hệ thống đang tạm ngừng nhận đơn mới.", 409);
+      }
 
       const service = await tx.service.findUnique({ where: { id: input.serviceId } });
       if (!service) throw new DomainError("SERVICE_NOT_FOUND", "Không tìm thấy dịch vụ.", 404);
@@ -209,6 +213,10 @@ export async function createDepositRequest(userId: string, input: { methodId: st
         }
         return existing;
       }
+      const settings = await tx.systemSetting.findUnique({ where: { id: "default" } });
+      if (settings && input.amountMinor < settings.minimumDepositMinor) {
+        throw new DomainError("VALIDATION_ERROR", `Số tiền nạp tối thiểu là ${settings.minimumDepositMinor.toString()} VND.`, 400);
+      }
       const method = await tx.depositMethod.findUnique({ where: { id: input.methodId } });
       if (!method || !method.enabled) throw new DomainError("VALIDATION_ERROR", "Phương thức nạp tiền hiện không khả dụng.", 400);
       if (input.amountMinor < method.minMinor || input.amountMinor > method.maxMinor) {
@@ -256,6 +264,8 @@ export async function createDepositRequest(userId: string, input: { methodId: st
 export async function createSupportTicket(userId: string, input: TicketCreateInput) {
   const db = getDb();
   return db.$transaction(async (tx) => {
+    const settings = await tx.systemSetting.findUnique({ where: { id: "default" } });
+    if (settings && !settings.supportEnabled) throw new DomainError("SERVICE_UNAVAILABLE", "Hỗ trợ đang tạm ngừng nhận yêu cầu mới.", 409);
     const ticket = await tx.supportTicket.create({
       data: {
         publicId: createPublicId("SUP"), userId, subject: input.subject.trim(), category: input.category.trim(),
@@ -272,6 +282,8 @@ export async function createSupportTicket(userId: string, input: TicketCreateInp
 export async function sendSupportReply(userId: string, ticketPublicId: string, body: string) {
   const db = getDb();
   return db.$transaction(async (tx) => {
+    const settings = await tx.systemSetting.findUnique({ where: { id: "default" } });
+    if (settings && !settings.supportEnabled) throw new DomainError("SERVICE_UNAVAILABLE", "Hỗ trợ đang tạm ngừng nhận phản hồi.", 409);
     const ticket = await tx.supportTicket.findFirst({ where: { publicId: ticketPublicId, userId } });
     if (!ticket) throw new DomainError("TICKET_NOT_FOUND", "Không tìm thấy yêu cầu hỗ trợ.", 404);
     const message = await tx.supportMessage.create({
