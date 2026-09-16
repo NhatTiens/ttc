@@ -122,3 +122,53 @@ export type AdminAuditLog = Prisma.AdminAuditLogModel
  * 
  */
 export type SystemSetting = Prisma.SystemSettingModel
+/**
+ * Model Provider
+ * 
+ */
+export type Provider = Prisma.ProviderModel
+/**
+ * Model ProviderService
+ * 
+ */
+export type ProviderService = Prisma.ProviderServiceModel
+/**
+ * Model ServiceProviderMapping
+ * 
+ */
+export type ServiceProviderMapping = Prisma.ServiceProviderMappingModel
+/**
+ * Model ProviderPriceHistory
+ * 
+ */
+export type ProviderPriceHistory = Prisma.ProviderPriceHistoryModel
+/**
+ * Model ProviderOrder
+ * 
+ */
+export type ProviderOrder = Prisma.ProviderOrderModel
+/**
+ * Model ProviderOrderAttempt
+ * 
+ */
+export type ProviderOrderAttempt = Prisma.ProviderOrderAttemptModel
+/**
+ * Model ProviderJob
+ * 
+ */
+export type ProviderJob = Prisma.ProviderJobModel
+/**
+ * Model ProviderOperationLog
+ * 
+ */
+export type ProviderOperationLog = Prisma.ProviderOperationLogModel
+/**
+ * Model ProviderBalanceSnapshot
+ * 
+ */
+export type ProviderBalanceSnapshot = Prisma.ProviderBalanceSnapshotModel
+/**
+ * Model ProviderRequestLease
+ * 
+ */
+export type ProviderRequestLease = Prisma.ProviderRequestLeaseModel

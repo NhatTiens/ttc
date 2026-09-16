@@ -96,3 +96,26 @@ export const analyticsQuerySchema = z.object({ range: z.enum(["7d", "30d"]).defa
 export function adminQueryObject(url: string) {
   return Object.fromEntries(new URL(url).searchParams.entries());
 }
+
+export const adminProviderQuerySchema = z.object({
+  search: z.string().trim().max(160).optional(),
+  status: z.enum(["ACTIVE", "DISABLED", "DEGRADED", "all"]).default("all"),
+  ...pageFields
+});
+export const adminProviderStatusSchema = z.object({ enabled: z.boolean() });
+export const adminProviderActionSchema = z.object({ action: z.enum(["TEST_CONNECTION", "SYNC_SERVICES", "SYNC_BALANCE"]) });
+export const adminProviderMappingSchema = z.object({
+  serviceId: z.string().trim().min(1).max(64),
+  providerServiceId: z.string().uuid(),
+  enabled: z.boolean().default(true),
+  priority: z.number().int().min(1).max(10_000).default(100),
+  markupType: z.enum(["PERCENTAGE", "FIXED"]).default("PERCENTAGE"),
+  markupBps: z.number().int().min(0).max(1_000_000).default(0),
+  fixedMarkup: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER).default(0),
+  minimumMargin: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER).default(0),
+  pricingMode: z.enum(["MANUAL", "AUTO_MARKUP"]).default("MANUAL")
+});
+export const adminProviderJobQuerySchema = z.object({
+  status: z.enum(["PENDING", "RUNNING", "RETRY", "MANUAL_REVIEW", "COMPLETED", "FAILED", "all"]).default("all"),
+  ...pageFields
+});

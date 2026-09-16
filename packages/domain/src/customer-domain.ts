@@ -3,6 +3,9 @@ import {
   DepositStatus,
   OrderStatus,
   Prisma,
+  ProviderMappingStatus,
+  ProviderServiceStatus,
+  ProviderStatus,
   ServiceStatus,
   SupportSenderType,
   SupportTicketStatus,
@@ -15,6 +18,7 @@ import {
 import { DomainError } from "./errors";
 import { createPublicId } from "./id";
 import { calculateChargeMinor } from "./money";
+import { enqueueOrderSubmissionIfEnabled } from "./provider-domain";
 
 export type OrderCreateInput = { serviceId: string; targetUrl: string; quantity: number };
 export type TicketCreateInput = { subject: string; category: string; message: string };
@@ -134,6 +138,24 @@ export async function createCustomerOrder(userId: string, input: OrderCreateInpu
       const service = await tx.service.findUnique({ where: { id: input.serviceId } });
       if (!service) throw new DomainError("SERVICE_NOT_FOUND", "Không tìm thấy dịch vụ.", 404);
       if (service.status !== ServiceStatus.ACTIVE) throw new DomainError("SERVICE_UNAVAILABLE", "Dịch vụ hiện không nhận đơn mới.", 409);
+      if (process.env.PROVIDER_ROUTING_ENABLED === "true") {
+        const mapping = await tx.serviceProviderMapping.findFirst({
+          where: {
+            serviceId: service.id,
+            enabled: true,
+            status: ProviderMappingStatus.ACTIVE,
+            providerService: {
+              status: ProviderServiceStatus.AVAILABLE,
+              provider: { enabled: true, status: ProviderStatus.ACTIVE }
+            }
+          },
+          orderBy: { priority: "asc" },
+          select: { id: true }
+        });
+        if (!mapping) {
+          throw new DomainError("SERVICE_UNAVAILABLE", "Dịch vụ chưa có tuyến nhà cung cấp khả dụng.", 409);
+        }
+      }
       if (input.quantity < service.min || input.quantity > service.max) {
         throw new DomainError("VALIDATION_ERROR", `Số lượng phải từ ${service.min} đến ${service.max}.`, 400);
       }
@@ -177,8 +199,15 @@ export async function createCustomerOrder(userId: string, input: OrderCreateInpu
         }
       });
       await tx.orderLog.create({
-        data: { orderId: order.id, toStatus: OrderStatus.PENDING, message: "Đơn hàng đã được tạo và đang chờ tích hợp nhà cung cấp." }
+        data: {
+          orderId: order.id,
+          toStatus: OrderStatus.PENDING,
+          message: process.env.PROVIDER_ROUTING_ENABLED === "true"
+            ? "Đơn hàng đã được tạo và đang chờ worker gửi tới nhà cung cấp."
+            : "Đơn hàng đã được tạo; provider routing hiện chưa được bật."
+        }
       });
+      await enqueueOrderSubmissionIfEnabled(tx, order.id, order.publicId);
       return tx.order.findUniqueOrThrow({
         where: { id: order.id },
         include: { service: true, logs: { orderBy: { createdAt: "asc" } } }

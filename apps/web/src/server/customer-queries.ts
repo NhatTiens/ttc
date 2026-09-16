@@ -1,4 +1,4 @@
-import { getDb, OrderStatus, Prisma, SocialPlatform } from "@tuong-tac-pro/db";
+import { getDb, OrderStatus, Prisma, ProviderMappingStatus, ProviderServiceStatus, ProviderStatus, ServiceStatus, SocialPlatform } from "@tuong-tac-pro/db";
 import { getOwnedTicket, moneyToSafeNumber } from "@tuong-tac-pro/domain";
 import { toCategory, toDeposit, toDepositMethod, toOrder, toProfile, toService, toSupportMessage, toTicket, toWallet, toWalletTransaction } from "./mappers";
 
@@ -20,6 +20,23 @@ const publicStatusToDb = {
   Refunded: [OrderStatus.REFUNDED]
 } as const;
 
+function providerRoutableServiceWhere(): Prisma.ServiceWhereInput {
+  if (process.env.PROVIDER_ROUTING_ENABLED !== "true") return {};
+  return {
+    status: ServiceStatus.ACTIVE,
+    providerMappings: {
+      some: {
+        enabled: true,
+        status: ProviderMappingStatus.ACTIVE,
+        providerService: {
+          status: ProviderServiceStatus.AVAILABLE,
+          provider: { enabled: true, status: ProviderStatus.ACTIVE }
+        }
+      }
+    }
+  };
+}
+
 export async function readProfile(userId: string) {
   const user = await getDb().user.findUniqueOrThrow({
     where: { id: userId },
@@ -39,7 +56,7 @@ export async function readDashboard(userId: string) {
     db.user.findUniqueOrThrow({ where: { id: userId }, include: { notificationPreference: true } }),
     db.wallet.findUniqueOrThrow({ where: { userId } }),
     db.order.findMany({ where: { userId }, include: { service: true }, orderBy: { createdAt: "desc" }, take: 200 }),
-    db.service.findMany({ where: { popular: true, status: "ACTIVE" }, orderBy: [{ platform: "asc" }, { name: "asc" }], take: 4 })
+    db.service.findMany({ where: { popular: true, status: ServiceStatus.ACTIVE, ...providerRoutableServiceWhere() }, orderBy: [{ platform: "asc" }, { name: "asc" }], take: 4 })
   ]);
   const completedPurchases = await db.walletTransaction.aggregate({
     where: { walletId: wallet.id, type: "PURCHASE", status: "COMPLETED" },
@@ -78,7 +95,7 @@ export async function readCategories() {
 }
 
 export async function readServices(filters: { search?: string; platform?: string; category?: string; page?: number; pageSize?: number }) {
-  const where: Prisma.ServiceWhereInput = {};
+  const where: Prisma.ServiceWhereInput = providerRoutableServiceWhere();
   if (filters.platform && filters.platform !== "all" && filters.platform in platformToDb) {
     where.platform = platformToDb[filters.platform as keyof typeof platformToDb];
   }
@@ -97,7 +114,10 @@ export async function readServices(filters: { search?: string; platform?: string
 }
 
 export async function readService(id: string) {
-  const service = await getDb().service.findUnique({ where: { id } });
+  const routable = providerRoutableServiceWhere();
+  const service = process.env.PROVIDER_ROUTING_ENABLED === "true"
+    ? await getDb().service.findFirst({ where: { id, ...routable } })
+    : await getDb().service.findUnique({ where: { id } });
   return service ? toService(service) : null;
 }
 

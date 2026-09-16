@@ -281,3 +281,13 @@ Every concrete adapter must pass the same suite:
 - redaction.
 - malformed response.
 - 429/backoff metadata.
+
+## 17. Work 06 concrete implementation
+
+Work 06 implements the provider contract in `packages/providers` and deliberately uses a PostgreSQL-backed `ProviderJob` queue in `apps/worker`. This is a controlled deviation from the earlier BullMQ recommendation, chosen for durability with the current deployment footprint.
+
+The first provider record is `TTC`. Its adapter now implements the documented TTC API v2 form protocol (`services`, `add`, `status`, `cancel`, `balance`) at the verified provider URL. The adapter still advertises `supportsCreateIdempotency=false` because the documented TTC `add` action has no idempotency/client-reference parameter; ambiguous create outcomes therefore remain manual-review states.
+
+TTC provider pricing is reported in XU. Service sync requires an explicit `TTC_XU_TO_VND_RATE` before normalized provider cost becomes authoritative VND economics. This avoids inventing an exchange value and preserves margin protection.
+
+Customer services and provider services remain distinct. With `PROVIDER_ROUTING_ENABLED=true`, a customer-visible/orderable service must have an ACTIVE mapping to an AVAILABLE service on an enabled ACTIVE provider. With the flag false, Work 03–05 behavior remains unchanged for migration safety.

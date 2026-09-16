@@ -397,3 +397,32 @@ Implemented groups: dashboard, customers/status/wallet adjustments, orders/refun
 All Admin endpoints independently require an ACTIVE `ADMIN` session. POST/PATCH routes use the same-origin guard and Zod boundary validation. The frontend never supplies authoritative resulting balances.
 
 The following remain deliberately unimplemented in Work 05: provider credentials/routes/sync/reconcile, provider-cost/profit analytics, automated payment gateway operations, arbitrary provider lifecycle transitions, and Tương Tác Chéo calls.
+
+## Work 06 Admin provider endpoints
+
+```text
+GET   /api/v1/admin/providers
+GET   /api/v1/admin/providers/:id
+PATCH /api/v1/admin/providers/:id
+POST  /api/v1/admin/providers/:id/actions
+POST  /api/v1/admin/provider-mappings
+POST  /api/v1/admin/provider-mappings/:id/disable
+GET   /api/v1/admin/provider-jobs
+```
+
+All routes require ADMIN authorization. Mutations use same-origin protection. Provider responses expose configuration indicators and sanitized operational data only; API keys/secrets are never returned.
+
+Provider actions enqueue durable jobs and return HTTP 202; they do not block the HTTP request on external provider I/O.
+
+## Work 06 TTC external adapter contract
+
+The internal `/api/v1` surface never exposes or proxies TTC credentials directly to the browser. Server-side `TTCProviderAdapter` uses the documented external API contract:
+
+```text
+POST https://tuongtaccheo.com/api/v2
+Content-Type: application/x-www-form-urlencoded
+key=<server-side API key>
+action=services|add|status|cancel|balance
+```
+
+`add` uses `service`, `link`, `quantity`; `status`/`cancel` use `order`. No TTC API key is returned by Admin or Customer APIs. The documented TTC `Access_token` tool-login endpoint is not part of provider order submission.

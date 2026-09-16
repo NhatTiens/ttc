@@ -641,3 +641,26 @@ Stores admin actor, action, entity type/id, redacted before/after/metadata JSON,
 Singleton operational configuration row (`id=default`) containing site name, support email, maintenance mode, minimum deposit, order-creation toggle and support toggle. It deliberately contains no provider/payment secret.
 
 Work 05 financial mutations use Serializable transactions/conditional state transitions for concurrency safety. Deposit confirmation and order refund are designed to have one financial effect even when requests race or replay.
+
+## Work 06 provider integration tables
+
+The implemented Prisma schema adds:
+
+```text
+providers
+provider_services
+service_provider_mappings
+provider_price_history
+provider_orders
+provider_order_attempts
+provider_jobs
+provider_operation_logs
+provider_balance_snapshots
+orders.refunded_minor
+```
+
+`provider_orders` stores immutable-at-submission economics snapshots: provider rate/rate unit, provider cost, customer charge, gross margin and currency. `orders.refunded_minor` records cumulative provider-driven refund target already posted to the wallet.
+
+`provider_jobs` is the current durable queue. `dedupe_key` is unique, jobs persist retry/manual-review/lock state, and worker crashes do not erase pending work.
+
+Provider credentials are intentionally absent from these tables. Provider secret values belong to server environment/secret storage only.

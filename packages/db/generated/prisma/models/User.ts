@@ -292,6 +292,7 @@ export type UserWhereInput = {
   adminAuditLogs?: Prisma.AdminAuditLogListRelationFilter
   servicePriceChanges?: Prisma.ServicePriceHistoryListRelationFilter
   systemSettingsUpdated?: Prisma.SystemSettingListRelationFilter
+  providerAuditMappings?: Prisma.ServiceProviderMappingListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -320,6 +321,7 @@ export type UserOrderByWithRelationInput = {
   adminAuditLogs?: Prisma.AdminAuditLogOrderByRelationAggregateInput
   servicePriceChanges?: Prisma.ServicePriceHistoryOrderByRelationAggregateInput
   systemSettingsUpdated?: Prisma.SystemSettingOrderByRelationAggregateInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -351,6 +353,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   adminAuditLogs?: Prisma.AdminAuditLogListRelationFilter
   servicePriceChanges?: Prisma.ServicePriceHistoryListRelationFilter
   systemSettingsUpdated?: Prisma.SystemSettingListRelationFilter
+  providerAuditMappings?: Prisma.ServiceProviderMappingListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -419,6 +422,7 @@ export type UserCreateInput = {
   adminAuditLogs?: Prisma.AdminAuditLogCreateNestedManyWithoutAdminUserInput
   servicePriceChanges?: Prisma.ServicePriceHistoryCreateNestedManyWithoutAdminUserInput
   systemSettingsUpdated?: Prisma.SystemSettingCreateNestedManyWithoutUpdatedByUserInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -447,6 +451,7 @@ export type UserUncheckedCreateInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUncheckedCreateNestedManyWithoutAdminUserInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedCreateNestedManyWithoutAdminUserInput
   systemSettingsUpdated?: Prisma.SystemSettingUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUpdateInput = {
@@ -475,6 +480,7 @@ export type UserUpdateInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUpdateManyWithoutAdminUserNestedInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUpdateManyWithoutAdminUserNestedInput
   systemSettingsUpdated?: Prisma.SystemSettingUpdateManyWithoutUpdatedByUserNestedInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -503,6 +509,7 @@ export type UserUncheckedUpdateInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminUserNestedInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedUpdateManyWithoutAdminUserNestedInput
   systemSettingsUpdated?: Prisma.SystemSettingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -829,6 +836,22 @@ export type UserUpdateOneWithoutSystemSettingsUpdatedNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSystemSettingsUpdatedInput, Prisma.UserUpdateWithoutSystemSettingsUpdatedInput>, Prisma.UserUncheckedUpdateWithoutSystemSettingsUpdatedInput>
 }
 
+export type UserCreateNestedOneWithoutProviderAuditMappingsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutProviderAuditMappingsInput, Prisma.UserUncheckedCreateWithoutProviderAuditMappingsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutProviderAuditMappingsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutProviderAuditMappingsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutProviderAuditMappingsInput, Prisma.UserUncheckedCreateWithoutProviderAuditMappingsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutProviderAuditMappingsInput
+  upsert?: Prisma.UserUpsertWithoutProviderAuditMappingsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutProviderAuditMappingsInput, Prisma.UserUpdateWithoutProviderAuditMappingsInput>, Prisma.UserUncheckedUpdateWithoutProviderAuditMappingsInput>
+}
+
 export type UserCreateWithoutAccountsInput = {
   id?: string
   email: string
@@ -854,6 +877,7 @@ export type UserCreateWithoutAccountsInput = {
   adminAuditLogs?: Prisma.AdminAuditLogCreateNestedManyWithoutAdminUserInput
   servicePriceChanges?: Prisma.ServicePriceHistoryCreateNestedManyWithoutAdminUserInput
   systemSettingsUpdated?: Prisma.SystemSettingCreateNestedManyWithoutUpdatedByUserInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutAccountsInput = {
@@ -881,6 +905,7 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUncheckedCreateNestedManyWithoutAdminUserInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedCreateNestedManyWithoutAdminUserInput
   systemSettingsUpdated?: Prisma.SystemSettingUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutAccountsInput = {
@@ -924,6 +949,7 @@ export type UserUpdateWithoutAccountsInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUpdateManyWithoutAdminUserNestedInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUpdateManyWithoutAdminUserNestedInput
   systemSettingsUpdated?: Prisma.SystemSettingUpdateManyWithoutUpdatedByUserNestedInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -951,6 +977,7 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminUserNestedInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedUpdateManyWithoutAdminUserNestedInput
   systemSettingsUpdated?: Prisma.SystemSettingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutSessionsInput = {
@@ -978,6 +1005,7 @@ export type UserCreateWithoutSessionsInput = {
   adminAuditLogs?: Prisma.AdminAuditLogCreateNestedManyWithoutAdminUserInput
   servicePriceChanges?: Prisma.ServicePriceHistoryCreateNestedManyWithoutAdminUserInput
   systemSettingsUpdated?: Prisma.SystemSettingCreateNestedManyWithoutUpdatedByUserInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -1005,6 +1033,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUncheckedCreateNestedManyWithoutAdminUserInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedCreateNestedManyWithoutAdminUserInput
   systemSettingsUpdated?: Prisma.SystemSettingUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -1048,6 +1077,7 @@ export type UserUpdateWithoutSessionsInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUpdateManyWithoutAdminUserNestedInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUpdateManyWithoutAdminUserNestedInput
   systemSettingsUpdated?: Prisma.SystemSettingUpdateManyWithoutUpdatedByUserNestedInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -1075,6 +1105,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminUserNestedInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedUpdateManyWithoutAdminUserNestedInput
   systemSettingsUpdated?: Prisma.SystemSettingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutWalletInput = {
@@ -1102,6 +1133,7 @@ export type UserCreateWithoutWalletInput = {
   adminAuditLogs?: Prisma.AdminAuditLogCreateNestedManyWithoutAdminUserInput
   servicePriceChanges?: Prisma.ServicePriceHistoryCreateNestedManyWithoutAdminUserInput
   systemSettingsUpdated?: Prisma.SystemSettingCreateNestedManyWithoutUpdatedByUserInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutWalletInput = {
@@ -1129,6 +1161,7 @@ export type UserUncheckedCreateWithoutWalletInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUncheckedCreateNestedManyWithoutAdminUserInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedCreateNestedManyWithoutAdminUserInput
   systemSettingsUpdated?: Prisma.SystemSettingUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutWalletInput = {
@@ -1172,6 +1205,7 @@ export type UserUpdateWithoutWalletInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUpdateManyWithoutAdminUserNestedInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUpdateManyWithoutAdminUserNestedInput
   systemSettingsUpdated?: Prisma.SystemSettingUpdateManyWithoutUpdatedByUserNestedInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWalletInput = {
@@ -1199,6 +1233,7 @@ export type UserUncheckedUpdateWithoutWalletInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminUserNestedInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedUpdateManyWithoutAdminUserNestedInput
   systemSettingsUpdated?: Prisma.SystemSettingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutAdminWalletTransactionsInput = {
@@ -1226,6 +1261,7 @@ export type UserCreateWithoutAdminWalletTransactionsInput = {
   adminAuditLogs?: Prisma.AdminAuditLogCreateNestedManyWithoutAdminUserInput
   servicePriceChanges?: Prisma.ServicePriceHistoryCreateNestedManyWithoutAdminUserInput
   systemSettingsUpdated?: Prisma.SystemSettingCreateNestedManyWithoutUpdatedByUserInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutAdminWalletTransactionsInput = {
@@ -1253,6 +1289,7 @@ export type UserUncheckedCreateWithoutAdminWalletTransactionsInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUncheckedCreateNestedManyWithoutAdminUserInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedCreateNestedManyWithoutAdminUserInput
   systemSettingsUpdated?: Prisma.SystemSettingUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutAdminWalletTransactionsInput = {
@@ -1296,6 +1333,7 @@ export type UserUpdateWithoutAdminWalletTransactionsInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUpdateManyWithoutAdminUserNestedInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUpdateManyWithoutAdminUserNestedInput
   systemSettingsUpdated?: Prisma.SystemSettingUpdateManyWithoutUpdatedByUserNestedInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAdminWalletTransactionsInput = {
@@ -1323,6 +1361,7 @@ export type UserUncheckedUpdateWithoutAdminWalletTransactionsInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminUserNestedInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedUpdateManyWithoutAdminUserNestedInput
   systemSettingsUpdated?: Prisma.SystemSettingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutOrdersInput = {
@@ -1350,6 +1389,7 @@ export type UserCreateWithoutOrdersInput = {
   adminAuditLogs?: Prisma.AdminAuditLogCreateNestedManyWithoutAdminUserInput
   servicePriceChanges?: Prisma.ServicePriceHistoryCreateNestedManyWithoutAdminUserInput
   systemSettingsUpdated?: Prisma.SystemSettingCreateNestedManyWithoutUpdatedByUserInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutOrdersInput = {
@@ -1377,6 +1417,7 @@ export type UserUncheckedCreateWithoutOrdersInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUncheckedCreateNestedManyWithoutAdminUserInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedCreateNestedManyWithoutAdminUserInput
   systemSettingsUpdated?: Prisma.SystemSettingUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutOrdersInput = {
@@ -1420,6 +1461,7 @@ export type UserUpdateWithoutOrdersInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUpdateManyWithoutAdminUserNestedInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUpdateManyWithoutAdminUserNestedInput
   systemSettingsUpdated?: Prisma.SystemSettingUpdateManyWithoutUpdatedByUserNestedInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOrdersInput = {
@@ -1447,6 +1489,7 @@ export type UserUncheckedUpdateWithoutOrdersInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminUserNestedInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedUpdateManyWithoutAdminUserNestedInput
   systemSettingsUpdated?: Prisma.SystemSettingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutDepositsInput = {
@@ -1474,6 +1517,7 @@ export type UserCreateWithoutDepositsInput = {
   adminAuditLogs?: Prisma.AdminAuditLogCreateNestedManyWithoutAdminUserInput
   servicePriceChanges?: Prisma.ServicePriceHistoryCreateNestedManyWithoutAdminUserInput
   systemSettingsUpdated?: Prisma.SystemSettingCreateNestedManyWithoutUpdatedByUserInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutDepositsInput = {
@@ -1501,6 +1545,7 @@ export type UserUncheckedCreateWithoutDepositsInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUncheckedCreateNestedManyWithoutAdminUserInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedCreateNestedManyWithoutAdminUserInput
   systemSettingsUpdated?: Prisma.SystemSettingUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutDepositsInput = {
@@ -1544,6 +1589,7 @@ export type UserUpdateWithoutDepositsInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUpdateManyWithoutAdminUserNestedInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUpdateManyWithoutAdminUserNestedInput
   systemSettingsUpdated?: Prisma.SystemSettingUpdateManyWithoutUpdatedByUserNestedInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDepositsInput = {
@@ -1571,6 +1617,7 @@ export type UserUncheckedUpdateWithoutDepositsInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminUserNestedInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedUpdateManyWithoutAdminUserNestedInput
   systemSettingsUpdated?: Prisma.SystemSettingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutSupportTicketsInput = {
@@ -1598,6 +1645,7 @@ export type UserCreateWithoutSupportTicketsInput = {
   adminAuditLogs?: Prisma.AdminAuditLogCreateNestedManyWithoutAdminUserInput
   servicePriceChanges?: Prisma.ServicePriceHistoryCreateNestedManyWithoutAdminUserInput
   systemSettingsUpdated?: Prisma.SystemSettingCreateNestedManyWithoutUpdatedByUserInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutSupportTicketsInput = {
@@ -1625,6 +1673,7 @@ export type UserUncheckedCreateWithoutSupportTicketsInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUncheckedCreateNestedManyWithoutAdminUserInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedCreateNestedManyWithoutAdminUserInput
   systemSettingsUpdated?: Prisma.SystemSettingUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutSupportTicketsInput = {
@@ -1668,6 +1717,7 @@ export type UserUpdateWithoutSupportTicketsInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUpdateManyWithoutAdminUserNestedInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUpdateManyWithoutAdminUserNestedInput
   systemSettingsUpdated?: Prisma.SystemSettingUpdateManyWithoutUpdatedByUserNestedInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSupportTicketsInput = {
@@ -1695,6 +1745,7 @@ export type UserUncheckedUpdateWithoutSupportTicketsInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminUserNestedInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedUpdateManyWithoutAdminUserNestedInput
   systemSettingsUpdated?: Prisma.SystemSettingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutSupportMessagesInput = {
@@ -1722,6 +1773,7 @@ export type UserCreateWithoutSupportMessagesInput = {
   adminAuditLogs?: Prisma.AdminAuditLogCreateNestedManyWithoutAdminUserInput
   servicePriceChanges?: Prisma.ServicePriceHistoryCreateNestedManyWithoutAdminUserInput
   systemSettingsUpdated?: Prisma.SystemSettingCreateNestedManyWithoutUpdatedByUserInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutSupportMessagesInput = {
@@ -1749,6 +1801,7 @@ export type UserUncheckedCreateWithoutSupportMessagesInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUncheckedCreateNestedManyWithoutAdminUserInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedCreateNestedManyWithoutAdminUserInput
   systemSettingsUpdated?: Prisma.SystemSettingUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutSupportMessagesInput = {
@@ -1792,6 +1845,7 @@ export type UserUpdateWithoutSupportMessagesInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUpdateManyWithoutAdminUserNestedInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUpdateManyWithoutAdminUserNestedInput
   systemSettingsUpdated?: Prisma.SystemSettingUpdateManyWithoutUpdatedByUserNestedInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSupportMessagesInput = {
@@ -1819,6 +1873,7 @@ export type UserUncheckedUpdateWithoutSupportMessagesInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminUserNestedInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedUpdateManyWithoutAdminUserNestedInput
   systemSettingsUpdated?: Prisma.SystemSettingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutNotificationPreferenceInput = {
@@ -1846,6 +1901,7 @@ export type UserCreateWithoutNotificationPreferenceInput = {
   adminAuditLogs?: Prisma.AdminAuditLogCreateNestedManyWithoutAdminUserInput
   servicePriceChanges?: Prisma.ServicePriceHistoryCreateNestedManyWithoutAdminUserInput
   systemSettingsUpdated?: Prisma.SystemSettingCreateNestedManyWithoutUpdatedByUserInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutNotificationPreferenceInput = {
@@ -1873,6 +1929,7 @@ export type UserUncheckedCreateWithoutNotificationPreferenceInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUncheckedCreateNestedManyWithoutAdminUserInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedCreateNestedManyWithoutAdminUserInput
   systemSettingsUpdated?: Prisma.SystemSettingUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutNotificationPreferenceInput = {
@@ -1916,6 +1973,7 @@ export type UserUpdateWithoutNotificationPreferenceInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUpdateManyWithoutAdminUserNestedInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUpdateManyWithoutAdminUserNestedInput
   systemSettingsUpdated?: Prisma.SystemSettingUpdateManyWithoutUpdatedByUserNestedInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationPreferenceInput = {
@@ -1943,6 +2001,7 @@ export type UserUncheckedUpdateWithoutNotificationPreferenceInput = {
   adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminUserNestedInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedUpdateManyWithoutAdminUserNestedInput
   systemSettingsUpdated?: Prisma.SystemSettingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutServicePriceChangesInput = {
@@ -1970,6 +2029,7 @@ export type UserCreateWithoutServicePriceChangesInput = {
   adminWalletTransactions?: Prisma.WalletTransactionCreateNestedManyWithoutAdminUserInput
   adminAuditLogs?: Prisma.AdminAuditLogCreateNestedManyWithoutAdminUserInput
   systemSettingsUpdated?: Prisma.SystemSettingCreateNestedManyWithoutUpdatedByUserInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutServicePriceChangesInput = {
@@ -1997,6 +2057,7 @@ export type UserUncheckedCreateWithoutServicePriceChangesInput = {
   adminWalletTransactions?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminUserInput
   adminAuditLogs?: Prisma.AdminAuditLogUncheckedCreateNestedManyWithoutAdminUserInput
   systemSettingsUpdated?: Prisma.SystemSettingUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutServicePriceChangesInput = {
@@ -2040,6 +2101,7 @@ export type UserUpdateWithoutServicePriceChangesInput = {
   adminWalletTransactions?: Prisma.WalletTransactionUpdateManyWithoutAdminUserNestedInput
   adminAuditLogs?: Prisma.AdminAuditLogUpdateManyWithoutAdminUserNestedInput
   systemSettingsUpdated?: Prisma.SystemSettingUpdateManyWithoutUpdatedByUserNestedInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutServicePriceChangesInput = {
@@ -2067,6 +2129,7 @@ export type UserUncheckedUpdateWithoutServicePriceChangesInput = {
   adminWalletTransactions?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminUserNestedInput
   adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminUserNestedInput
   systemSettingsUpdated?: Prisma.SystemSettingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutAdminAuditLogsInput = {
@@ -2094,6 +2157,7 @@ export type UserCreateWithoutAdminAuditLogsInput = {
   adminWalletTransactions?: Prisma.WalletTransactionCreateNestedManyWithoutAdminUserInput
   servicePriceChanges?: Prisma.ServicePriceHistoryCreateNestedManyWithoutAdminUserInput
   systemSettingsUpdated?: Prisma.SystemSettingCreateNestedManyWithoutUpdatedByUserInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutAdminAuditLogsInput = {
@@ -2121,6 +2185,7 @@ export type UserUncheckedCreateWithoutAdminAuditLogsInput = {
   adminWalletTransactions?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminUserInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedCreateNestedManyWithoutAdminUserInput
   systemSettingsUpdated?: Prisma.SystemSettingUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutAdminAuditLogsInput = {
@@ -2164,6 +2229,7 @@ export type UserUpdateWithoutAdminAuditLogsInput = {
   adminWalletTransactions?: Prisma.WalletTransactionUpdateManyWithoutAdminUserNestedInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUpdateManyWithoutAdminUserNestedInput
   systemSettingsUpdated?: Prisma.SystemSettingUpdateManyWithoutUpdatedByUserNestedInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAdminAuditLogsInput = {
@@ -2191,6 +2257,7 @@ export type UserUncheckedUpdateWithoutAdminAuditLogsInput = {
   adminWalletTransactions?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminUserNestedInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedUpdateManyWithoutAdminUserNestedInput
   systemSettingsUpdated?: Prisma.SystemSettingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutSystemSettingsUpdatedInput = {
@@ -2218,6 +2285,7 @@ export type UserCreateWithoutSystemSettingsUpdatedInput = {
   adminWalletTransactions?: Prisma.WalletTransactionCreateNestedManyWithoutAdminUserInput
   adminAuditLogs?: Prisma.AdminAuditLogCreateNestedManyWithoutAdminUserInput
   servicePriceChanges?: Prisma.ServicePriceHistoryCreateNestedManyWithoutAdminUserInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutSystemSettingsUpdatedInput = {
@@ -2245,6 +2313,7 @@ export type UserUncheckedCreateWithoutSystemSettingsUpdatedInput = {
   adminWalletTransactions?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminUserInput
   adminAuditLogs?: Prisma.AdminAuditLogUncheckedCreateNestedManyWithoutAdminUserInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedCreateNestedManyWithoutAdminUserInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutSystemSettingsUpdatedInput = {
@@ -2288,6 +2357,7 @@ export type UserUpdateWithoutSystemSettingsUpdatedInput = {
   adminWalletTransactions?: Prisma.WalletTransactionUpdateManyWithoutAdminUserNestedInput
   adminAuditLogs?: Prisma.AdminAuditLogUpdateManyWithoutAdminUserNestedInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUpdateManyWithoutAdminUserNestedInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSystemSettingsUpdatedInput = {
@@ -2315,6 +2385,135 @@ export type UserUncheckedUpdateWithoutSystemSettingsUpdatedInput = {
   adminWalletTransactions?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminUserNestedInput
   adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminUserNestedInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedUpdateManyWithoutAdminUserNestedInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserCreateWithoutProviderAuditMappingsInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  emailVerifiedAt?: Date | string | null
+  twoFactorEnabled?: boolean
+  lastPasswordChangeAt?: Date | string
+  sessionVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  deposits?: Prisma.DepositCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  adminWalletTransactions?: Prisma.WalletTransactionCreateNestedManyWithoutAdminUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogCreateNestedManyWithoutAdminUserInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryCreateNestedManyWithoutAdminUserInput
+  systemSettingsUpdated?: Prisma.SystemSettingCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserUncheckedCreateWithoutProviderAuditMappingsInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  emailVerifiedAt?: Date | string | null
+  twoFactorEnabled?: boolean
+  lastPasswordChangeAt?: Date | string
+  sessionVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  deposits?: Prisma.DepositUncheckedCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  adminWalletTransactions?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedCreateNestedManyWithoutAdminUserInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedCreateNestedManyWithoutAdminUserInput
+  systemSettingsUpdated?: Prisma.SystemSettingUncheckedCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserCreateOrConnectWithoutProviderAuditMappingsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutProviderAuditMappingsInput, Prisma.UserUncheckedCreateWithoutProviderAuditMappingsInput>
+}
+
+export type UserUpsertWithoutProviderAuditMappingsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutProviderAuditMappingsInput, Prisma.UserUncheckedUpdateWithoutProviderAuditMappingsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutProviderAuditMappingsInput, Prisma.UserUncheckedCreateWithoutProviderAuditMappingsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutProviderAuditMappingsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutProviderAuditMappingsInput, Prisma.UserUncheckedUpdateWithoutProviderAuditMappingsInput>
+}
+
+export type UserUpdateWithoutProviderAuditMappingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastPasswordChangeAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  deposits?: Prisma.DepositUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  adminWalletTransactions?: Prisma.WalletTransactionUpdateManyWithoutAdminUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUpdateManyWithoutAdminUserNestedInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUpdateManyWithoutAdminUserNestedInput
+  systemSettingsUpdated?: Prisma.SystemSettingUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutProviderAuditMappingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastPasswordChangeAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  deposits?: Prisma.DepositUncheckedUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  adminWalletTransactions?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminUserNestedInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedUpdateManyWithoutAdminUserNestedInput
+  systemSettingsUpdated?: Prisma.SystemSettingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 
@@ -2333,6 +2532,7 @@ export type UserCountOutputType = {
   adminAuditLogs: number
   servicePriceChanges: number
   systemSettingsUpdated: number
+  providerAuditMappings: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2346,6 +2546,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   adminAuditLogs?: boolean | UserCountOutputTypeCountAdminAuditLogsArgs
   servicePriceChanges?: boolean | UserCountOutputTypeCountServicePriceChangesArgs
   systemSettingsUpdated?: boolean | UserCountOutputTypeCountSystemSettingsUpdatedArgs
+  providerAuditMappings?: boolean | UserCountOutputTypeCountProviderAuditMappingsArgs
 }
 
 /**
@@ -2428,6 +2629,13 @@ export type UserCountOutputTypeCountSystemSettingsUpdatedArgs<ExtArgs extends ru
   where?: Prisma.SystemSettingWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountProviderAuditMappingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ServiceProviderMappingWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2455,6 +2663,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   adminAuditLogs?: boolean | Prisma.User$adminAuditLogsArgs<ExtArgs>
   servicePriceChanges?: boolean | Prisma.User$servicePriceChangesArgs<ExtArgs>
   systemSettingsUpdated?: boolean | Prisma.User$systemSettingsUpdatedArgs<ExtArgs>
+  providerAuditMappings?: boolean | Prisma.User$providerAuditMappingsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -2520,6 +2729,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   adminAuditLogs?: boolean | Prisma.User$adminAuditLogsArgs<ExtArgs>
   servicePriceChanges?: boolean | Prisma.User$servicePriceChangesArgs<ExtArgs>
   systemSettingsUpdated?: boolean | Prisma.User$systemSettingsUpdatedArgs<ExtArgs>
+  providerAuditMappings?: boolean | Prisma.User$providerAuditMappingsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -2540,6 +2750,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     adminAuditLogs: Prisma.$AdminAuditLogPayload<ExtArgs>[]
     servicePriceChanges: Prisma.$ServicePriceHistoryPayload<ExtArgs>[]
     systemSettingsUpdated: Prisma.$SystemSettingPayload<ExtArgs>[]
+    providerAuditMappings: Prisma.$ServiceProviderMappingPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2961,6 +3172,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   adminAuditLogs<T extends Prisma.User$adminAuditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$adminAuditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AdminAuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   servicePriceChanges<T extends Prisma.User$servicePriceChangesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$servicePriceChangesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ServicePriceHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   systemSettingsUpdated<T extends Prisma.User$systemSettingsUpdatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$systemSettingsUpdatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SystemSettingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  providerAuditMappings<T extends Prisma.User$providerAuditMappingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$providerAuditMappingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ServiceProviderMappingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3671,6 +3883,30 @@ export type User$systemSettingsUpdatedArgs<ExtArgs extends runtime.Types.Extensi
   take?: number
   skip?: number
   distinct?: Prisma.SystemSettingScalarFieldEnum | Prisma.SystemSettingScalarFieldEnum[]
+}
+
+/**
+ * User.providerAuditMappings
+ */
+export type User$providerAuditMappingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ServiceProviderMapping
+   */
+  select?: Prisma.ServiceProviderMappingSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ServiceProviderMapping
+   */
+  omit?: Prisma.ServiceProviderMappingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServiceProviderMappingInclude<ExtArgs> | null
+  where?: Prisma.ServiceProviderMappingWhereInput
+  orderBy?: Prisma.ServiceProviderMappingOrderByWithRelationInput | Prisma.ServiceProviderMappingOrderByWithRelationInput[]
+  cursor?: Prisma.ServiceProviderMappingWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ServiceProviderMappingScalarFieldEnum | Prisma.ServiceProviderMappingScalarFieldEnum[]
 }
 
 /**

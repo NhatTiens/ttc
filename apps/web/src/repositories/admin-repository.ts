@@ -1,6 +1,6 @@
 import type {
   AdminAnalytics, AdminAuditLog, AdminCategory, AdminCategoryInput, AdminDashboard, AdminDeposit, AdminOrder, AdminOrderDetail, AdminPage,
-  AdminService, AdminServiceDetail, AdminServiceInput, AdminSettings, AdminSupportThread, AdminSupportTicket, AdminTransaction,
+  AdminProvider, AdminProviderDetail, AdminProviderMappingInput, AdminService, AdminServiceDetail, AdminServiceInput, AdminSettings, AdminSupportThread, AdminSupportTicket, AdminTransaction,
   AdminUserDetail, AdminUserListItem, AdminWallet
 } from "@/domain/admin";
 
@@ -35,4 +35,10 @@ export interface AdminRepository {
   listAuditLogs(filters?: Record<string, string | number | undefined>): Promise<AdminPage<AdminAuditLog>>;
   getSettings(): Promise<AdminSettings>;
   updateSettings(input: Omit<AdminSettings, "updatedAt">): Promise<AdminSettings>;
+  listProviders(filters?: Record<string, string | number | undefined>): Promise<AdminPage<AdminProvider>>;
+  getProvider(id: string): Promise<AdminProviderDetail>;
+  setProviderEnabled(id: string, enabled: boolean): Promise<AdminProviderDetail>;
+  runProviderAction(id: string, action: "TEST_CONNECTION" | "SYNC_SERVICES" | "SYNC_BALANCE"): Promise<{ id: string; type: string; status: string }>;
+  saveProviderMapping(input: AdminProviderMappingInput): Promise<{ id: string; status: string; enabled: boolean }>;
+  disableProviderMapping(id: string): Promise<{ id: string; status: string; enabled: boolean }>;
 }

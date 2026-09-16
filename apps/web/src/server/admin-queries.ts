@@ -2,6 +2,8 @@ import {
   DepositStatus,
   OrderStatus,
   Prisma,
+  ProviderJobStatus,
+  ProviderSubmissionState,
   ServiceStatus,
   SocialPlatform,
   SupportTicketStatus,
@@ -20,6 +22,9 @@ import type {
   AdminOrder,
   AdminOrderDetail,
   AdminPage,
+  AdminProvider,
+  AdminProviderDetail,
+  AdminProviderService,
   AdminService,
   AdminServiceDetail,
   AdminSettings,
@@ -338,7 +343,13 @@ export async function readAdminOrders(filters: { search?: string; customer?: str
 export async function readAdminOrder(publicId: string): Promise<AdminOrderDetail | null> {
   const db = getDb();
   const order = await db.order.findUnique({
-    where: { publicId }, include: { user: { select: { name: true, email: true } }, service: true, logs: { orderBy: { createdAt: "asc" } } }
+    where: { publicId },
+    include: {
+      user: { select: { name: true, email: true } },
+      service: true,
+      logs: { orderBy: { createdAt: "asc" } },
+      providerOrder: { include: { provider: true, providerService: true } }
+    }
   });
   if (!order) return null;
   const wallet = await db.wallet.findUnique({ where: { userId: order.userId } });
@@ -350,7 +361,20 @@ export async function readAdminOrder(publicId: string): Promise<AdminOrderDetail
   return {
     ...orderMap(order),
     timeline: order.logs.map((log) => ({ fromStatus: log.fromStatus, toStatus: log.toStatus, message: log.message, createdAt: log.createdAt.toISOString() })),
-    walletTransactions: transactions.map(transactionMap)
+    walletTransactions: transactions.map(transactionMap),
+    provider: order.providerOrder ? {
+      providerName: order.providerOrder.provider.name,
+      providerServiceName: order.providerOrder.providerService.name,
+      externalOrderId: order.providerOrder.externalOrderId ?? "",
+      submissionState: order.providerOrder.submissionState,
+      providerStatus: order.providerOrder.status,
+      attempts: order.providerOrder.attemptCount,
+      submittedAt: order.providerOrder.submittedAt?.toISOString() ?? null,
+      lastCheckedAt: order.providerOrder.lastCheckedAt?.toISOString() ?? null,
+      providerCost: moneyToSafeNumber(order.providerOrder.providerCostMinor),
+      customerCharge: moneyToSafeNumber(order.providerOrder.customerChargeMinor),
+      grossMargin: moneyToSafeNumber(order.providerOrder.grossMarginMinor)
+    } : null
   };
 }
 
@@ -446,12 +470,13 @@ export async function readAdminSupportThread(publicId: string): Promise<AdminSup
 export async function readAdminAnalytics(days: 7 | 30): Promise<AdminAnalytics> {
   const db = getDb();
   const start = new Date(Date.now() - (days - 1) * 86_400_000); start.setHours(0, 0, 0, 0);
-  const [orders, users, deposits, refunds, wallets] = await Promise.all([
+  const [orders, users, deposits, refunds, wallets, providerOrders] = await Promise.all([
     db.order.findMany({ where: { createdAt: { gte: start } }, include: { service: true } }),
     db.user.findMany({ where: { role: UserRole.CUSTOMER, createdAt: { gte: start } }, select: { createdAt: true } }),
     db.deposit.findMany({ where: { status: DepositStatus.CONFIRMED, updatedAt: { gte: start } }, select: { amountMinor: true, updatedAt: true } }),
     db.walletTransaction.findMany({ where: { type: WalletTransactionType.REFUND, status: WalletTransactionStatus.COMPLETED, createdAt: { gte: start } }, select: { amountMinor: true, createdAt: true } }),
-    db.wallet.aggregate({ _sum: { balanceMinor: true } })
+    db.wallet.aggregate({ _sum: { balanceMinor: true } }),
+    db.providerOrder.findMany({ where: { createdAt: { gte: start }, submissionState: ProviderSubmissionState.ACCEPTED }, include: { provider: { select: { name: true } } } })
   ]);
   const byDate = new Map<string, { date: string; orders: number; customerSpend: number; newCustomers: number; deposits: number; refunds: number }>();
   for (let offset = 0; offset < days; offset += 1) {
@@ -480,7 +505,20 @@ export async function readAdminAnalytics(days: 7 | 30): Promise<AdminAnalytics> 
     platformDistribution: [...platforms.entries()].map(([platform, count]) => ({ label: platformName(platform), count })).sort((a, b) => b.count - a.count),
     topServices: [...serviceMapData.values()].sort((a, b) => b.orders - a.orders).slice(0, 8),
     orderStatusDistribution: [...statuses.entries()].map(([status, count]) => ({ status, count })).sort((a, b) => b.count - a.count),
-    walletLiability: moneyToSafeNumber(wallets._sum.balanceMinor ?? 0n)
+    walletLiability: moneyToSafeNumber(wallets._sum.balanceMinor ?? 0n),
+    providerEconomics: (() => {
+      const byProvider = new Map<string, { provider: string; orders: number; providerCost: number; grossMargin: number }>();
+      let customerCharge = 0; let providerCost = 0; let grossMarginValue = 0;
+      for (const item of providerOrders) {
+        const charge = moneyToSafeNumber(item.customerChargeMinor);
+        const cost = moneyToSafeNumber(item.providerCostMinor);
+        const margin = moneyToSafeNumber(item.grossMarginMinor);
+        customerCharge += charge; providerCost += cost; grossMarginValue += margin;
+        const current = byProvider.get(item.provider.name) ?? { provider: item.provider.name, orders: 0, providerCost: 0, grossMargin: 0 };
+        current.orders += 1; current.providerCost += cost; current.grossMargin += margin; byProvider.set(item.provider.name, current);
+      }
+      return { orderCount: providerOrders.length, customerCharge, providerCost, grossMargin: grossMarginValue, byProvider: [...byProvider.values()].sort((a, b) => b.orders - a.orders) };
+    })()
   };
 }
 
@@ -513,4 +551,163 @@ export async function readAdminSettings(): Promise<AdminSettings> {
     siteName: row.siteName, supportEmail: row.supportEmail, maintenanceMode: row.maintenanceMode, minimumDeposit: moneyToSafeNumber(row.minimumDepositMinor),
     orderCreationEnabled: row.orderCreationEnabled, supportEnabled: row.supportEnabled, updatedAt: row.updatedAt.toISOString()
   };
+}
+
+function providerBase(row: {
+  id: string;
+  code: string;
+  name: string;
+  status: "ACTIVE" | "DISABLED" | "DEGRADED";
+  health: "HEALTHY" | "DEGRADED" | "DOWN" | "UNKNOWN";
+  enabled: boolean;
+  priority: number;
+  baseUrl: string | null;
+  balanceMinor: bigint | null;
+  balanceCurrency: string | null;
+  lastBalanceSyncAt: Date | null;
+  lastHealthAt: Date | null;
+  lastSuccessfulAt: Date | null;
+  lastErrorCode: string | null;
+  updatedAt: Date;
+  _count: { services: number; operationLogs: number };
+  services: { _count: { mappings: number } }[];
+}): AdminProvider {
+  const mapped = row.services.reduce((sum, item) => sum + (item._count.mappings > 0 ? 1 : 0), 0);
+  return {
+    id: row.id,
+    code: row.code,
+    name: row.name,
+    status: row.status,
+    health: row.health,
+    enabled: row.enabled,
+    priority: row.priority,
+    baseUrlConfigured: Boolean(row.baseUrl),
+    credentialConfigured: row.code === "TTC" ? Boolean(process.env.TTC_API_KEY) : false,
+    balance: row.balanceMinor === null ? null : moneyToSafeNumber(row.balanceMinor),
+    balanceCurrency: row.balanceCurrency ?? "",
+    lastBalanceSyncAt: row.lastBalanceSyncAt?.toISOString() ?? null,
+    lastHealthAt: row.lastHealthAt?.toISOString() ?? null,
+    lastSuccessfulAt: row.lastSuccessfulAt?.toISOString() ?? null,
+    lastErrorCode: row.lastErrorCode ?? "",
+    services: row._count.services,
+    mappedServices: mapped,
+    unmappedServices: Math.max(0, row._count.services - mapped),
+    errors: row._count.operationLogs,
+    updatedAt: row.updatedAt.toISOString()
+  };
+}
+
+export async function readAdminProviders(filters: { search?: string; status?: string; page: number; pageSize: number }) {
+  const db = getDb();
+  const where: Prisma.ProviderWhereInput = {};
+  if (filters.search) where.OR = [{ code: { contains: filters.search, mode: "insensitive" } }, { name: { contains: filters.search, mode: "insensitive" } }];
+  if (filters.status && filters.status !== "all" && ["ACTIVE", "DISABLED", "DEGRADED"].includes(filters.status)) {
+    where.status = filters.status as "ACTIVE" | "DISABLED" | "DEGRADED";
+  }
+  const [total, rows] = await Promise.all([
+    db.provider.count({ where }),
+    db.provider.findMany({
+      where,
+      include: {
+        _count: { select: { services: true, operationLogs: true } },
+        services: { select: { _count: { select: { mappings: true } } } }
+      },
+      orderBy: [{ priority: "asc" }, { name: "asc" }],
+      skip: (filters.page - 1) * filters.pageSize,
+      take: filters.pageSize
+    })
+  ]);
+  return pageResult(rows.map(providerBase), filters.page, filters.pageSize, total);
+}
+
+export async function readAdminProvider(providerId: string): Promise<AdminProviderDetail | null> {
+  const db = getDb();
+  const row = await db.provider.findUnique({
+    where: { id: providerId },
+    include: {
+      _count: { select: { services: true, operationLogs: true } },
+      services: {
+        orderBy: [{ status: "asc" }, { name: "asc" }],
+        include: {
+          _count: { select: { mappings: true } },
+          mappings: { include: { service: true }, orderBy: { priority: "asc" } }
+        }
+      },
+      jobs: { orderBy: { createdAt: "desc" }, take: 30 },
+      operationLogs: { orderBy: { createdAt: "desc" }, take: 50 }
+    }
+  });
+  if (!row) return null;
+  const servicesList: AdminProviderService[] = row.services.map((service) => ({
+    id: service.id,
+    externalServiceId: service.externalServiceId,
+    name: service.name,
+    category: service.category ?? "",
+    platform: service.platform,
+    providerRate: moneyToSafeNumber(service.providerRateMinor),
+    rateUnit: service.rateUnit,
+    currency: service.currency,
+    min: service.min,
+    max: service.max,
+    supportsRefill: service.supportsRefill,
+    supportsCancel: service.supportsCancel,
+    status: service.status,
+    lastSyncedAt: service.lastSyncedAt.toISOString(),
+    mappings: service.mappings.map((mapping) => ({
+      id: mapping.id,
+      internalServiceId: mapping.serviceId,
+      internalServiceCode: mapping.service.code,
+      internalServiceName: mapping.service.name,
+      customerRate: moneyToSafeNumber(mapping.service.ratePerThousandMinor),
+      marginPerRateUnit: moneyToSafeNumber(mapping.service.ratePerThousandMinor - ((service.providerRateMinor * 1000n + BigInt(service.rateUnit) - 1n) / BigInt(service.rateUnit))),
+      enabled: mapping.enabled,
+      priority: mapping.priority,
+      markupType: mapping.markupType,
+      markupBps: mapping.markupBps,
+      fixedMarkup: moneyToSafeNumber(mapping.fixedMarkupMinor),
+      minimumMargin: moneyToSafeNumber(mapping.minimumMarginMinor),
+      pricingMode: mapping.pricingMode,
+      status: mapping.status
+    }))
+  }));
+  return {
+    ...providerBase(row),
+    servicesList,
+    jobs: row.jobs.map((job) => ({
+      id: job.id,
+      type: job.type,
+      status: job.status,
+      attempts: job.attempts,
+      maxAttempts: job.maxAttempts,
+      runAt: job.runAt.toISOString(),
+      lastErrorCode: job.lastErrorCode ?? "",
+      lastErrorMessage: job.lastErrorMessage ?? "",
+      createdAt: job.createdAt.toISOString()
+    })),
+    operations: row.operationLogs.map((operation) => ({
+      id: operation.id,
+      operation: operation.operation,
+      result: operation.result,
+      durationMs: operation.durationMs,
+      attempt: operation.attempt,
+      errorCode: operation.errorCode ?? "",
+      createdAt: operation.createdAt.toISOString()
+    }))
+  };
+}
+
+export async function readAdminProviderJobs(filters: { status?: string; page: number; pageSize: number }) {
+  const where: Prisma.ProviderJobWhereInput = {};
+  if (filters.status && filters.status !== "all" && Object.values(ProviderJobStatus).includes(filters.status as ProviderJobStatus)) {
+    where.status = filters.status as ProviderJobStatus;
+  }
+  const db = getDb();
+  const [total, rows] = await Promise.all([
+    db.providerJob.count({ where }),
+    db.providerJob.findMany({ where, orderBy: { createdAt: "desc" }, skip: (filters.page - 1) * filters.pageSize, take: filters.pageSize })
+  ]);
+  return pageResult(rows.map((job) => ({
+    id: job.id, type: job.type, status: job.status, attempts: job.attempts, maxAttempts: job.maxAttempts,
+    runAt: job.runAt.toISOString(), lastErrorCode: job.lastErrorCode ?? "", lastErrorMessage: job.lastErrorMessage ?? "", createdAt: job.createdAt.toISOString()
+  })), filters.page, filters.pageSize, total);
 }

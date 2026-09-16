@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import argon2 from "argon2";
 import { getDb } from "../src/client";
-import { DepositStatus, OrderStatus, SocialPlatform, ServiceStatus, SupportSenderType, SupportTicketStatus, UserRole, UserStatus, DepositMethodType, WalletTransactionStatus, WalletTransactionType } from "../generated/prisma/client";
+import { DepositStatus, OrderStatus, ProviderHealth, ProviderStatus, SocialPlatform, ServiceStatus, SupportSenderType, SupportTicketStatus, UserRole, UserStatus, DepositMethodType, WalletTransactionStatus, WalletTransactionType } from "../generated/prisma/client";
 
 const rootEnvPath = fileURLToPath(new URL("../../../.env", import.meta.url));
 if (existsSync(rootEnvPath)) process.loadEnvFile(rootEnvPath);
@@ -80,6 +80,23 @@ async function main() {
       minimumDepositMinor: 50000n,
       orderCreationEnabled: true,
       supportEnabled: true
+    }
+  });
+
+  // TTC API v2 base URL is public provider metadata. Credentials remain environment-only.
+  const ttcBaseUrl = (process.env.TTC_API_BASE_URL ?? "https://tuongtaccheo.com/api/v2").trim();
+  await db.provider.upsert({
+    where: { code: "TTC" },
+    update: { name: "Tương Tác Chéo", baseUrl: ttcBaseUrl },
+    create: {
+      code: "TTC",
+      name: "Tương Tác Chéo",
+      status: ProviderStatus.DISABLED,
+      health: ProviderHealth.UNKNOWN,
+      enabled: false,
+      priority: 100,
+      timeoutMs: 10000,
+      baseUrl: ttcBaseUrl
     }
   });
 

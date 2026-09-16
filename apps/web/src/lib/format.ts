@@ -2,6 +2,11 @@ export function formatCurrency(value: number) {
   return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND", maximumFractionDigits: 0 }).format(value);
 }
 
+export function formatProviderMoney(value: number, currency: string) {
+  const normalized = currency.trim().toUpperCase();
+  return normalized === "VND" ? formatCurrency(value) : `${formatNumber(value)} ${normalized || "UNIT"}`;
+}
+
 export function formatNumber(value: number) {
   return new Intl.NumberFormat("vi-VN").format(value);
 }

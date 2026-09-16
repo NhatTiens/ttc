@@ -2,7 +2,7 @@
 
 import type { AdminRepository } from "./admin-repository";
 import type {
-  AdminAnalytics, AdminAuditLog, AdminCategory, AdminDashboard, AdminDeposit, AdminOrder, AdminOrderDetail, AdminPage, AdminService,
+  AdminAnalytics, AdminAuditLog, AdminCategory, AdminDashboard, AdminDeposit, AdminOrder, AdminOrderDetail, AdminPage, AdminProvider, AdminProviderDetail, AdminService,
   AdminServiceDetail, AdminSettings, AdminSupportThread, AdminSupportTicket, AdminTransaction, AdminUserDetail, AdminUserListItem, AdminWallet
 } from "@/domain/admin";
 
@@ -93,5 +93,11 @@ export const restAdminRepository: AdminRepository = {
   getAnalytics: (range = "30d") => request<AdminAnalytics>(query("/api/v1/admin/analytics", { range })),
   listAuditLogs: (filters = {}) => request<AdminPage<AdminAuditLog>>(query("/api/v1/admin/audit-logs", filters)),
   getSettings: () => request<AdminSettings>("/api/v1/admin/settings"),
-  updateSettings: (input) => request<AdminSettings>("/api/v1/admin/settings", { method: "PATCH", body: JSON.stringify(input) })
+  updateSettings: (input) => request<AdminSettings>("/api/v1/admin/settings", { method: "PATCH", body: JSON.stringify(input) }),
+  listProviders: (filters = {}) => request<AdminPage<AdminProvider>>(query("/api/v1/admin/providers", filters)),
+  getProvider: (id) => request<AdminProviderDetail>(`/api/v1/admin/providers/${encodeURIComponent(id)}`),
+  setProviderEnabled: (id, enabled) => request<AdminProviderDetail>(`/api/v1/admin/providers/${encodeURIComponent(id)}`, { method: "PATCH", body: JSON.stringify({ enabled }) }),
+  runProviderAction: (id, action) => request<{ id: string; type: string; status: string }>(`/api/v1/admin/providers/${encodeURIComponent(id)}/actions`, { method: "POST", body: JSON.stringify({ action }) }),
+  saveProviderMapping: (input) => request<{ id: string; status: string; enabled: boolean }>("/api/v1/admin/provider-mappings", { method: "POST", body: JSON.stringify(input) }),
+  disableProviderMapping: (id) => request<{ id: string; status: string; enabled: boolean }>(`/api/v1/admin/provider-mappings/${encodeURIComponent(id)}/disable`, { method: "POST" })
 };

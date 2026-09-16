@@ -1,0 +1,23 @@
+{
+  "name": "@tuong-tac-pro/worker",
+  "private": true,
+  "version": "0.3.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/bootstrap.ts",
+    "start": "tsx src/bootstrap.ts",
+    "once": "tsx src/bootstrap.ts --once",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "node --import tsx --test tests/*.test.ts"
+  },
+  "dependencies": {
+    "@tuong-tac-pro/db": "*",
+    "@tuong-tac-pro/domain": "*",
+    "@tuong-tac-pro/providers": "*"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.6",
+    "typescript": "^5.8.3",
+    "@types/node": "^22.0.0"
+  }
+}

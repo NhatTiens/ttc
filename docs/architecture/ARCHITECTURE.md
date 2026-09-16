@@ -353,3 +353,20 @@ PostgreSQL và Redis không expose public port trong production compose.
 | ADR-008 | Versioned pricing + quote | Chống price race và lưu lịch sử |
 | ADR-009 | Provider adapter interface | Provider-specific API không lan vào domain |
 | ADR-010 | No blind retry for non-idempotent provider create | Ngăn provider order duplication |
+
+## Work 06 implementation note — durable provider jobs
+
+The original blueprint recommends Redis/BullMQ + transactional outbox. Work 06 currently implements a PostgreSQL-backed durable `provider_jobs` queue because the Work 06 contract explicitly allows this strategy and it avoids an additional runtime dependency while preserving crash durability, retry state and multi-worker conditional claiming.
+
+Current implemented boundary:
+
+```text
+Customer/API transaction
+ -> orders + wallet ledger + provider_jobs (same PostgreSQL commit)
+ -> dedicated apps/worker
+ -> ProviderRegistry
+ -> ProviderAdapter
+ -> external provider
+```
+
+This is not an in-memory queue. Redis/BullMQ may be introduced later for throughput without changing the provider adapter/domain contract. Provider HTTP still never occurs in the browser or inside the customer order database transaction.

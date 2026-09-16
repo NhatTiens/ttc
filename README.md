@@ -225,3 +225,34 @@ WORK5_QA_REPORT.md
 ```
 
 Work 05 explicitly does not connect providers, Tương Tác Chéo, or an automatic payment gateway. `/admin/providers` is a non-calling placeholder for the next integration work.
+
+## Work 06 — Provider Integration
+
+Work 06 adds a provider-neutral integration layer, PostgreSQL durable provider jobs, a dedicated worker, service mapping, provider cost/markup/margin safety, provider order economics snapshots, status polling/refund logic and Admin provider operations.
+
+Safe default:
+
+```text
+PROVIDER_ROUTING_ENABLED=false
+```
+
+TTC API v2 is implemented from the provider documentation supplied for Work 06: form-urlencoded `POST` requests to `https://tuongtaccheo.com/api/v2` using `key` plus `services`, `add`, `status`, `cancel` and `balance` actions. The separate TTC `Access_token` tool-login flow is not used for provider ordering.
+
+Keep routing off until a real server-side API key and authoritative `TTC_XU_TO_VND_RATE` are configured, services are synced/reviewed, and mappings pass margin checks.
+
+Useful commands:
+
+```text
+npm run dev:worker
+npm run worker:once
+npm run test:work6
+npm run qa:work6:static
+npm run qa:work6:api
+npm run qa:ttc:readonly
+npm run qa:ttc:order
+npm run check:work6
+```
+
+`qa:ttc:order` is a side-effecting live smoke and refuses to run unless `TTC_LIVE_TEST_ALLOW_ORDER="YES_I_UNDERSTAND"` plus service/link/quantity are explicitly configured.
+
+See `WORK6_PROVIDER.md`, `TTC_INTEGRATION.md` and `TTC_INTEGRATION_GAPS.md`.

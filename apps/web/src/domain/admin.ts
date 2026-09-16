@@ -51,6 +51,7 @@ export type AdminOrder = {
 export type AdminOrderDetail = AdminOrder & {
   timeline: { fromStatus: AdminOrderStatus | null; toStatus: AdminOrderStatus; message: string; createdAt: string }[];
   walletTransactions: AdminTransaction[];
+  provider: AdminProviderEconomics | null;
 };
 export type AdminCategory = { id: string; name: string; sortOrder: number; enabled: boolean; serviceCount: number; createdAt: string; updatedAt: string };
 export type AdminService = {
@@ -78,6 +79,7 @@ export type AdminAnalytics = {
   topServices: { id: string; name: string; orders: number; customerSpend: number }[];
   orderStatusDistribution: { status: string; count: number }[];
   walletLiability: number;
+  providerEconomics: { orderCount: number; customerCharge: number; providerCost: number; grossMargin: number; byProvider: { provider: string; orders: number; providerCost: number; grossMargin: number }[] };
 };
 export type AdminAuditLog = {
   id: string; timestamp: string; adminId: string; adminName: string; action: string; entityType: string; entityId: string;
@@ -92,3 +94,109 @@ export type AdminServiceInput = {
   averageTime: string; popular: boolean; status: AdminServiceStatus; priceChangeReason?: string;
 };
 export type AdminCategoryInput = { id?: string; name: string; sortOrder: number; enabled: boolean };
+
+export type AdminProviderStatus = "ACTIVE" | "DISABLED" | "DEGRADED";
+export type AdminProviderHealth = "HEALTHY" | "DEGRADED" | "DOWN" | "UNKNOWN";
+export type AdminProvider = {
+  id: string;
+  code: string;
+  name: string;
+  status: AdminProviderStatus;
+  health: AdminProviderHealth;
+  enabled: boolean;
+  priority: number;
+  baseUrlConfigured: boolean;
+  credentialConfigured: boolean;
+  balance: number | null;
+  balanceCurrency: string;
+  lastBalanceSyncAt: string | null;
+  lastHealthAt: string | null;
+  lastSuccessfulAt: string | null;
+  lastErrorCode: string;
+  services: number;
+  mappedServices: number;
+  unmappedServices: number;
+  errors: number;
+  updatedAt: string;
+};
+export type AdminProviderService = {
+  id: string;
+  externalServiceId: string;
+  name: string;
+  category: string;
+  platform: AdminPlatform | null;
+  providerRate: number;
+  rateUnit: number;
+  currency: string;
+  min: number;
+  max: number;
+  supportsRefill: boolean;
+  supportsCancel: boolean;
+  status: "AVAILABLE" | "UNAVAILABLE" | "DISABLED" | "REMOVED";
+  lastSyncedAt: string;
+  mappings: {
+    id: string;
+    internalServiceId: string;
+    internalServiceCode: string;
+    internalServiceName: string;
+    customerRate: number;
+    marginPerRateUnit: number;
+    enabled: boolean;
+    priority: number;
+    markupType: "PERCENTAGE" | "FIXED";
+    markupBps: number;
+    fixedMarkup: number;
+    minimumMargin: number;
+    pricingMode: "MANUAL" | "AUTO_MARKUP";
+    status: "ACTIVE" | "DISABLED" | "PRICE_REVIEW_REQUIRED" | "PROVIDER_UNAVAILABLE" | "MIN_MAX_CONFLICT";
+  }[];
+};
+export type AdminProviderJob = {
+  id: string;
+  type: string;
+  status: string;
+  attempts: number;
+  maxAttempts: number;
+  runAt: string;
+  lastErrorCode: string;
+  lastErrorMessage: string;
+  createdAt: string;
+};
+export type AdminProviderOperation = {
+  id: string;
+  operation: string;
+  result: string;
+  durationMs: number | null;
+  attempt: number;
+  errorCode: string;
+  createdAt: string;
+};
+export type AdminProviderDetail = AdminProvider & {
+  servicesList: AdminProviderService[];
+  jobs: AdminProviderJob[];
+  operations: AdminProviderOperation[];
+};
+export type AdminProviderMappingInput = {
+  serviceId: string;
+  providerServiceId: string;
+  enabled: boolean;
+  priority: number;
+  markupType: "PERCENTAGE" | "FIXED";
+  markupBps: number;
+  fixedMarkup: number;
+  minimumMargin: number;
+  pricingMode: "MANUAL" | "AUTO_MARKUP";
+};
+export type AdminProviderEconomics = {
+  providerName: string;
+  providerServiceName: string;
+  externalOrderId: string;
+  submissionState: string;
+  providerStatus: string;
+  attempts: number;
+  submittedAt: string | null;
+  lastCheckedAt: string | null;
+  providerCost: number;
+  customerCharge: number;
+  grossMargin: number;
+};

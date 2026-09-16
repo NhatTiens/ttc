@@ -278,17 +278,20 @@ const refundableStatuses = new Set<OrderStatus>([
 
 export async function refundOrder(actor: AdminActor, publicId: string, reason: string) {
   return serializable(async (tx) => {
-    const order = await tx.order.findUnique({ where: { publicId }, include: { user: { include: { wallet: true } } } });
+    const order = await tx.order.findUnique({ where: { publicId }, include: { user: { include: { wallet: true } }, providerOrder: true } });
     if (!order) throw new DomainError("ORDER_NOT_FOUND", "Không tìm thấy đơn hàng.", 404);
     if (order.status === OrderStatus.REFUNDED) return order;
     if (!refundableStatuses.has(order.status)) {
       throw new DomainError("VALIDATION_ERROR", "Trạng thái đơn hiện tại chưa đủ điều kiện hoàn tiền tự động.", 409);
     }
+    if (order.providerOrder) {
+      throw new DomainError("VALIDATION_ERROR", "Đơn đã bước vào provider workflow; hoàn tiền phải do provider reconciliation xử lý để tránh double-credit hoặc provider vẫn chạy đơn.", 409);
+    }
     const wallet = order.user.wallet;
     if (!wallet) throw new DomainError("INTERNAL_ERROR", "Khách hàng chưa có ví.", 500);
     const updated = await tx.order.updateMany({
       where: { id: order.id, status: order.status },
-      data: { status: OrderStatus.REFUNDED, remaining: 0 }
+      data: { status: OrderStatus.REFUNDED, remaining: 0, refundedMinor: order.chargeMinor }
     });
     if (updated.count !== 1) throw new DomainError("DUPLICATE_REQUEST", "Đơn hàng đã được thay đổi bởi một thao tác khác.", 409);
     const nextBalance = wallet.balanceMinor + order.chargeMinor;

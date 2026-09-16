@@ -1,12 +1,13 @@
 {
   "name": "@tuong-tac-pro/domain",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "exports": {
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@tuong-tac-pro/db": "*"
+    "@tuong-tac-pro/db": "*",
+    "@tuong-tac-pro/providers": "*"
   }
 }

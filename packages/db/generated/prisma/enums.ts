@@ -131,3 +131,111 @@ export const SupportSenderType = {
 } as const
 
 export type SupportSenderType = (typeof SupportSenderType)[keyof typeof SupportSenderType]
+
+
+export const ProviderStatus = {
+  ACTIVE: 'ACTIVE',
+  DISABLED: 'DISABLED',
+  DEGRADED: 'DEGRADED'
+} as const
+
+export type ProviderStatus = (typeof ProviderStatus)[keyof typeof ProviderStatus]
+
+
+export const ProviderHealth = {
+  HEALTHY: 'HEALTHY',
+  DEGRADED: 'DEGRADED',
+  DOWN: 'DOWN',
+  UNKNOWN: 'UNKNOWN'
+} as const
+
+export type ProviderHealth = (typeof ProviderHealth)[keyof typeof ProviderHealth]
+
+
+export const ProviderServiceStatus = {
+  AVAILABLE: 'AVAILABLE',
+  UNAVAILABLE: 'UNAVAILABLE',
+  DISABLED: 'DISABLED',
+  REMOVED: 'REMOVED'
+} as const
+
+export type ProviderServiceStatus = (typeof ProviderServiceStatus)[keyof typeof ProviderServiceStatus]
+
+
+export const ProviderMappingStatus = {
+  ACTIVE: 'ACTIVE',
+  DISABLED: 'DISABLED',
+  PRICE_REVIEW_REQUIRED: 'PRICE_REVIEW_REQUIRED',
+  PROVIDER_UNAVAILABLE: 'PROVIDER_UNAVAILABLE',
+  MIN_MAX_CONFLICT: 'MIN_MAX_CONFLICT'
+} as const
+
+export type ProviderMappingStatus = (typeof ProviderMappingStatus)[keyof typeof ProviderMappingStatus]
+
+
+export const ProviderMarkupType = {
+  PERCENTAGE: 'PERCENTAGE',
+  FIXED: 'FIXED'
+} as const
+
+export type ProviderMarkupType = (typeof ProviderMarkupType)[keyof typeof ProviderMarkupType]
+
+
+export const ProviderPricingMode = {
+  MANUAL: 'MANUAL',
+  AUTO_MARKUP: 'AUTO_MARKUP'
+} as const
+
+export type ProviderPricingMode = (typeof ProviderPricingMode)[keyof typeof ProviderPricingMode]
+
+
+export const ProviderSubmissionState = {
+  PENDING: 'PENDING',
+  PREPARED: 'PREPARED',
+  SENDING: 'SENDING',
+  SAFE_TO_RETRY: 'SAFE_TO_RETRY',
+  UNKNOWN_SUBMISSION: 'UNKNOWN_SUBMISSION',
+  ACCEPTED: 'ACCEPTED',
+  REJECTED: 'REJECTED',
+  MANUAL_REVIEW: 'MANUAL_REVIEW'
+} as const
+
+export type ProviderSubmissionState = (typeof ProviderSubmissionState)[keyof typeof ProviderSubmissionState]
+
+
+export const ProviderOrderStatus = {
+  CREATED: 'CREATED',
+  SUBMITTED: 'SUBMITTED',
+  PROCESSING: 'PROCESSING',
+  COMPLETED: 'COMPLETED',
+  PARTIAL: 'PARTIAL',
+  FAILED: 'FAILED',
+  CANCELLED: 'CANCELLED',
+  REFUNDED: 'REFUNDED',
+  UNKNOWN: 'UNKNOWN'
+} as const
+
+export type ProviderOrderStatus = (typeof ProviderOrderStatus)[keyof typeof ProviderOrderStatus]
+
+
+export const ProviderJobType = {
+  SUBMIT_ORDER: 'SUBMIT_ORDER',
+  POLL_ORDER_STATUS: 'POLL_ORDER_STATUS',
+  SYNC_SERVICES: 'SYNC_SERVICES',
+  SYNC_BALANCE: 'SYNC_BALANCE',
+  TEST_CONNECTION: 'TEST_CONNECTION'
+} as const
+
+export type ProviderJobType = (typeof ProviderJobType)[keyof typeof ProviderJobType]
+
+
+export const ProviderJobStatus = {
+  PENDING: 'PENDING',
+  RUNNING: 'RUNNING',
+  RETRY: 'RETRY',
+  MANUAL_REVIEW: 'MANUAL_REVIEW',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED'
+} as const
+
+export type ProviderJobStatus = (typeof ProviderJobStatus)[keyof typeof ProviderJobStatus]

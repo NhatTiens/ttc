@@ -969,3 +969,13 @@ img { max-width: 100%; display: block; }
   .admin-main { padding-left:12px; padding-right:12px; }
   .admin-mobile-nav { padding-left:2px; padding-right:2px; }
 }
+
+/* Work 06 provider operations */
+.admin-action-row { display:flex; flex-wrap:wrap; gap:8px; justify-content:flex-end; }
+.admin-grid-2 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+.admin-activity-list { display:grid; gap:0; }
+.admin-activity-list > div { display:grid; gap:3px; padding:10px 0; border-bottom:1px solid var(--color-border); }
+.admin-activity-list > div:last-child { border-bottom:0; }
+.admin-activity-list span,.admin-activity-list small { color:var(--color-text-muted); font-size:10.5px; overflow-wrap:anywhere; }
+@media (max-width: 899px) { .admin-grid-2 { grid-template-columns:1fr; } }
+@media (max-width: 767px) { .admin-action-row { justify-content:flex-start; } .admin-action-row .button { flex:1 1 140px; } }

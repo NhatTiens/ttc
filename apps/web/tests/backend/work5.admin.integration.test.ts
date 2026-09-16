@@ -49,6 +49,16 @@ let passwordHash = "";
 
 async function reset() {
   const db = getDb();
+  await db.providerRequestLease.deleteMany();
+  await db.providerJob.deleteMany();
+  await db.providerOperationLog.deleteMany();
+  await db.providerOrderAttempt.deleteMany();
+  await db.providerOrder.deleteMany();
+  await db.providerBalanceSnapshot.deleteMany();
+  await db.serviceProviderMapping.deleteMany();
+  await db.providerPriceHistory.deleteMany();
+  await db.providerService.deleteMany();
+  await db.provider.deleteMany();
   await db.adminAuditLog.deleteMany();
   await db.servicePriceHistory.deleteMany();
   await db.systemSetting.deleteMany();

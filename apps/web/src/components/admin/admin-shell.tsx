@@ -25,7 +25,7 @@ const adminNavigation: AdminNavItem[] = [
   { href: "/admin/analytics", label: "Phân tích", icon: <TrendIcon size={18} /> },
   { href: "/admin/audit-logs", label: "Nhật ký", icon: <LockIcon size={18} /> },
   { href: "/admin/settings", label: "Cài đặt", icon: <GridIcon size={18} /> },
-  { href: "/admin/providers", label: "Nhà cung cấp", icon: <GridIcon size={18} />, badge: "Sắp tới" }
+  { href: "/admin/providers", label: "Nhà cung cấp", icon: <GridIcon size={18} /> }
 ];
 
 function active(pathname: string, href: string) { return href === "/admin" ? pathname === "/admin" : pathname === href || pathname.startsWith(`${href}/`); }

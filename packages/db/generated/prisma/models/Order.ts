@@ -29,6 +29,7 @@ export type AggregateOrder = {
 export type OrderAvgAggregateOutputType = {
   quantity: number | null
   chargeMinor: number | null
+  refundedMinor: number | null
   startCount: number | null
   remaining: number | null
 }
@@ -36,6 +37,7 @@ export type OrderAvgAggregateOutputType = {
 export type OrderSumAggregateOutputType = {
   quantity: number | null
   chargeMinor: bigint | null
+  refundedMinor: bigint | null
   startCount: number | null
   remaining: number | null
 }
@@ -48,6 +50,7 @@ export type OrderMinAggregateOutputType = {
   targetUrl: string | null
   quantity: number | null
   chargeMinor: bigint | null
+  refundedMinor: bigint | null
   startCount: number | null
   remaining: number | null
   status: $Enums.OrderStatus | null
@@ -65,6 +68,7 @@ export type OrderMaxAggregateOutputType = {
   targetUrl: string | null
   quantity: number | null
   chargeMinor: bigint | null
+  refundedMinor: bigint | null
   startCount: number | null
   remaining: number | null
   status: $Enums.OrderStatus | null
@@ -82,6 +86,7 @@ export type OrderCountAggregateOutputType = {
   targetUrl: number
   quantity: number
   chargeMinor: number
+  refundedMinor: number
   startCount: number
   remaining: number
   status: number
@@ -96,6 +101,7 @@ export type OrderCountAggregateOutputType = {
 export type OrderAvgAggregateInputType = {
   quantity?: true
   chargeMinor?: true
+  refundedMinor?: true
   startCount?: true
   remaining?: true
 }
@@ -103,6 +109,7 @@ export type OrderAvgAggregateInputType = {
 export type OrderSumAggregateInputType = {
   quantity?: true
   chargeMinor?: true
+  refundedMinor?: true
   startCount?: true
   remaining?: true
 }
@@ -115,6 +122,7 @@ export type OrderMinAggregateInputType = {
   targetUrl?: true
   quantity?: true
   chargeMinor?: true
+  refundedMinor?: true
   startCount?: true
   remaining?: true
   status?: true
@@ -132,6 +140,7 @@ export type OrderMaxAggregateInputType = {
   targetUrl?: true
   quantity?: true
   chargeMinor?: true
+  refundedMinor?: true
   startCount?: true
   remaining?: true
   status?: true
@@ -149,6 +158,7 @@ export type OrderCountAggregateInputType = {
   targetUrl?: true
   quantity?: true
   chargeMinor?: true
+  refundedMinor?: true
   startCount?: true
   remaining?: true
   status?: true
@@ -253,6 +263,7 @@ export type OrderGroupByOutputType = {
   targetUrl: string
   quantity: number
   chargeMinor: bigint
+  refundedMinor: bigint
   startCount: number | null
   remaining: number
   status: $Enums.OrderStatus
@@ -293,6 +304,7 @@ export type OrderWhereInput = {
   targetUrl?: Prisma.StringFilter<"Order"> | string
   quantity?: Prisma.IntFilter<"Order"> | number
   chargeMinor?: Prisma.BigIntFilter<"Order"> | bigint | number
+  refundedMinor?: Prisma.BigIntFilter<"Order"> | bigint | number
   startCount?: Prisma.IntNullableFilter<"Order"> | number | null
   remaining?: Prisma.IntFilter<"Order"> | number
   status?: Prisma.EnumOrderStatusFilter<"Order"> | $Enums.OrderStatus
@@ -303,6 +315,10 @@ export type OrderWhereInput = {
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   service?: Prisma.XOR<Prisma.ServiceScalarRelationFilter, Prisma.ServiceWhereInput>
   logs?: Prisma.OrderLogListRelationFilter
+  providerOrder?: Prisma.XOR<Prisma.ProviderOrderNullableScalarRelationFilter, Prisma.ProviderOrderWhereInput> | null
+  providerJobs?: Prisma.ProviderJobListRelationFilter
+  providerAttempts?: Prisma.ProviderOrderAttemptListRelationFilter
+  providerOperationLogs?: Prisma.ProviderOperationLogListRelationFilter
 }
 
 export type OrderOrderByWithRelationInput = {
@@ -313,6 +329,7 @@ export type OrderOrderByWithRelationInput = {
   targetUrl?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   chargeMinor?: Prisma.SortOrder
+  refundedMinor?: Prisma.SortOrder
   startCount?: Prisma.SortOrderInput | Prisma.SortOrder
   remaining?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -323,6 +340,10 @@ export type OrderOrderByWithRelationInput = {
   user?: Prisma.UserOrderByWithRelationInput
   service?: Prisma.ServiceOrderByWithRelationInput
   logs?: Prisma.OrderLogOrderByRelationAggregateInput
+  providerOrder?: Prisma.ProviderOrderOrderByWithRelationInput
+  providerJobs?: Prisma.ProviderJobOrderByRelationAggregateInput
+  providerAttempts?: Prisma.ProviderOrderAttemptOrderByRelationAggregateInput
+  providerOperationLogs?: Prisma.ProviderOperationLogOrderByRelationAggregateInput
 }
 
 export type OrderWhereUniqueInput = Prisma.AtLeast<{
@@ -337,6 +358,7 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
   targetUrl?: Prisma.StringFilter<"Order"> | string
   quantity?: Prisma.IntFilter<"Order"> | number
   chargeMinor?: Prisma.BigIntFilter<"Order"> | bigint | number
+  refundedMinor?: Prisma.BigIntFilter<"Order"> | bigint | number
   startCount?: Prisma.IntNullableFilter<"Order"> | number | null
   remaining?: Prisma.IntFilter<"Order"> | number
   status?: Prisma.EnumOrderStatusFilter<"Order"> | $Enums.OrderStatus
@@ -347,6 +369,10 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   service?: Prisma.XOR<Prisma.ServiceScalarRelationFilter, Prisma.ServiceWhereInput>
   logs?: Prisma.OrderLogListRelationFilter
+  providerOrder?: Prisma.XOR<Prisma.ProviderOrderNullableScalarRelationFilter, Prisma.ProviderOrderWhereInput> | null
+  providerJobs?: Prisma.ProviderJobListRelationFilter
+  providerAttempts?: Prisma.ProviderOrderAttemptListRelationFilter
+  providerOperationLogs?: Prisma.ProviderOperationLogListRelationFilter
 }, "id" | "publicId" | "userId_idempotencyKey">
 
 export type OrderOrderByWithAggregationInput = {
@@ -357,6 +383,7 @@ export type OrderOrderByWithAggregationInput = {
   targetUrl?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   chargeMinor?: Prisma.SortOrder
+  refundedMinor?: Prisma.SortOrder
   startCount?: Prisma.SortOrderInput | Prisma.SortOrder
   remaining?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -382,6 +409,7 @@ export type OrderScalarWhereWithAggregatesInput = {
   targetUrl?: Prisma.StringWithAggregatesFilter<"Order"> | string
   quantity?: Prisma.IntWithAggregatesFilter<"Order"> | number
   chargeMinor?: Prisma.BigIntWithAggregatesFilter<"Order"> | bigint | number
+  refundedMinor?: Prisma.BigIntWithAggregatesFilter<"Order"> | bigint | number
   startCount?: Prisma.IntNullableWithAggregatesFilter<"Order"> | number | null
   remaining?: Prisma.IntWithAggregatesFilter<"Order"> | number
   status?: Prisma.EnumOrderStatusWithAggregatesFilter<"Order"> | $Enums.OrderStatus
@@ -397,6 +425,7 @@ export type OrderCreateInput = {
   targetUrl: string
   quantity: number
   chargeMinor: bigint | number
+  refundedMinor?: bigint | number
   startCount?: number | null
   remaining: number
   status?: $Enums.OrderStatus
@@ -407,6 +436,10 @@ export type OrderCreateInput = {
   user: Prisma.UserCreateNestedOneWithoutOrdersInput
   service: Prisma.ServiceCreateNestedOneWithoutOrdersInput
   logs?: Prisma.OrderLogCreateNestedManyWithoutOrderInput
+  providerOrder?: Prisma.ProviderOrderCreateNestedOneWithoutOrderInput
+  providerJobs?: Prisma.ProviderJobCreateNestedManyWithoutOrderInput
+  providerAttempts?: Prisma.ProviderOrderAttemptCreateNestedManyWithoutOrderInput
+  providerOperationLogs?: Prisma.ProviderOperationLogCreateNestedManyWithoutOrderInput
 }
 
 export type OrderUncheckedCreateInput = {
@@ -417,6 +450,7 @@ export type OrderUncheckedCreateInput = {
   targetUrl: string
   quantity: number
   chargeMinor: bigint | number
+  refundedMinor?: bigint | number
   startCount?: number | null
   remaining: number
   status?: $Enums.OrderStatus
@@ -425,6 +459,10 @@ export type OrderUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   logs?: Prisma.OrderLogUncheckedCreateNestedManyWithoutOrderInput
+  providerOrder?: Prisma.ProviderOrderUncheckedCreateNestedOneWithoutOrderInput
+  providerJobs?: Prisma.ProviderJobUncheckedCreateNestedManyWithoutOrderInput
+  providerAttempts?: Prisma.ProviderOrderAttemptUncheckedCreateNestedManyWithoutOrderInput
+  providerOperationLogs?: Prisma.ProviderOperationLogUncheckedCreateNestedManyWithoutOrderInput
 }
 
 export type OrderUpdateInput = {
@@ -433,6 +471,7 @@ export type OrderUpdateInput = {
   targetUrl?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   chargeMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  refundedMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   startCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
@@ -443,6 +482,10 @@ export type OrderUpdateInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutOrdersNestedInput
   service?: Prisma.ServiceUpdateOneRequiredWithoutOrdersNestedInput
   logs?: Prisma.OrderLogUpdateManyWithoutOrderNestedInput
+  providerOrder?: Prisma.ProviderOrderUpdateOneWithoutOrderNestedInput
+  providerJobs?: Prisma.ProviderJobUpdateManyWithoutOrderNestedInput
+  providerAttempts?: Prisma.ProviderOrderAttemptUpdateManyWithoutOrderNestedInput
+  providerOperationLogs?: Prisma.ProviderOperationLogUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateInput = {
@@ -453,6 +496,7 @@ export type OrderUncheckedUpdateInput = {
   targetUrl?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   chargeMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  refundedMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   startCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
@@ -461,6 +505,10 @@ export type OrderUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   logs?: Prisma.OrderLogUncheckedUpdateManyWithoutOrderNestedInput
+  providerOrder?: Prisma.ProviderOrderUncheckedUpdateOneWithoutOrderNestedInput
+  providerJobs?: Prisma.ProviderJobUncheckedUpdateManyWithoutOrderNestedInput
+  providerAttempts?: Prisma.ProviderOrderAttemptUncheckedUpdateManyWithoutOrderNestedInput
+  providerOperationLogs?: Prisma.ProviderOperationLogUncheckedUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderCreateManyInput = {
@@ -471,6 +519,7 @@ export type OrderCreateManyInput = {
   targetUrl: string
   quantity: number
   chargeMinor: bigint | number
+  refundedMinor?: bigint | number
   startCount?: number | null
   remaining: number
   status?: $Enums.OrderStatus
@@ -486,6 +535,7 @@ export type OrderUpdateManyMutationInput = {
   targetUrl?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   chargeMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  refundedMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   startCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
@@ -503,6 +553,7 @@ export type OrderUncheckedUpdateManyInput = {
   targetUrl?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   chargeMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  refundedMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   startCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
@@ -535,6 +586,7 @@ export type OrderCountOrderByAggregateInput = {
   targetUrl?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   chargeMinor?: Prisma.SortOrder
+  refundedMinor?: Prisma.SortOrder
   startCount?: Prisma.SortOrder
   remaining?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -547,6 +599,7 @@ export type OrderCountOrderByAggregateInput = {
 export type OrderAvgOrderByAggregateInput = {
   quantity?: Prisma.SortOrder
   chargeMinor?: Prisma.SortOrder
+  refundedMinor?: Prisma.SortOrder
   startCount?: Prisma.SortOrder
   remaining?: Prisma.SortOrder
 }
@@ -559,6 +612,7 @@ export type OrderMaxOrderByAggregateInput = {
   targetUrl?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   chargeMinor?: Prisma.SortOrder
+  refundedMinor?: Prisma.SortOrder
   startCount?: Prisma.SortOrder
   remaining?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -576,6 +630,7 @@ export type OrderMinOrderByAggregateInput = {
   targetUrl?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   chargeMinor?: Prisma.SortOrder
+  refundedMinor?: Prisma.SortOrder
   startCount?: Prisma.SortOrder
   remaining?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -588,6 +643,7 @@ export type OrderMinOrderByAggregateInput = {
 export type OrderSumOrderByAggregateInput = {
   quantity?: Prisma.SortOrder
   chargeMinor?: Prisma.SortOrder
+  refundedMinor?: Prisma.SortOrder
   startCount?: Prisma.SortOrder
   remaining?: Prisma.SortOrder
 }
@@ -595,6 +651,11 @@ export type OrderSumOrderByAggregateInput = {
 export type OrderScalarRelationFilter = {
   is?: Prisma.OrderWhereInput
   isNot?: Prisma.OrderWhereInput
+}
+
+export type OrderNullableScalarRelationFilter = {
+  is?: Prisma.OrderWhereInput | null
+  isNot?: Prisma.OrderWhereInput | null
 }
 
 export type OrderCreateNestedManyWithoutUserInput = {
@@ -699,12 +760,73 @@ export type OrderUpdateOneRequiredWithoutLogsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.OrderUpdateToOneWithWhereWithoutLogsInput, Prisma.OrderUpdateWithoutLogsInput>, Prisma.OrderUncheckedUpdateWithoutLogsInput>
 }
 
+export type OrderCreateNestedOneWithoutProviderOrderInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutProviderOrderInput, Prisma.OrderUncheckedCreateWithoutProviderOrderInput>
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutProviderOrderInput
+  connect?: Prisma.OrderWhereUniqueInput
+}
+
+export type OrderUpdateOneRequiredWithoutProviderOrderNestedInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutProviderOrderInput, Prisma.OrderUncheckedCreateWithoutProviderOrderInput>
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutProviderOrderInput
+  upsert?: Prisma.OrderUpsertWithoutProviderOrderInput
+  connect?: Prisma.OrderWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrderUpdateToOneWithWhereWithoutProviderOrderInput, Prisma.OrderUpdateWithoutProviderOrderInput>, Prisma.OrderUncheckedUpdateWithoutProviderOrderInput>
+}
+
+export type OrderCreateNestedOneWithoutProviderAttemptsInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutProviderAttemptsInput, Prisma.OrderUncheckedCreateWithoutProviderAttemptsInput>
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutProviderAttemptsInput
+  connect?: Prisma.OrderWhereUniqueInput
+}
+
+export type OrderUpdateOneRequiredWithoutProviderAttemptsNestedInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutProviderAttemptsInput, Prisma.OrderUncheckedCreateWithoutProviderAttemptsInput>
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutProviderAttemptsInput
+  upsert?: Prisma.OrderUpsertWithoutProviderAttemptsInput
+  connect?: Prisma.OrderWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrderUpdateToOneWithWhereWithoutProviderAttemptsInput, Prisma.OrderUpdateWithoutProviderAttemptsInput>, Prisma.OrderUncheckedUpdateWithoutProviderAttemptsInput>
+}
+
+export type OrderCreateNestedOneWithoutProviderJobsInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutProviderJobsInput, Prisma.OrderUncheckedCreateWithoutProviderJobsInput>
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutProviderJobsInput
+  connect?: Prisma.OrderWhereUniqueInput
+}
+
+export type OrderUpdateOneWithoutProviderJobsNestedInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutProviderJobsInput, Prisma.OrderUncheckedCreateWithoutProviderJobsInput>
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutProviderJobsInput
+  upsert?: Prisma.OrderUpsertWithoutProviderJobsInput
+  disconnect?: Prisma.OrderWhereInput | boolean
+  delete?: Prisma.OrderWhereInput | boolean
+  connect?: Prisma.OrderWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrderUpdateToOneWithWhereWithoutProviderJobsInput, Prisma.OrderUpdateWithoutProviderJobsInput>, Prisma.OrderUncheckedUpdateWithoutProviderJobsInput>
+}
+
+export type OrderCreateNestedOneWithoutProviderOperationLogsInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutProviderOperationLogsInput, Prisma.OrderUncheckedCreateWithoutProviderOperationLogsInput>
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutProviderOperationLogsInput
+  connect?: Prisma.OrderWhereUniqueInput
+}
+
+export type OrderUpdateOneWithoutProviderOperationLogsNestedInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutProviderOperationLogsInput, Prisma.OrderUncheckedCreateWithoutProviderOperationLogsInput>
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutProviderOperationLogsInput
+  upsert?: Prisma.OrderUpsertWithoutProviderOperationLogsInput
+  disconnect?: Prisma.OrderWhereInput | boolean
+  delete?: Prisma.OrderWhereInput | boolean
+  connect?: Prisma.OrderWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrderUpdateToOneWithWhereWithoutProviderOperationLogsInput, Prisma.OrderUpdateWithoutProviderOperationLogsInput>, Prisma.OrderUncheckedUpdateWithoutProviderOperationLogsInput>
+}
+
 export type OrderCreateWithoutUserInput = {
   id?: string
   publicId: string
   targetUrl: string
   quantity: number
   chargeMinor: bigint | number
+  refundedMinor?: bigint | number
   startCount?: number | null
   remaining: number
   status?: $Enums.OrderStatus
@@ -714,6 +836,10 @@ export type OrderCreateWithoutUserInput = {
   updatedAt?: Date | string
   service: Prisma.ServiceCreateNestedOneWithoutOrdersInput
   logs?: Prisma.OrderLogCreateNestedManyWithoutOrderInput
+  providerOrder?: Prisma.ProviderOrderCreateNestedOneWithoutOrderInput
+  providerJobs?: Prisma.ProviderJobCreateNestedManyWithoutOrderInput
+  providerAttempts?: Prisma.ProviderOrderAttemptCreateNestedManyWithoutOrderInput
+  providerOperationLogs?: Prisma.ProviderOperationLogCreateNestedManyWithoutOrderInput
 }
 
 export type OrderUncheckedCreateWithoutUserInput = {
@@ -723,6 +849,7 @@ export type OrderUncheckedCreateWithoutUserInput = {
   targetUrl: string
   quantity: number
   chargeMinor: bigint | number
+  refundedMinor?: bigint | number
   startCount?: number | null
   remaining: number
   status?: $Enums.OrderStatus
@@ -731,6 +858,10 @@ export type OrderUncheckedCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   logs?: Prisma.OrderLogUncheckedCreateNestedManyWithoutOrderInput
+  providerOrder?: Prisma.ProviderOrderUncheckedCreateNestedOneWithoutOrderInput
+  providerJobs?: Prisma.ProviderJobUncheckedCreateNestedManyWithoutOrderInput
+  providerAttempts?: Prisma.ProviderOrderAttemptUncheckedCreateNestedManyWithoutOrderInput
+  providerOperationLogs?: Prisma.ProviderOperationLogUncheckedCreateNestedManyWithoutOrderInput
 }
 
 export type OrderCreateOrConnectWithoutUserInput = {
@@ -770,6 +901,7 @@ export type OrderScalarWhereInput = {
   targetUrl?: Prisma.StringFilter<"Order"> | string
   quantity?: Prisma.IntFilter<"Order"> | number
   chargeMinor?: Prisma.BigIntFilter<"Order"> | bigint | number
+  refundedMinor?: Prisma.BigIntFilter<"Order"> | bigint | number
   startCount?: Prisma.IntNullableFilter<"Order"> | number | null
   remaining?: Prisma.IntFilter<"Order"> | number
   status?: Prisma.EnumOrderStatusFilter<"Order"> | $Enums.OrderStatus
@@ -785,6 +917,7 @@ export type OrderCreateWithoutServiceInput = {
   targetUrl: string
   quantity: number
   chargeMinor: bigint | number
+  refundedMinor?: bigint | number
   startCount?: number | null
   remaining: number
   status?: $Enums.OrderStatus
@@ -794,6 +927,10 @@ export type OrderCreateWithoutServiceInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutOrdersInput
   logs?: Prisma.OrderLogCreateNestedManyWithoutOrderInput
+  providerOrder?: Prisma.ProviderOrderCreateNestedOneWithoutOrderInput
+  providerJobs?: Prisma.ProviderJobCreateNestedManyWithoutOrderInput
+  providerAttempts?: Prisma.ProviderOrderAttemptCreateNestedManyWithoutOrderInput
+  providerOperationLogs?: Prisma.ProviderOperationLogCreateNestedManyWithoutOrderInput
 }
 
 export type OrderUncheckedCreateWithoutServiceInput = {
@@ -803,6 +940,7 @@ export type OrderUncheckedCreateWithoutServiceInput = {
   targetUrl: string
   quantity: number
   chargeMinor: bigint | number
+  refundedMinor?: bigint | number
   startCount?: number | null
   remaining: number
   status?: $Enums.OrderStatus
@@ -811,6 +949,10 @@ export type OrderUncheckedCreateWithoutServiceInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   logs?: Prisma.OrderLogUncheckedCreateNestedManyWithoutOrderInput
+  providerOrder?: Prisma.ProviderOrderUncheckedCreateNestedOneWithoutOrderInput
+  providerJobs?: Prisma.ProviderJobUncheckedCreateNestedManyWithoutOrderInput
+  providerAttempts?: Prisma.ProviderOrderAttemptUncheckedCreateNestedManyWithoutOrderInput
+  providerOperationLogs?: Prisma.ProviderOperationLogUncheckedCreateNestedManyWithoutOrderInput
 }
 
 export type OrderCreateOrConnectWithoutServiceInput = {
@@ -845,6 +987,7 @@ export type OrderCreateWithoutLogsInput = {
   targetUrl: string
   quantity: number
   chargeMinor: bigint | number
+  refundedMinor?: bigint | number
   startCount?: number | null
   remaining: number
   status?: $Enums.OrderStatus
@@ -854,6 +997,10 @@ export type OrderCreateWithoutLogsInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutOrdersInput
   service: Prisma.ServiceCreateNestedOneWithoutOrdersInput
+  providerOrder?: Prisma.ProviderOrderCreateNestedOneWithoutOrderInput
+  providerJobs?: Prisma.ProviderJobCreateNestedManyWithoutOrderInput
+  providerAttempts?: Prisma.ProviderOrderAttemptCreateNestedManyWithoutOrderInput
+  providerOperationLogs?: Prisma.ProviderOperationLogCreateNestedManyWithoutOrderInput
 }
 
 export type OrderUncheckedCreateWithoutLogsInput = {
@@ -864,6 +1011,7 @@ export type OrderUncheckedCreateWithoutLogsInput = {
   targetUrl: string
   quantity: number
   chargeMinor: bigint | number
+  refundedMinor?: bigint | number
   startCount?: number | null
   remaining: number
   status?: $Enums.OrderStatus
@@ -871,6 +1019,10 @@ export type OrderUncheckedCreateWithoutLogsInput = {
   requestFingerprint: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  providerOrder?: Prisma.ProviderOrderUncheckedCreateNestedOneWithoutOrderInput
+  providerJobs?: Prisma.ProviderJobUncheckedCreateNestedManyWithoutOrderInput
+  providerAttempts?: Prisma.ProviderOrderAttemptUncheckedCreateNestedManyWithoutOrderInput
+  providerOperationLogs?: Prisma.ProviderOperationLogUncheckedCreateNestedManyWithoutOrderInput
 }
 
 export type OrderCreateOrConnectWithoutLogsInput = {
@@ -895,6 +1047,7 @@ export type OrderUpdateWithoutLogsInput = {
   targetUrl?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   chargeMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  refundedMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   startCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
@@ -904,6 +1057,10 @@ export type OrderUpdateWithoutLogsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutOrdersNestedInput
   service?: Prisma.ServiceUpdateOneRequiredWithoutOrdersNestedInput
+  providerOrder?: Prisma.ProviderOrderUpdateOneWithoutOrderNestedInput
+  providerJobs?: Prisma.ProviderJobUpdateManyWithoutOrderNestedInput
+  providerAttempts?: Prisma.ProviderOrderAttemptUpdateManyWithoutOrderNestedInput
+  providerOperationLogs?: Prisma.ProviderOperationLogUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateWithoutLogsInput = {
@@ -914,6 +1071,7 @@ export type OrderUncheckedUpdateWithoutLogsInput = {
   targetUrl?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   chargeMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  refundedMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   startCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
@@ -921,6 +1079,426 @@ export type OrderUncheckedUpdateWithoutLogsInput = {
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  providerOrder?: Prisma.ProviderOrderUncheckedUpdateOneWithoutOrderNestedInput
+  providerJobs?: Prisma.ProviderJobUncheckedUpdateManyWithoutOrderNestedInput
+  providerAttempts?: Prisma.ProviderOrderAttemptUncheckedUpdateManyWithoutOrderNestedInput
+  providerOperationLogs?: Prisma.ProviderOperationLogUncheckedUpdateManyWithoutOrderNestedInput
+}
+
+export type OrderCreateWithoutProviderOrderInput = {
+  id?: string
+  publicId: string
+  targetUrl: string
+  quantity: number
+  chargeMinor: bigint | number
+  refundedMinor?: bigint | number
+  startCount?: number | null
+  remaining: number
+  status?: $Enums.OrderStatus
+  idempotencyKey: string
+  requestFingerprint: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutOrdersInput
+  service: Prisma.ServiceCreateNestedOneWithoutOrdersInput
+  logs?: Prisma.OrderLogCreateNestedManyWithoutOrderInput
+  providerJobs?: Prisma.ProviderJobCreateNestedManyWithoutOrderInput
+  providerAttempts?: Prisma.ProviderOrderAttemptCreateNestedManyWithoutOrderInput
+  providerOperationLogs?: Prisma.ProviderOperationLogCreateNestedManyWithoutOrderInput
+}
+
+export type OrderUncheckedCreateWithoutProviderOrderInput = {
+  id?: string
+  publicId: string
+  userId: string
+  serviceId: string
+  targetUrl: string
+  quantity: number
+  chargeMinor: bigint | number
+  refundedMinor?: bigint | number
+  startCount?: number | null
+  remaining: number
+  status?: $Enums.OrderStatus
+  idempotencyKey: string
+  requestFingerprint: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  logs?: Prisma.OrderLogUncheckedCreateNestedManyWithoutOrderInput
+  providerJobs?: Prisma.ProviderJobUncheckedCreateNestedManyWithoutOrderInput
+  providerAttempts?: Prisma.ProviderOrderAttemptUncheckedCreateNestedManyWithoutOrderInput
+  providerOperationLogs?: Prisma.ProviderOperationLogUncheckedCreateNestedManyWithoutOrderInput
+}
+
+export type OrderCreateOrConnectWithoutProviderOrderInput = {
+  where: Prisma.OrderWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrderCreateWithoutProviderOrderInput, Prisma.OrderUncheckedCreateWithoutProviderOrderInput>
+}
+
+export type OrderUpsertWithoutProviderOrderInput = {
+  update: Prisma.XOR<Prisma.OrderUpdateWithoutProviderOrderInput, Prisma.OrderUncheckedUpdateWithoutProviderOrderInput>
+  create: Prisma.XOR<Prisma.OrderCreateWithoutProviderOrderInput, Prisma.OrderUncheckedCreateWithoutProviderOrderInput>
+  where?: Prisma.OrderWhereInput
+}
+
+export type OrderUpdateToOneWithWhereWithoutProviderOrderInput = {
+  where?: Prisma.OrderWhereInput
+  data: Prisma.XOR<Prisma.OrderUpdateWithoutProviderOrderInput, Prisma.OrderUncheckedUpdateWithoutProviderOrderInput>
+}
+
+export type OrderUpdateWithoutProviderOrderInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  publicId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  chargeMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  refundedMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  startCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  remaining?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutOrdersNestedInput
+  service?: Prisma.ServiceUpdateOneRequiredWithoutOrdersNestedInput
+  logs?: Prisma.OrderLogUpdateManyWithoutOrderNestedInput
+  providerJobs?: Prisma.ProviderJobUpdateManyWithoutOrderNestedInput
+  providerAttempts?: Prisma.ProviderOrderAttemptUpdateManyWithoutOrderNestedInput
+  providerOperationLogs?: Prisma.ProviderOperationLogUpdateManyWithoutOrderNestedInput
+}
+
+export type OrderUncheckedUpdateWithoutProviderOrderInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  publicId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  chargeMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  refundedMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  startCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  remaining?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  logs?: Prisma.OrderLogUncheckedUpdateManyWithoutOrderNestedInput
+  providerJobs?: Prisma.ProviderJobUncheckedUpdateManyWithoutOrderNestedInput
+  providerAttempts?: Prisma.ProviderOrderAttemptUncheckedUpdateManyWithoutOrderNestedInput
+  providerOperationLogs?: Prisma.ProviderOperationLogUncheckedUpdateManyWithoutOrderNestedInput
+}
+
+export type OrderCreateWithoutProviderAttemptsInput = {
+  id?: string
+  publicId: string
+  targetUrl: string
+  quantity: number
+  chargeMinor: bigint | number
+  refundedMinor?: bigint | number
+  startCount?: number | null
+  remaining: number
+  status?: $Enums.OrderStatus
+  idempotencyKey: string
+  requestFingerprint: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutOrdersInput
+  service: Prisma.ServiceCreateNestedOneWithoutOrdersInput
+  logs?: Prisma.OrderLogCreateNestedManyWithoutOrderInput
+  providerOrder?: Prisma.ProviderOrderCreateNestedOneWithoutOrderInput
+  providerJobs?: Prisma.ProviderJobCreateNestedManyWithoutOrderInput
+  providerOperationLogs?: Prisma.ProviderOperationLogCreateNestedManyWithoutOrderInput
+}
+
+export type OrderUncheckedCreateWithoutProviderAttemptsInput = {
+  id?: string
+  publicId: string
+  userId: string
+  serviceId: string
+  targetUrl: string
+  quantity: number
+  chargeMinor: bigint | number
+  refundedMinor?: bigint | number
+  startCount?: number | null
+  remaining: number
+  status?: $Enums.OrderStatus
+  idempotencyKey: string
+  requestFingerprint: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  logs?: Prisma.OrderLogUncheckedCreateNestedManyWithoutOrderInput
+  providerOrder?: Prisma.ProviderOrderUncheckedCreateNestedOneWithoutOrderInput
+  providerJobs?: Prisma.ProviderJobUncheckedCreateNestedManyWithoutOrderInput
+  providerOperationLogs?: Prisma.ProviderOperationLogUncheckedCreateNestedManyWithoutOrderInput
+}
+
+export type OrderCreateOrConnectWithoutProviderAttemptsInput = {
+  where: Prisma.OrderWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrderCreateWithoutProviderAttemptsInput, Prisma.OrderUncheckedCreateWithoutProviderAttemptsInput>
+}
+
+export type OrderUpsertWithoutProviderAttemptsInput = {
+  update: Prisma.XOR<Prisma.OrderUpdateWithoutProviderAttemptsInput, Prisma.OrderUncheckedUpdateWithoutProviderAttemptsInput>
+  create: Prisma.XOR<Prisma.OrderCreateWithoutProviderAttemptsInput, Prisma.OrderUncheckedCreateWithoutProviderAttemptsInput>
+  where?: Prisma.OrderWhereInput
+}
+
+export type OrderUpdateToOneWithWhereWithoutProviderAttemptsInput = {
+  where?: Prisma.OrderWhereInput
+  data: Prisma.XOR<Prisma.OrderUpdateWithoutProviderAttemptsInput, Prisma.OrderUncheckedUpdateWithoutProviderAttemptsInput>
+}
+
+export type OrderUpdateWithoutProviderAttemptsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  publicId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  chargeMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  refundedMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  startCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  remaining?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutOrdersNestedInput
+  service?: Prisma.ServiceUpdateOneRequiredWithoutOrdersNestedInput
+  logs?: Prisma.OrderLogUpdateManyWithoutOrderNestedInput
+  providerOrder?: Prisma.ProviderOrderUpdateOneWithoutOrderNestedInput
+  providerJobs?: Prisma.ProviderJobUpdateManyWithoutOrderNestedInput
+  providerOperationLogs?: Prisma.ProviderOperationLogUpdateManyWithoutOrderNestedInput
+}
+
+export type OrderUncheckedUpdateWithoutProviderAttemptsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  publicId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  chargeMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  refundedMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  startCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  remaining?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  logs?: Prisma.OrderLogUncheckedUpdateManyWithoutOrderNestedInput
+  providerOrder?: Prisma.ProviderOrderUncheckedUpdateOneWithoutOrderNestedInput
+  providerJobs?: Prisma.ProviderJobUncheckedUpdateManyWithoutOrderNestedInput
+  providerOperationLogs?: Prisma.ProviderOperationLogUncheckedUpdateManyWithoutOrderNestedInput
+}
+
+export type OrderCreateWithoutProviderJobsInput = {
+  id?: string
+  publicId: string
+  targetUrl: string
+  quantity: number
+  chargeMinor: bigint | number
+  refundedMinor?: bigint | number
+  startCount?: number | null
+  remaining: number
+  status?: $Enums.OrderStatus
+  idempotencyKey: string
+  requestFingerprint: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutOrdersInput
+  service: Prisma.ServiceCreateNestedOneWithoutOrdersInput
+  logs?: Prisma.OrderLogCreateNestedManyWithoutOrderInput
+  providerOrder?: Prisma.ProviderOrderCreateNestedOneWithoutOrderInput
+  providerAttempts?: Prisma.ProviderOrderAttemptCreateNestedManyWithoutOrderInput
+  providerOperationLogs?: Prisma.ProviderOperationLogCreateNestedManyWithoutOrderInput
+}
+
+export type OrderUncheckedCreateWithoutProviderJobsInput = {
+  id?: string
+  publicId: string
+  userId: string
+  serviceId: string
+  targetUrl: string
+  quantity: number
+  chargeMinor: bigint | number
+  refundedMinor?: bigint | number
+  startCount?: number | null
+  remaining: number
+  status?: $Enums.OrderStatus
+  idempotencyKey: string
+  requestFingerprint: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  logs?: Prisma.OrderLogUncheckedCreateNestedManyWithoutOrderInput
+  providerOrder?: Prisma.ProviderOrderUncheckedCreateNestedOneWithoutOrderInput
+  providerAttempts?: Prisma.ProviderOrderAttemptUncheckedCreateNestedManyWithoutOrderInput
+  providerOperationLogs?: Prisma.ProviderOperationLogUncheckedCreateNestedManyWithoutOrderInput
+}
+
+export type OrderCreateOrConnectWithoutProviderJobsInput = {
+  where: Prisma.OrderWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrderCreateWithoutProviderJobsInput, Prisma.OrderUncheckedCreateWithoutProviderJobsInput>
+}
+
+export type OrderUpsertWithoutProviderJobsInput = {
+  update: Prisma.XOR<Prisma.OrderUpdateWithoutProviderJobsInput, Prisma.OrderUncheckedUpdateWithoutProviderJobsInput>
+  create: Prisma.XOR<Prisma.OrderCreateWithoutProviderJobsInput, Prisma.OrderUncheckedCreateWithoutProviderJobsInput>
+  where?: Prisma.OrderWhereInput
+}
+
+export type OrderUpdateToOneWithWhereWithoutProviderJobsInput = {
+  where?: Prisma.OrderWhereInput
+  data: Prisma.XOR<Prisma.OrderUpdateWithoutProviderJobsInput, Prisma.OrderUncheckedUpdateWithoutProviderJobsInput>
+}
+
+export type OrderUpdateWithoutProviderJobsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  publicId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  chargeMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  refundedMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  startCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  remaining?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutOrdersNestedInput
+  service?: Prisma.ServiceUpdateOneRequiredWithoutOrdersNestedInput
+  logs?: Prisma.OrderLogUpdateManyWithoutOrderNestedInput
+  providerOrder?: Prisma.ProviderOrderUpdateOneWithoutOrderNestedInput
+  providerAttempts?: Prisma.ProviderOrderAttemptUpdateManyWithoutOrderNestedInput
+  providerOperationLogs?: Prisma.ProviderOperationLogUpdateManyWithoutOrderNestedInput
+}
+
+export type OrderUncheckedUpdateWithoutProviderJobsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  publicId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  chargeMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  refundedMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  startCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  remaining?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  logs?: Prisma.OrderLogUncheckedUpdateManyWithoutOrderNestedInput
+  providerOrder?: Prisma.ProviderOrderUncheckedUpdateOneWithoutOrderNestedInput
+  providerAttempts?: Prisma.ProviderOrderAttemptUncheckedUpdateManyWithoutOrderNestedInput
+  providerOperationLogs?: Prisma.ProviderOperationLogUncheckedUpdateManyWithoutOrderNestedInput
+}
+
+export type OrderCreateWithoutProviderOperationLogsInput = {
+  id?: string
+  publicId: string
+  targetUrl: string
+  quantity: number
+  chargeMinor: bigint | number
+  refundedMinor?: bigint | number
+  startCount?: number | null
+  remaining: number
+  status?: $Enums.OrderStatus
+  idempotencyKey: string
+  requestFingerprint: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutOrdersInput
+  service: Prisma.ServiceCreateNestedOneWithoutOrdersInput
+  logs?: Prisma.OrderLogCreateNestedManyWithoutOrderInput
+  providerOrder?: Prisma.ProviderOrderCreateNestedOneWithoutOrderInput
+  providerJobs?: Prisma.ProviderJobCreateNestedManyWithoutOrderInput
+  providerAttempts?: Prisma.ProviderOrderAttemptCreateNestedManyWithoutOrderInput
+}
+
+export type OrderUncheckedCreateWithoutProviderOperationLogsInput = {
+  id?: string
+  publicId: string
+  userId: string
+  serviceId: string
+  targetUrl: string
+  quantity: number
+  chargeMinor: bigint | number
+  refundedMinor?: bigint | number
+  startCount?: number | null
+  remaining: number
+  status?: $Enums.OrderStatus
+  idempotencyKey: string
+  requestFingerprint: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  logs?: Prisma.OrderLogUncheckedCreateNestedManyWithoutOrderInput
+  providerOrder?: Prisma.ProviderOrderUncheckedCreateNestedOneWithoutOrderInput
+  providerJobs?: Prisma.ProviderJobUncheckedCreateNestedManyWithoutOrderInput
+  providerAttempts?: Prisma.ProviderOrderAttemptUncheckedCreateNestedManyWithoutOrderInput
+}
+
+export type OrderCreateOrConnectWithoutProviderOperationLogsInput = {
+  where: Prisma.OrderWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrderCreateWithoutProviderOperationLogsInput, Prisma.OrderUncheckedCreateWithoutProviderOperationLogsInput>
+}
+
+export type OrderUpsertWithoutProviderOperationLogsInput = {
+  update: Prisma.XOR<Prisma.OrderUpdateWithoutProviderOperationLogsInput, Prisma.OrderUncheckedUpdateWithoutProviderOperationLogsInput>
+  create: Prisma.XOR<Prisma.OrderCreateWithoutProviderOperationLogsInput, Prisma.OrderUncheckedCreateWithoutProviderOperationLogsInput>
+  where?: Prisma.OrderWhereInput
+}
+
+export type OrderUpdateToOneWithWhereWithoutProviderOperationLogsInput = {
+  where?: Prisma.OrderWhereInput
+  data: Prisma.XOR<Prisma.OrderUpdateWithoutProviderOperationLogsInput, Prisma.OrderUncheckedUpdateWithoutProviderOperationLogsInput>
+}
+
+export type OrderUpdateWithoutProviderOperationLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  publicId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  chargeMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  refundedMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  startCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  remaining?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutOrdersNestedInput
+  service?: Prisma.ServiceUpdateOneRequiredWithoutOrdersNestedInput
+  logs?: Prisma.OrderLogUpdateManyWithoutOrderNestedInput
+  providerOrder?: Prisma.ProviderOrderUpdateOneWithoutOrderNestedInput
+  providerJobs?: Prisma.ProviderJobUpdateManyWithoutOrderNestedInput
+  providerAttempts?: Prisma.ProviderOrderAttemptUpdateManyWithoutOrderNestedInput
+}
+
+export type OrderUncheckedUpdateWithoutProviderOperationLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  publicId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  chargeMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  refundedMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  startCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  remaining?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  logs?: Prisma.OrderLogUncheckedUpdateManyWithoutOrderNestedInput
+  providerOrder?: Prisma.ProviderOrderUncheckedUpdateOneWithoutOrderNestedInput
+  providerJobs?: Prisma.ProviderJobUncheckedUpdateManyWithoutOrderNestedInput
+  providerAttempts?: Prisma.ProviderOrderAttemptUncheckedUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderCreateManyUserInput = {
@@ -930,6 +1508,7 @@ export type OrderCreateManyUserInput = {
   targetUrl: string
   quantity: number
   chargeMinor: bigint | number
+  refundedMinor?: bigint | number
   startCount?: number | null
   remaining: number
   status?: $Enums.OrderStatus
@@ -945,6 +1524,7 @@ export type OrderUpdateWithoutUserInput = {
   targetUrl?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   chargeMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  refundedMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   startCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
@@ -954,6 +1534,10 @@ export type OrderUpdateWithoutUserInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   service?: Prisma.ServiceUpdateOneRequiredWithoutOrdersNestedInput
   logs?: Prisma.OrderLogUpdateManyWithoutOrderNestedInput
+  providerOrder?: Prisma.ProviderOrderUpdateOneWithoutOrderNestedInput
+  providerJobs?: Prisma.ProviderJobUpdateManyWithoutOrderNestedInput
+  providerAttempts?: Prisma.ProviderOrderAttemptUpdateManyWithoutOrderNestedInput
+  providerOperationLogs?: Prisma.ProviderOperationLogUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateWithoutUserInput = {
@@ -963,6 +1547,7 @@ export type OrderUncheckedUpdateWithoutUserInput = {
   targetUrl?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   chargeMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  refundedMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   startCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
@@ -971,6 +1556,10 @@ export type OrderUncheckedUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   logs?: Prisma.OrderLogUncheckedUpdateManyWithoutOrderNestedInput
+  providerOrder?: Prisma.ProviderOrderUncheckedUpdateOneWithoutOrderNestedInput
+  providerJobs?: Prisma.ProviderJobUncheckedUpdateManyWithoutOrderNestedInput
+  providerAttempts?: Prisma.ProviderOrderAttemptUncheckedUpdateManyWithoutOrderNestedInput
+  providerOperationLogs?: Prisma.ProviderOperationLogUncheckedUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateManyWithoutUserInput = {
@@ -980,6 +1569,7 @@ export type OrderUncheckedUpdateManyWithoutUserInput = {
   targetUrl?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   chargeMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  refundedMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   startCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
@@ -996,6 +1586,7 @@ export type OrderCreateManyServiceInput = {
   targetUrl: string
   quantity: number
   chargeMinor: bigint | number
+  refundedMinor?: bigint | number
   startCount?: number | null
   remaining: number
   status?: $Enums.OrderStatus
@@ -1011,6 +1602,7 @@ export type OrderUpdateWithoutServiceInput = {
   targetUrl?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   chargeMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  refundedMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   startCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
@@ -1020,6 +1612,10 @@ export type OrderUpdateWithoutServiceInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutOrdersNestedInput
   logs?: Prisma.OrderLogUpdateManyWithoutOrderNestedInput
+  providerOrder?: Prisma.ProviderOrderUpdateOneWithoutOrderNestedInput
+  providerJobs?: Prisma.ProviderJobUpdateManyWithoutOrderNestedInput
+  providerAttempts?: Prisma.ProviderOrderAttemptUpdateManyWithoutOrderNestedInput
+  providerOperationLogs?: Prisma.ProviderOperationLogUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateWithoutServiceInput = {
@@ -1029,6 +1625,7 @@ export type OrderUncheckedUpdateWithoutServiceInput = {
   targetUrl?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   chargeMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  refundedMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   startCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
@@ -1037,6 +1634,10 @@ export type OrderUncheckedUpdateWithoutServiceInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   logs?: Prisma.OrderLogUncheckedUpdateManyWithoutOrderNestedInput
+  providerOrder?: Prisma.ProviderOrderUncheckedUpdateOneWithoutOrderNestedInput
+  providerJobs?: Prisma.ProviderJobUncheckedUpdateManyWithoutOrderNestedInput
+  providerAttempts?: Prisma.ProviderOrderAttemptUncheckedUpdateManyWithoutOrderNestedInput
+  providerOperationLogs?: Prisma.ProviderOperationLogUncheckedUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateManyWithoutServiceInput = {
@@ -1046,6 +1647,7 @@ export type OrderUncheckedUpdateManyWithoutServiceInput = {
   targetUrl?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   chargeMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  refundedMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   startCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   remaining?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
@@ -1062,10 +1664,16 @@ export type OrderUncheckedUpdateManyWithoutServiceInput = {
 
 export type OrderCountOutputType = {
   logs: number
+  providerJobs: number
+  providerAttempts: number
+  providerOperationLogs: number
 }
 
 export type OrderCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   logs?: boolean | OrderCountOutputTypeCountLogsArgs
+  providerJobs?: boolean | OrderCountOutputTypeCountProviderJobsArgs
+  providerAttempts?: boolean | OrderCountOutputTypeCountProviderAttemptsArgs
+  providerOperationLogs?: boolean | OrderCountOutputTypeCountProviderOperationLogsArgs
 }
 
 /**
@@ -1085,6 +1693,27 @@ export type OrderCountOutputTypeCountLogsArgs<ExtArgs extends runtime.Types.Exte
   where?: Prisma.OrderLogWhereInput
 }
 
+/**
+ * OrderCountOutputType without action
+ */
+export type OrderCountOutputTypeCountProviderJobsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProviderJobWhereInput
+}
+
+/**
+ * OrderCountOutputType without action
+ */
+export type OrderCountOutputTypeCountProviderAttemptsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProviderOrderAttemptWhereInput
+}
+
+/**
+ * OrderCountOutputType without action
+ */
+export type OrderCountOutputTypeCountProviderOperationLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProviderOperationLogWhereInput
+}
+
 
 export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1094,6 +1723,7 @@ export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   targetUrl?: boolean
   quantity?: boolean
   chargeMinor?: boolean
+  refundedMinor?: boolean
   startCount?: boolean
   remaining?: boolean
   status?: boolean
@@ -1104,6 +1734,10 @@ export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   service?: boolean | Prisma.ServiceDefaultArgs<ExtArgs>
   logs?: boolean | Prisma.Order$logsArgs<ExtArgs>
+  providerOrder?: boolean | Prisma.Order$providerOrderArgs<ExtArgs>
+  providerJobs?: boolean | Prisma.Order$providerJobsArgs<ExtArgs>
+  providerAttempts?: boolean | Prisma.Order$providerAttemptsArgs<ExtArgs>
+  providerOperationLogs?: boolean | Prisma.Order$providerOperationLogsArgs<ExtArgs>
   _count?: boolean | Prisma.OrderCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["order"]>
 
@@ -1115,6 +1749,7 @@ export type OrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   targetUrl?: boolean
   quantity?: boolean
   chargeMinor?: boolean
+  refundedMinor?: boolean
   startCount?: boolean
   remaining?: boolean
   status?: boolean
@@ -1134,6 +1769,7 @@ export type OrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   targetUrl?: boolean
   quantity?: boolean
   chargeMinor?: boolean
+  refundedMinor?: boolean
   startCount?: boolean
   remaining?: boolean
   status?: boolean
@@ -1153,6 +1789,7 @@ export type OrderSelectScalar = {
   targetUrl?: boolean
   quantity?: boolean
   chargeMinor?: boolean
+  refundedMinor?: boolean
   startCount?: boolean
   remaining?: boolean
   status?: boolean
@@ -1162,11 +1799,15 @@ export type OrderSelectScalar = {
   updatedAt?: boolean
 }
 
-export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "publicId" | "userId" | "serviceId" | "targetUrl" | "quantity" | "chargeMinor" | "startCount" | "remaining" | "status" | "idempotencyKey" | "requestFingerprint" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
+export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "publicId" | "userId" | "serviceId" | "targetUrl" | "quantity" | "chargeMinor" | "refundedMinor" | "startCount" | "remaining" | "status" | "idempotencyKey" | "requestFingerprint" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
 export type OrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   service?: boolean | Prisma.ServiceDefaultArgs<ExtArgs>
   logs?: boolean | Prisma.Order$logsArgs<ExtArgs>
+  providerOrder?: boolean | Prisma.Order$providerOrderArgs<ExtArgs>
+  providerJobs?: boolean | Prisma.Order$providerJobsArgs<ExtArgs>
+  providerAttempts?: boolean | Prisma.Order$providerAttemptsArgs<ExtArgs>
+  providerOperationLogs?: boolean | Prisma.Order$providerOperationLogsArgs<ExtArgs>
   _count?: boolean | Prisma.OrderCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type OrderIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1184,6 +1825,10 @@ export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     user: Prisma.$UserPayload<ExtArgs>
     service: Prisma.$ServicePayload<ExtArgs>
     logs: Prisma.$OrderLogPayload<ExtArgs>[]
+    providerOrder: Prisma.$ProviderOrderPayload<ExtArgs> | null
+    providerJobs: Prisma.$ProviderJobPayload<ExtArgs>[]
+    providerAttempts: Prisma.$ProviderOrderAttemptPayload<ExtArgs>[]
+    providerOperationLogs: Prisma.$ProviderOperationLogPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1193,6 +1838,7 @@ export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     targetUrl: string
     quantity: number
     chargeMinor: bigint
+    refundedMinor: bigint
     startCount: number | null
     remaining: number
     status: $Enums.OrderStatus
@@ -1597,6 +2243,10 @@ export interface Prisma__OrderClient<T, Null = never, ExtArgs extends runtime.Ty
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   service<T extends Prisma.ServiceDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ServiceDefaultArgs<ExtArgs>>): Prisma.Prisma__ServiceClient<runtime.Types.Result.GetResult<Prisma.$ServicePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   logs<T extends Prisma.Order$logsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$logsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  providerOrder<T extends Prisma.Order$providerOrderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$providerOrderArgs<ExtArgs>>): Prisma.Prisma__ProviderOrderClient<runtime.Types.Result.GetResult<Prisma.$ProviderOrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  providerJobs<T extends Prisma.Order$providerJobsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$providerJobsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProviderJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  providerAttempts<T extends Prisma.Order$providerAttemptsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$providerAttemptsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProviderOrderAttemptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  providerOperationLogs<T extends Prisma.Order$providerOperationLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$providerOperationLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProviderOperationLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1633,6 +2283,7 @@ export interface OrderFieldRefs {
   readonly targetUrl: Prisma.FieldRef<"Order", 'String'>
   readonly quantity: Prisma.FieldRef<"Order", 'Int'>
   readonly chargeMinor: Prisma.FieldRef<"Order", 'BigInt'>
+  readonly refundedMinor: Prisma.FieldRef<"Order", 'BigInt'>
   readonly startCount: Prisma.FieldRef<"Order", 'Int'>
   readonly remaining: Prisma.FieldRef<"Order", 'Int'>
   readonly status: Prisma.FieldRef<"Order", 'OrderStatus'>
@@ -2062,6 +2713,97 @@ export type Order$logsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
   take?: number
   skip?: number
   distinct?: Prisma.OrderLogScalarFieldEnum | Prisma.OrderLogScalarFieldEnum[]
+}
+
+/**
+ * Order.providerOrder
+ */
+export type Order$providerOrderArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProviderOrder
+   */
+  select?: Prisma.ProviderOrderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProviderOrder
+   */
+  omit?: Prisma.ProviderOrderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProviderOrderInclude<ExtArgs> | null
+  where?: Prisma.ProviderOrderWhereInput
+}
+
+/**
+ * Order.providerJobs
+ */
+export type Order$providerJobsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProviderJob
+   */
+  select?: Prisma.ProviderJobSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProviderJob
+   */
+  omit?: Prisma.ProviderJobOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProviderJobInclude<ExtArgs> | null
+  where?: Prisma.ProviderJobWhereInput
+  orderBy?: Prisma.ProviderJobOrderByWithRelationInput | Prisma.ProviderJobOrderByWithRelationInput[]
+  cursor?: Prisma.ProviderJobWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProviderJobScalarFieldEnum | Prisma.ProviderJobScalarFieldEnum[]
+}
+
+/**
+ * Order.providerAttempts
+ */
+export type Order$providerAttemptsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProviderOrderAttempt
+   */
+  select?: Prisma.ProviderOrderAttemptSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProviderOrderAttempt
+   */
+  omit?: Prisma.ProviderOrderAttemptOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProviderOrderAttemptInclude<ExtArgs> | null
+  where?: Prisma.ProviderOrderAttemptWhereInput
+  orderBy?: Prisma.ProviderOrderAttemptOrderByWithRelationInput | Prisma.ProviderOrderAttemptOrderByWithRelationInput[]
+  cursor?: Prisma.ProviderOrderAttemptWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProviderOrderAttemptScalarFieldEnum | Prisma.ProviderOrderAttemptScalarFieldEnum[]
+}
+
+/**
+ * Order.providerOperationLogs
+ */
+export type Order$providerOperationLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProviderOperationLog
+   */
+  select?: Prisma.ProviderOperationLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProviderOperationLog
+   */
+  omit?: Prisma.ProviderOperationLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProviderOperationLogInclude<ExtArgs> | null
+  where?: Prisma.ProviderOperationLogWhereInput
+  orderBy?: Prisma.ProviderOperationLogOrderByWithRelationInput | Prisma.ProviderOperationLogOrderByWithRelationInput[]
+  cursor?: Prisma.ProviderOperationLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProviderOperationLogScalarFieldEnum | Prisma.ProviderOperationLogScalarFieldEnum[]
 }
 
 /**

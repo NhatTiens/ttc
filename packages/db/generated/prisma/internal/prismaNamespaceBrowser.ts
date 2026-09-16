@@ -71,7 +71,17 @@ export const ModelName = {
   NotificationPreference: 'NotificationPreference',
   ServicePriceHistory: 'ServicePriceHistory',
   AdminAuditLog: 'AdminAuditLog',
-  SystemSetting: 'SystemSetting'
+  SystemSetting: 'SystemSetting',
+  Provider: 'Provider',
+  ProviderService: 'ProviderService',
+  ServiceProviderMapping: 'ServiceProviderMapping',
+  ProviderPriceHistory: 'ProviderPriceHistory',
+  ProviderOrder: 'ProviderOrder',
+  ProviderOrderAttempt: 'ProviderOrderAttempt',
+  ProviderJob: 'ProviderJob',
+  ProviderOperationLog: 'ProviderOperationLog',
+  ProviderBalanceSnapshot: 'ProviderBalanceSnapshot',
+  ProviderRequestLease: 'ProviderRequestLease'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -231,6 +241,7 @@ export const OrderScalarFieldEnum = {
   targetUrl: 'targetUrl',
   quantity: 'quantity',
   chargeMinor: 'chargeMinor',
+  refundedMinor: 'refundedMinor',
   startCount: 'startCount',
   remaining: 'remaining',
   status: 'status',
@@ -402,6 +413,205 @@ export const SystemSettingScalarFieldEnum = {
 } as const
 
 export type SystemSettingScalarFieldEnum = (typeof SystemSettingScalarFieldEnum)[keyof typeof SystemSettingScalarFieldEnum]
+
+
+export const ProviderScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  name: 'name',
+  status: 'status',
+  health: 'health',
+  baseUrl: 'baseUrl',
+  enabled: 'enabled',
+  priority: 'priority',
+  timeoutMs: 'timeoutMs',
+  maxConcurrentRequests: 'maxConcurrentRequests',
+  minRequestIntervalMs: 'minRequestIntervalMs',
+  nextRequestAt: 'nextRequestAt',
+  balanceMinor: 'balanceMinor',
+  balanceCurrency: 'balanceCurrency',
+  lastBalanceSyncAt: 'lastBalanceSyncAt',
+  lastHealthAt: 'lastHealthAt',
+  lastSuccessfulAt: 'lastSuccessfulAt',
+  lastErrorCode: 'lastErrorCode',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProviderScalarFieldEnum = (typeof ProviderScalarFieldEnum)[keyof typeof ProviderScalarFieldEnum]
+
+
+export const ProviderServiceScalarFieldEnum = {
+  id: 'id',
+  providerId: 'providerId',
+  externalServiceId: 'externalServiceId',
+  name: 'name',
+  category: 'category',
+  platform: 'platform',
+  providerRateMinor: 'providerRateMinor',
+  rateUnit: 'rateUnit',
+  currency: 'currency',
+  min: 'min',
+  max: 'max',
+  supportsRefill: 'supportsRefill',
+  supportsCancel: 'supportsCancel',
+  status: 'status',
+  rawMetadata: 'rawMetadata',
+  lastSyncedAt: 'lastSyncedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProviderServiceScalarFieldEnum = (typeof ProviderServiceScalarFieldEnum)[keyof typeof ProviderServiceScalarFieldEnum]
+
+
+export const ServiceProviderMappingScalarFieldEnum = {
+  id: 'id',
+  serviceId: 'serviceId',
+  providerServiceId: 'providerServiceId',
+  enabled: 'enabled',
+  priority: 'priority',
+  autoFallbackAllowed: 'autoFallbackAllowed',
+  markupType: 'markupType',
+  markupBps: 'markupBps',
+  fixedMarkupMinor: 'fixedMarkupMinor',
+  minimumMarginMinor: 'minimumMarginMinor',
+  pricingMode: 'pricingMode',
+  status: 'status',
+  lastPriceReviewAt: 'lastPriceReviewAt',
+  updatedByUserId: 'updatedByUserId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ServiceProviderMappingScalarFieldEnum = (typeof ServiceProviderMappingScalarFieldEnum)[keyof typeof ServiceProviderMappingScalarFieldEnum]
+
+
+export const ProviderPriceHistoryScalarFieldEnum = {
+  id: 'id',
+  providerServiceId: 'providerServiceId',
+  previousRateMinor: 'previousRateMinor',
+  newRateMinor: 'newRateMinor',
+  source: 'source',
+  createdAt: 'createdAt'
+} as const
+
+export type ProviderPriceHistoryScalarFieldEnum = (typeof ProviderPriceHistoryScalarFieldEnum)[keyof typeof ProviderPriceHistoryScalarFieldEnum]
+
+
+export const ProviderOrderScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  providerId: 'providerId',
+  providerServiceId: 'providerServiceId',
+  externalOrderId: 'externalOrderId',
+  clientReference: 'clientReference',
+  submissionState: 'submissionState',
+  status: 'status',
+  attemptCount: 'attemptCount',
+  providerRateSnapshotMinor: 'providerRateSnapshotMinor',
+  rateUnitSnapshot: 'rateUnitSnapshot',
+  providerCostMinor: 'providerCostMinor',
+  customerChargeMinor: 'customerChargeMinor',
+  grossMarginMinor: 'grossMarginMinor',
+  currency: 'currency',
+  requestPayload: 'requestPayload',
+  responsePayload: 'responsePayload',
+  submittedAt: 'submittedAt',
+  lastCheckedAt: 'lastCheckedAt',
+  nextPollAt: 'nextPollAt',
+  lastErrorCode: 'lastErrorCode',
+  lastErrorMessage: 'lastErrorMessage',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProviderOrderScalarFieldEnum = (typeof ProviderOrderScalarFieldEnum)[keyof typeof ProviderOrderScalarFieldEnum]
+
+
+export const ProviderOrderAttemptScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  providerOrderRecordId: 'providerOrderRecordId',
+  providerId: 'providerId',
+  providerServiceId: 'providerServiceId',
+  action: 'action',
+  attemptNo: 'attemptNo',
+  providerIdempotencyKey: 'providerIdempotencyKey',
+  clientReference: 'clientReference',
+  requestHash: 'requestHash',
+  state: 'state',
+  httpStatus: 'httpStatus',
+  externalOrderId: 'externalOrderId',
+  errorCode: 'errorCode',
+  startedAt: 'startedAt',
+  finishedAt: 'finishedAt'
+} as const
+
+export type ProviderOrderAttemptScalarFieldEnum = (typeof ProviderOrderAttemptScalarFieldEnum)[keyof typeof ProviderOrderAttemptScalarFieldEnum]
+
+
+export const ProviderJobScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  status: 'status',
+  dedupeKey: 'dedupeKey',
+  providerId: 'providerId',
+  orderId: 'orderId',
+  providerOrderId: 'providerOrderId',
+  payload: 'payload',
+  runAt: 'runAt',
+  attempts: 'attempts',
+  maxAttempts: 'maxAttempts',
+  lockedAt: 'lockedAt',
+  lockedBy: 'lockedBy',
+  lastErrorCode: 'lastErrorCode',
+  lastErrorMessage: 'lastErrorMessage',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProviderJobScalarFieldEnum = (typeof ProviderJobScalarFieldEnum)[keyof typeof ProviderJobScalarFieldEnum]
+
+
+export const ProviderOperationLogScalarFieldEnum = {
+  id: 'id',
+  providerId: 'providerId',
+  orderId: 'orderId',
+  operation: 'operation',
+  externalOrderId: 'externalOrderId',
+  durationMs: 'durationMs',
+  result: 'result',
+  attempt: 'attempt',
+  errorCode: 'errorCode',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type ProviderOperationLogScalarFieldEnum = (typeof ProviderOperationLogScalarFieldEnum)[keyof typeof ProviderOperationLogScalarFieldEnum]
+
+
+export const ProviderBalanceSnapshotScalarFieldEnum = {
+  id: 'id',
+  providerId: 'providerId',
+  amountMinor: 'amountMinor',
+  currency: 'currency',
+  capturedAt: 'capturedAt'
+} as const
+
+export type ProviderBalanceSnapshotScalarFieldEnum = (typeof ProviderBalanceSnapshotScalarFieldEnum)[keyof typeof ProviderBalanceSnapshotScalarFieldEnum]
+
+
+export const ProviderRequestLeaseScalarFieldEnum = {
+  id: 'id',
+  providerId: 'providerId',
+  workerId: 'workerId',
+  acquiredAt: 'acquiredAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type ProviderRequestLeaseScalarFieldEnum = (typeof ProviderRequestLeaseScalarFieldEnum)[keyof typeof ProviderRequestLeaseScalarFieldEnum]
 
 
 export const SortOrder = {

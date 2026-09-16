@@ -6,13 +6,14 @@ import type { ReactNode } from "react";
 const tones: Record<string, BadgeTone> = {
   ACTIVE: "green", SUSPENDED: "red", PENDING: "amber", VALIDATING: "blue", SUBMITTED: "blue", PROCESSING: "blue",
   COMPLETED: "green", CONFIRMED: "green", FAILED: "red", CANCELLED: "neutral", PARTIAL: "purple", REFUNDED: "purple",
-  MAINTENANCE: "amber", DISABLED: "neutral", OPEN: "green", WAITING_CUSTOMER: "amber", WAITING_SUPPORT: "blue", RESOLVED: "purple", CLOSED: "neutral"
+  MAINTENANCE: "amber", DISABLED: "neutral", DEGRADED: "amber", HEALTHY: "green", DOWN: "red", UNKNOWN: "neutral", AVAILABLE: "green", UNAVAILABLE: "red", REMOVED: "neutral", PRICE_REVIEW_REQUIRED: "red", PROVIDER_UNAVAILABLE: "red", MIN_MAX_CONFLICT: "amber", MANUAL_REVIEW: "amber", RETRY: "amber", RUNNING: "blue", OPEN: "green", WAITING_CUSTOMER: "amber", WAITING_SUPPORT: "blue", RESOLVED: "purple", CLOSED: "neutral"
 };
 const labels: Record<string, string> = {
   ACTIVE: "Hoạt động", SUSPENDED: "Tạm khóa", PENDING: "Đang chờ", VALIDATING: "Đang kiểm tra", SUBMITTED: "Đã gửi",
   PROCESSING: "Đang xử lý", COMPLETED: "Hoàn thành", CONFIRMED: "Đã xác nhận", FAILED: "Thất bại", CANCELLED: "Đã hủy",
   PARTIAL: "Một phần", REFUNDED: "Đã hoàn tiền", MAINTENANCE: "Bảo trì", DISABLED: "Vô hiệu", OPEN: "Mở",
-  WAITING_CUSTOMER: "Chờ khách hàng", WAITING_SUPPORT: "Chờ hỗ trợ", RESOLVED: "Đã giải quyết", CLOSED: "Đã đóng"
+  WAITING_CUSTOMER: "Chờ khách hàng", WAITING_SUPPORT: "Chờ hỗ trợ", RESOLVED: "Đã giải quyết", CLOSED: "Đã đóng",
+  DEGRADED: "Suy giảm", HEALTHY: "Ổn định", DOWN: "Mất kết nối", UNKNOWN: "Chưa xác định", AVAILABLE: "Khả dụng", UNAVAILABLE: "Không khả dụng", REMOVED: "Đã gỡ", PRICE_REVIEW_REQUIRED: "Cần duyệt giá", PROVIDER_UNAVAILABLE: "Provider lỗi", MIN_MAX_CONFLICT: "Lệch min/max", MANUAL_REVIEW: "Cần duyệt", RETRY: "Đang retry", RUNNING: "Đang chạy"
 };
 
 export function AdminStatusBadge({ status }: { status: string }) {

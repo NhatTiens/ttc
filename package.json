@@ -1,7 +1,7 @@
 {
   "name": "tuong-tac-pro",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -13,7 +13,7 @@
     "typecheck:web": "npm --workspace @tuong-tac-pro/web run typecheck",
     "lint:web:offline": "npm --workspace @tuong-tac-pro/web run lint:offline",
     "typecheck:web:offline": "npm --workspace @tuong-tac-pro/web run typecheck:offline",
-    "qa:offline": "node qa/component-contract-check.mjs && node qa/responsive-check.mjs && node qa/customer-application-check.mjs && node qa/work4-backend-contract-check.mjs && node qa/work5-admin-contract-check.mjs",
+    "qa:offline": "node qa/component-contract-check.mjs && node qa/responsive-check.mjs && node qa/customer-application-check.mjs && node qa/work4-backend-contract-check.mjs && node qa/work5-admin-contract-check.mjs && node qa/work6-provider-contract-check.mjs",
     "check:offline": "npm --workspace @tuong-tac-pro/web run lint:offline && npm --workspace @tuong-tac-pro/web run typecheck:offline && npm run qa:offline",
     "qa:customer": "node qa/customer-application-check.mjs",
     "db:generate": "npm --workspace @tuong-tac-pro/db run db:generate",
@@ -30,7 +30,20 @@
     "qa:work4:persistence": "node qa/work4-persistence-verify.mjs",
     "qa:work5:api": "node qa/work5-admin-api-smoke.mjs",
     "qa:work5:static": "node qa/work5-admin-contract-check.mjs",
-    "check:work5": "npm run db:validate && npm run lint:web && npm run typecheck:web && npm run test:backend && npm run build:web && npm run check:offline"
+    "check:work5": "npm run db:validate && npm run lint:web && npm run typecheck:web && npm run test:backend && npm run build:web && npm run check:offline",
+    "dev:worker": "npm --workspace @tuong-tac-pro/worker run dev",
+    "worker:start": "npm --workspace @tuong-tac-pro/worker run start",
+    "worker:once": "npm --workspace @tuong-tac-pro/worker run once",
+    "typecheck:providers": "npm --workspace @tuong-tac-pro/providers run typecheck",
+    "typecheck:worker": "npm --workspace @tuong-tac-pro/worker run typecheck",
+    "test:providers": "npm --workspace @tuong-tac-pro/providers run test",
+    "test:worker": "npm run db:test:prepare && npm --workspace @tuong-tac-pro/worker run test",
+    "test:work6": "npm run test:providers && npm run test:backend && npm run test:worker",
+    "qa:work6:static": "node qa/work6-provider-contract-check.mjs",
+    "qa:work6:api": "node qa/work6-api-smoke.mjs",
+    "check:work6": "npm run db:validate && npm run lint:web && npm run typecheck:web && npm run typecheck:providers && npm run typecheck:worker && npm run test:work6 && npm run build:web && npm run check:offline",
+    "qa:ttc:readonly": "node --import tsx qa/ttc-live-readonly.mjs",
+    "qa:ttc:order": "node --import tsx qa/ttc-live-order.mjs"
   },
   "engines": {
     "node": ">=22"
