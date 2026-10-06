@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { providerFetch } from "../src/http";
 import {
   ProviderAdapterError,
   TTCProviderAdapter,
@@ -9,6 +10,7 @@ import {
   decideProviderRetry,
   normalizeTTCStatus,
   proportionalRefundTarget,
+  sanitizeProviderErrorMessage,
   sanitizeProviderValue
 } from "../src/index";
 
@@ -202,4 +204,48 @@ test("retry with provider idempotency keeps ambiguous transient create retryable
   );
   assert.equal(decision.action, "RETRY");
   assert.ok((decision.delayMs ?? 0) > 0);
+});
+
+test("create HTTP 5xx is ambiguous while a read HTTP 5xx remains safely retryable", async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response("gateway error", { status: 502 });
+  try {
+    const url = new URL("https://provider.example/test");
+    await assert.rejects(() => providerFetch(url, { method: "POST" }, { timeoutMs: 100, allowHosts: [url.hostname], ambiguousSideEffect: true }), (error: unknown) => {
+      assert.ok(error instanceof ProviderAdapterError);
+      assert.equal(error.ambiguousSideEffect, true);
+      assert.equal(decideProviderRetry(error, 1, 6, { sideEffecting: true, providerSupportsIdempotency: false }).action, "MANUAL_REVIEW");
+      return true;
+    });
+    await assert.rejects(() => providerFetch(url, {}, { timeoutMs: 100, allowHosts: [url.hostname] }), (error: unknown) => error instanceof ProviderAdapterError && error.retryable && !error.ambiguousSideEffect);
+  } finally { globalThis.fetch = originalFetch; }
+});
+
+test("provider response body is covered by the request timeout", async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (_input, init) => new Response(new ReadableStream({ start(controller) {
+    init?.signal?.addEventListener("abort", () => controller.error(new DOMException("body timed out", "AbortError")), { once: true });
+  } }));
+  try {
+    const url = new URL("https://provider.example/test");
+    await assert.rejects(() => providerFetch(url, {}, { timeoutMs: 10, allowHosts: [url.hostname], ambiguousSideEffect: true }), (error: unknown) => error instanceof ProviderAdapterError && error.code === "PROVIDER_TIMEOUT" && error.ambiguousSideEffect);
+  } finally { globalThis.fetch = originalFetch; }
+});
+
+test("camel-case credentials and embedded error credentials are redacted", () => {
+  const sanitized = sanitizeProviderValue({ accessToken: "private", refreshToken: "private", clientSecret: "private", passwordHash: "private" });
+  assert.deepEqual(sanitized, { accessToken: "[REDACTED]", refreshToken: "[REDACTED]", clientSecret: "[REDACTED]", passwordHash: "[REDACTED]" });
+  const message = sanitizeProviderErrorMessage("apiKey=private&key=private Bearer private");
+  assert.equal(message.includes("private"), false);
+  const payload = sanitizeProviderValue(JSON.parse('{"__proto__":{"polluted":true},"ok":true}'));
+  assert.equal(Object.getPrototypeOf(payload), Object.prototype);
+});
+
+test("provider response size is bounded before parsing JSON", async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(new Uint8Array(11));
+  try {
+    const url = new URL("https://provider.example/test");
+    await assert.rejects(() => providerFetch(url, {}, { timeoutMs: 100, allowHosts: [url.hostname], maxResponseBytes: 10, ambiguousSideEffect: true }), (error: unknown) => error instanceof ProviderAdapterError && error.code === "PROVIDER_MALFORMED_RESPONSE" && error.ambiguousSideEffect);
+  } finally { globalThis.fetch = originalFetch; }
 });

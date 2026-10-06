@@ -1,5 +1,7 @@
 # Work 04 — API Implementation
 
+Work 07 updates the financial contract while preserving the response envelope and customer ownership checks. Create a server quote using `POST /api/v1/quotes` with `{ serviceId, quantity }`, then create an order using `{ quoteId, targetUrl }` and `Idempotency-Key`. Quotes expire and are single-use; idempotent replay of an existing order is resolved before expiry/consumption checks. The wallet response's `balance` is available funds (`posted - reserved`). A new order reserves funds and has no completed PURCHASE until provider acceptance. Google Maps is accepted by customer and admin platform filters.
+
 ## Response envelope
 
 Success:
@@ -41,6 +43,7 @@ GET   /api/v1/services
 GET   /api/v1/services/:id
 
 GET   /api/v1/orders
+POST  /api/v1/quotes
 POST  /api/v1/orders
 GET   /api/v1/orders/:id
 
@@ -65,7 +68,7 @@ Zod validates all Work 04 HTTP boundaries, including:
 - profile/password/notification preferences;
 - service/order query filters and pagination values;
 - target URL protocol;
-- order service ID/quantity;
+- quote service ID/quantity and order quote ID/target URL;
 - deposit amount/method;
 - support subject/message/reply.
 
@@ -89,6 +92,10 @@ FORBIDDEN
 VALIDATION_ERROR
 SERVICE_NOT_FOUND
 SERVICE_UNAVAILABLE
+QUOTE_NOT_FOUND
+QUOTE_EXPIRED
+QUOTE_ALREADY_USED
+RESERVATION_CONFLICT
 ORDER_NOT_FOUND
 INSUFFICIENT_BALANCE
 DUPLICATE_REQUEST

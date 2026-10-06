@@ -1,11 +1,6 @@
 import { Prisma, getDb } from "@tuong-tac-pro/db";
 import { ProviderAdapterError } from "@tuong-tac-pro/providers";
-
-function errorCode(error: unknown): string {
-  return typeof error === "object" && error !== null && "code" in error
-    ? String((error as { code?: unknown }).code ?? "")
-    : "";
-}
+import { isTransactionConflict } from "@tuong-tac-pro/domain";
 
 async function serializable<T>(operation: (tx: Prisma.TransactionClient) => Promise<T>, attempts = 4): Promise<T> {
   const db = getDb();
@@ -17,7 +12,7 @@ async function serializable<T>(operation: (tx: Prisma.TransactionClient) => Prom
         timeout: 10000
       });
     } catch (error) {
-      if (errorCode(error) === "P2034" && attempt < attempts) continue;
+      if (isTransactionConflict(error) && attempt < attempts) continue;
       throw error;
     }
   }

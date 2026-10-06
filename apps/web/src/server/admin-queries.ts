@@ -52,7 +52,7 @@ function platformName(platform: SocialPlatform) {
   return platform === SocialPlatform.FACEBOOK ? "Facebook"
     : platform === SocialPlatform.TIKTOK ? "TikTok"
       : platform === SocialPlatform.INSTAGRAM ? "Instagram"
-        : platform === SocialPlatform.YOUTUBE ? "YouTube" : "Threads";
+        : platform === SocialPlatform.YOUTUBE ? "YouTube" : platform === SocialPlatform.GOOGLE ? "Google Maps" : "Threads";
 }
 
 function transactionMap(item: {

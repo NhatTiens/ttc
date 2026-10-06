@@ -1,5 +1,7 @@
 # Tương Tác Pro — Security Plan
 
+This is a security roadmap, not a claim that every control below is deployed. Runtime currently uses Auth.js JWT sessions with database session-version checks; 2FA, distributed login throttling, email reset delivery, SePay authentication and periodic reconciliation are follow-up work. Work 07 adds isolated-test-database guards, monotonic refunds, order-scoped submission admission and stale-worker fencing. Provider responses have a body deadline/size limit; camel-case credential fields and labelled credentials in errors are redacted. Technical PASS does not replace a production security review or a verified payment/provider contract.
+
 ## 1. Security priorities
 
 1. Protect money/wallet integrity.

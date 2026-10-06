@@ -4,7 +4,7 @@ import { getSession, signIn, signOut } from "next-auth/react";
 import type { CustomerRepository } from "./customer-repository";
 import type {
   AuthResult, CreateOrderInput, CreateTicketInput, CustomerProfile, DashboardData, DepositMethod, DepositRequest,
-  Order, Service, ServiceCategory, SupportMessage, SupportThread, SupportTicket, Wallet, WalletTransaction
+  Order, OrderQuote, Service, ServiceCategory, SupportMessage, SupportThread, SupportTicket, Wallet, WalletTransaction
 } from "@/domain/customer";
 
 type ApiSuccess<T> = { data: T };
@@ -69,8 +69,14 @@ async function apiRequest<T>(path: string, init?: RequestInit): Promise<T> {
     credentials: "same-origin",
     cache: "no-store"
   });
-  const payload = await response.json().catch(() => ({})) as ApiSuccess<T> & ApiFailure;
-  if (!response.ok) throw new ApiClientError(payload.error?.code ?? "REQUEST_FAILED", response.status, payload.error?.message ?? "Yêu cầu không thể hoàn tất.");
+  const raw: unknown = await response.json().catch(() => undefined);
+  const payload = typeof raw === "object" && raw !== null ? raw as ApiSuccess<T> & ApiFailure : undefined;
+  if (!response.ok) throw new ApiClientError(payload?.error?.code ?? "REQUEST_FAILED", response.status, payload?.error?.message ?? "Yêu cầu không thể hoàn tất.");
+  if (!payload || !("data" in payload)) {
+    // A proxy/truncated success response does not prove the mutation failed.
+    // Preserve its Idempotency-Key so retry can recover the committed result.
+    throw new ApiClientError("MALFORMED_RESPONSE", 502, "Phản hồi máy chủ không hợp lệ. Vui lòng thử lại với cùng yêu cầu.");
+  }
   return payload.data;
 }
 
@@ -96,8 +102,11 @@ export const restCustomerRepository: CustomerRepository = {
     return apiRequest<Order[]>(withQuery("/api/v1/orders", { search: filters.search, platform: filters.platform, status: filters.status, dateRange: filters.dateRange }));
   },
   getOrder(id: string) { return apiRequest<Order>(`/api/v1/orders/${encodeURIComponent(id)}`).catch((error: unknown) => error instanceof ApiClientError && error.code === "ORDER_NOT_FOUND" ? null : Promise.reject(error)); },
+  createQuote(serviceId: string, quantity: number) {
+    return apiRequest<OrderQuote>("/api/v1/quotes", { method: "POST", body: JSON.stringify({ serviceId, quantity }) });
+  },
   createOrder(input: CreateOrderInput) {
-    const payload = { serviceId: input.serviceId, targetUrl: input.targetUrl.trim(), quantity: input.quantity };
+    const payload = { quoteId: input.quoteId, targetUrl: input.targetUrl.trim() };
     return idempotentApiRequest<Order>("order", payload, "/api/v1/orders", { method: "POST", body: JSON.stringify(payload) });
   },
   getWallet() { return apiRequest<Wallet>("/api/v1/wallet"); },

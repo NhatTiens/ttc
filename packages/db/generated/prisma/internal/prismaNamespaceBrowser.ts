@@ -58,8 +58,10 @@ export const ModelName = {
   PasswordResetToken: 'PasswordResetToken',
   Wallet: 'Wallet',
   WalletTransaction: 'WalletTransaction',
+  WalletReservation: 'WalletReservation',
   ServiceCategory: 'ServiceCategory',
   Service: 'Service',
+  OrderQuote: 'OrderQuote',
   Order: 'Order',
   OrderLog: 'OrderLog',
   DepositMethod: 'DepositMethod',
@@ -201,6 +203,21 @@ export const WalletTransactionScalarFieldEnum = {
 export type WalletTransactionScalarFieldEnum = (typeof WalletTransactionScalarFieldEnum)[keyof typeof WalletTransactionScalarFieldEnum]
 
 
+export const WalletReservationScalarFieldEnum = {
+  id: 'id',
+  walletId: 'walletId',
+  orderId: 'orderId',
+  amountMinor: 'amountMinor',
+  status: 'status',
+  capturedAt: 'capturedAt',
+  releasedAt: 'releasedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WalletReservationScalarFieldEnum = (typeof WalletReservationScalarFieldEnum)[keyof typeof WalletReservationScalarFieldEnum]
+
+
 export const ServiceCategoryScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -233,6 +250,22 @@ export const ServiceScalarFieldEnum = {
 export type ServiceScalarFieldEnum = (typeof ServiceScalarFieldEnum)[keyof typeof ServiceScalarFieldEnum]
 
 
+export const OrderQuoteScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  serviceId: 'serviceId',
+  quantity: 'quantity',
+  ratePerThousandMinor: 'ratePerThousandMinor',
+  chargeMinor: 'chargeMinor',
+  currency: 'currency',
+  expiresAt: 'expiresAt',
+  consumedAt: 'consumedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type OrderQuoteScalarFieldEnum = (typeof OrderQuoteScalarFieldEnum)[keyof typeof OrderQuoteScalarFieldEnum]
+
+
 export const OrderScalarFieldEnum = {
   id: 'id',
   publicId: 'publicId',
@@ -247,6 +280,7 @@ export const OrderScalarFieldEnum = {
   status: 'status',
   idempotencyKey: 'idempotencyKey',
   requestFingerprint: 'requestFingerprint',
+  quoteId: 'quoteId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

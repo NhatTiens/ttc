@@ -39,18 +39,22 @@ export async function claimDueProviderJobs(workerId: string, batchSize = Number(
   return claimed;
 }
 
-export async function completeProviderJob(jobId: string): Promise<void> {
+export function providerJobClaimWhere(job: ProviderJob) {
+  return { id: job.id, status: ProviderJobStatus.RUNNING, lockedBy: job.lockedBy, lockedAt: job.lockedAt, attempts: job.attempts };
+}
+
+export async function completeProviderJob(job: ProviderJob): Promise<void> {
   const db = getDb();
-  await db.providerJob.update({
-    where: { id: jobId },
+  await db.providerJob.updateMany({
+    where: providerJobClaimWhere(job),
     data: { status: ProviderJobStatus.COMPLETED, completedAt: new Date(), lockedAt: null, lockedBy: null, lastErrorCode: null, lastErrorMessage: null }
   });
 }
 
-export async function manualReviewProviderJob(jobId: string, code: string, message: string): Promise<void> {
+export async function manualReviewProviderJob(job: ProviderJob, code: string, message: string): Promise<void> {
   const db = getDb();
-  await db.providerJob.update({
-    where: { id: jobId },
+  await db.providerJob.updateMany({
+    where: providerJobClaimWhere(job),
     data: {
       status: ProviderJobStatus.MANUAL_REVIEW,
       lockedAt: null,
@@ -61,10 +65,10 @@ export async function manualReviewProviderJob(jobId: string, code: string, messa
   });
 }
 
-export async function failProviderJob(jobId: string, code: string, message: string): Promise<void> {
+export async function failProviderJob(job: ProviderJob, code: string, message: string): Promise<void> {
   const db = getDb();
-  await db.providerJob.update({
-    where: { id: jobId },
+  await db.providerJob.updateMany({
+    where: providerJobClaimWhere(job),
     data: {
       status: ProviderJobStatus.FAILED,
       lockedAt: null,
@@ -78,11 +82,11 @@ export async function failProviderJob(jobId: string, code: string, message: stri
 export async function retryProviderJob(job: ProviderJob, code: string, message: string, delayMs?: number): Promise<void> {
   const db = getDb();
   if (job.attempts >= job.maxAttempts) {
-    return failProviderJob(job.id, "MAX_ATTEMPTS", message);
+    return failProviderJob(job, "MAX_ATTEMPTS", message);
   }
   const waitMs = delayMs ?? computeBackoffMs(job.attempts);
-  await db.providerJob.update({
-    where: { id: job.id },
+  await db.providerJob.updateMany({
+    where: providerJobClaimWhere(job),
     data: {
       status: ProviderJobStatus.RETRY,
       runAt: new Date(Date.now() + waitMs),

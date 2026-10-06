@@ -24,6 +24,7 @@ import {
   confirmDeposit,
   createCategory,
   createCustomerOrder,
+  createOrderQuote,
   createDepositRequest,
   createService,
   createSupportTicket,
@@ -37,10 +38,12 @@ import {
   updateSystemSettings
 } from "@tuong-tac-pro/domain";
 import { verifyCustomerCredentials } from "@/server/auth-service";
+import { assertSafeTestDatabaseUrl } from "../../../../qa/test-database-safety.mjs";
 
 const rootEnvPath = fileURLToPath(new URL("../../../../.env", import.meta.url));
 if (existsSync(rootEnvPath)) process.loadEnvFile(rootEnvPath);
 const testDatabaseUrl = process.env.TEST_DATABASE_URL;
+assertSafeTestDatabaseUrl(testDatabaseUrl, process.env.DATABASE_URL);
 if (!testDatabaseUrl) throw new Error("TEST_DATABASE_URL is required for Work 05 admin tests.");
 process.env.DATABASE_URL = testDatabaseUrl;
 
@@ -65,10 +68,12 @@ async function reset() {
   await db.paymentEvent.deleteMany();
   await db.payment.deleteMany();
   await db.walletTransaction.deleteMany();
+  await db.walletReservation.deleteMany();
   await db.orderLog.deleteMany();
   await db.supportMessage.deleteMany();
   await db.deposit.deleteMany();
   await db.order.deleteMany();
+  await db.orderQuote.deleteMany();
   await db.supportTicket.deleteMany();
   await db.passwordResetToken.deleteMany();
   await db.session.deleteMany();
@@ -98,9 +103,19 @@ async function createCustomer(email: string, balance = 0n) {
   }
   return user;
 }
+async function createQuotedOrder(userId: string, input: { serviceId: string; targetUrl: string; quantity: number }, key: string) {
+  const quote = await createOrderQuote(userId, { serviceId: input.serviceId, quantity: input.quantity });
+  return createCustomerOrder(userId, { quoteId: quote.id, targetUrl: input.targetUrl }, key);
+}
 function domainCode(code: string) { return (error: unknown) => error instanceof DomainError && error.code === code; }
 
 test("Work 05 admin operations", async (t) => {
+  const previousProviderRouting = process.env.PROVIDER_ROUTING_ENABLED;
+  process.env.PROVIDER_ROUTING_ENABLED = "false";
+  t.after(() => {
+    if (previousProviderRouting === undefined) delete process.env.PROVIDER_ROUTING_ENABLED;
+    else process.env.PROVIDER_ROUTING_ENABLED = previousProviderRouting;
+  });
   passwordHash = await argon2.hash(password, { type: argon2.argon2id });
 
   await t.test("WALLET: positive/negative adjustments are ledger-backed and audited", async () => {
@@ -138,15 +153,35 @@ test("Work 05 admin operations", async (t) => {
 
   await t.test("ORDER REFUND: idempotent/concurrent and ledger/order log/audit remain consistent", async () => {
     await reset(); const admin = await createAdmin(); const customer = await createCustomer("refund@example.com", 300000n); const actor = { userId: admin.id };
-    const order = await createCustomerOrder(customer.id, { serviceId: "svc-admin-test", targetUrl: "https://example.com/refund", quantity: 1000 }, "work5-order-create");
-    assert.equal((await getDb().wallet.findUniqueOrThrow({ where: { userId: customer.id } })).balanceMinor, 200000n);
+    const order = await createQuotedOrder(customer.id, { serviceId: "svc-admin-test", targetUrl: "https://example.com/refund", quantity: 1000 }, "work5-order-create");
+    const reservedWallet = await getDb().wallet.findUniqueOrThrow({ where: { userId: customer.id } });
+    assert.equal(reservedWallet.balanceMinor, 300000n);
+    assert.equal(reservedWallet.reservedMinor, 100000n);
     await Promise.allSettled([refundOrder(actor, order.publicId, "Provider not submitted"), refundOrder(actor, order.publicId, "Provider not submitted")]);
     const wallet = await getDb().wallet.findUniqueOrThrow({ where: { userId: customer.id } });
     assert.equal(wallet.balanceMinor, 300000n);
+    assert.equal(wallet.reservedMinor, 0n);
     assert.equal((await getDb().order.findUniqueOrThrow({ where: { id: order.id } })).status, OrderStatus.REFUNDED);
-    assert.equal(await getDb().walletTransaction.count({ where: { walletId: wallet.id, type: WalletTransactionType.REFUND, referenceId: order.publicId } }), 1);
+    assert.equal(await getDb().walletTransaction.count({ where: { walletId: wallet.id, type: WalletTransactionType.REFUND, referenceId: order.publicId } }), 0);
     assert.equal(await getDb().orderLog.count({ where: { orderId: order.id, toStatus: OrderStatus.REFUNDED } }), 1);
     assert.equal(await getDb().adminAuditLog.count({ where: { action: "ORDER_REFUND", entityId: order.publicId } }), 1);
+  });
+
+  await t.test("ORDER REFUND: legacy orders require a posted purchase and refund it only once", async () => {
+    await reset(); const admin = await createAdmin(); const customer = await createCustomer("legacy-refund@example.com", 300000n); const actor = { userId: admin.id };
+    const db = getDb();
+    const order = await db.order.create({ data: { publicId: "TT-LEGACY-REFUND", userId: customer.id, serviceId: "svc-admin-test", targetUrl: "https://example.com/legacy", quantity: 1000, chargeMinor: 100000n, remaining: 1000, status: OrderStatus.PENDING, idempotencyKey: "legacy-refund", requestFingerprint: "legacy-refund" } });
+    await assert.rejects(() => refundOrder(actor, order.publicId, "Unverified legacy record"), domainCode("RESERVATION_CONFLICT"));
+    const wallet = await db.wallet.findUniqueOrThrow({ where: { userId: customer.id } });
+    assert.equal(wallet.balanceMinor, 300000n);
+    await db.$transaction([
+      db.wallet.update({ where: { id: wallet.id }, data: { balanceMinor: 200000n } }),
+      db.walletTransaction.create({ data: { walletId: wallet.id, type: WalletTransactionType.PURCHASE, status: WalletTransactionStatus.COMPLETED, amountMinor: -100000n, balanceBeforeMinor: 300000n, balanceAfterMinor: 200000n, referenceType: "ORDER", referenceId: order.publicId, description: "Historical posted purchase", idempotencyKey: "legacy-posted-purchase" } })
+    ]);
+    await refundOrder(actor, order.publicId, "Verified posted purchase");
+    await refundOrder(actor, order.publicId, "Replay");
+    assert.equal((await db.wallet.findUniqueOrThrow({ where: { id: wallet.id } })).balanceMinor, 300000n);
+    assert.equal(await db.walletTransaction.count({ where: { walletId: wallet.id, type: WalletTransactionType.REFUND } }), 1);
   });
 
   await t.test("SERVICE/CATEGORY: create, duplicate code, price history, statuses and category safety", async () => {
@@ -175,11 +210,13 @@ test("Work 05 admin operations", async (t) => {
 
   await t.test("SETTINGS: disabling new orders does not break idempotent replay of an existing order", async () => {
     await reset(); const admin = await createAdmin(); const customer = await createCustomer("settings-order@example.com", 300000n); const actor = { userId: admin.id };
-    const existing = await createCustomerOrder(customer.id, { serviceId: "svc-admin-test", targetUrl: "https://example.com/settings-idempotency", quantity: 1000 }, "work5-settings-order");
+    const quote = await createOrderQuote(customer.id, { serviceId: "svc-admin-test", quantity: 1000 });
+    const input = { quoteId: quote.id, targetUrl: "https://example.com/settings-idempotency" };
+    const existing = await createCustomerOrder(customer.id, input, "work5-settings-order");
     await updateSystemSettings(actor, { siteName: "Tương Tác Pro", supportEmail: "support@example.com", maintenanceMode: false, minimumDepositMinor: 50000n, orderCreationEnabled: false, supportEnabled: true });
-    const replay = await createCustomerOrder(customer.id, { serviceId: "svc-admin-test", targetUrl: "https://example.com/settings-idempotency", quantity: 1000 }, "work5-settings-order");
+    const replay = await createCustomerOrder(customer.id, input, "work5-settings-order");
     assert.equal(replay.id, existing.id);
-    await assert.rejects(() => createCustomerOrder(customer.id, { serviceId: "svc-admin-test", targetUrl: "https://example.com/settings-new", quantity: 1000 }, "work5-settings-new-order"), domainCode("SERVICE_UNAVAILABLE"));
+    await assert.rejects(() => createOrderQuote(customer.id, { serviceId: "svc-admin-test", quantity: 1000 }), domainCode("SERVICE_UNAVAILABLE"));
     assert.equal(await getDb().order.count({ where: { userId: customer.id } }), 1);
   });
 

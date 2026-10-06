@@ -1,5 +1,7 @@
 # Tương Tác Pro — REST API Specification
 
+Tài liệu bao gồm blueprint dài hạn. Những endpoint chưa có route trong `apps/web/src/app/api` không được coi là đã triển khai. Runtime hiện hành trả `{ data }` hoặc `{ error: { code, message } }`, chưa có `meta.requestId`. Hợp đồng customer thực tế nằm trong `API_IMPLEMENTATION.md`; quote/order dưới đây phản ánh Work 07.
+
 ## 1. Base conventions
 
 Base path:
@@ -107,14 +109,13 @@ Response never includes provider ID, provider service ID, provider rate or marku
 
 ## 7. Quote & order endpoints
 
-### `POST /orders/quote`
+### `POST /quotes`
 
 Request:
 
 ```json
 {
   "serviceId": "svc_...",
-  "target": "https://...",
   "quantity": 1000
 }
 ```
@@ -122,9 +123,8 @@ Request:
 Backend:
 
 - Zod validation.
-- Normalize target.
 - Validate min/max and service active.
-- Resolve current route + price version.
+- Verify current provider route when routing is enabled.
 - Calculate charge.
 - Store short-lived quote.
 
@@ -133,12 +133,12 @@ Response:
 ```json
 {
   "data": {
-    "quoteId": "qte_...",
+    "id": "00000000-0000-4000-8000-000000000001",
     "serviceId": "svc_...",
     "quantity": 1000,
-    "customerRate": "20.25",
-    "rateUnit": 1,
-    "chargeMinor": 20250,
+    "serviceName": "Example service",
+    "ratePerThousand": 20250,
+    "charge": 20250,
     "currency": "VND",
     "expiresAt": "..."
   }
@@ -157,7 +157,8 @@ Request:
 
 ```json
 {
-  "quoteId": "qte_..."
+  "quoteId": "00000000-0000-4000-8000-000000000001",
+  "targetUrl": "https://example.com/public-target"
 }
 ```
 
@@ -165,9 +166,9 @@ Behavior:
 
 - Same user + same idempotency key + same payload => return original response.
 - Same key + different payload => 409.
-- Atomic quote consume + wallet reserve + order + outbox.
+- Atomic quote consume + wallet reserve + reservation + order/log + durable provider job when routing is enabled.
 
-Response status: `201 Created` first time, `200 OK` on idempotent replay is acceptable if documented consistently.
+Response status: `201 Created` for both first creation and successful idempotent replay. Expired/consumed quotes reject with `409 QUOTE_EXPIRED`/`QUOTE_ALREADY_USED`; a different payload under an existing key rejects with `409 DUPLICATE_REQUEST`.
 
 ### Other order endpoints
 
@@ -384,7 +385,7 @@ For Work 04 customer lists, `services` and `orders` validate optional `page`/`pa
 
 Credentials auth in Work 04 uses Auth.js JWT sessions plus database `sessionVersion` revalidation. See `AUTH_IMPLEMENTATION.md` for the controlled deviation from the earlier database-session preference.
 
-The architecture's future `/orders/quote`/price-version workflow is not activated in Work 04. Work 04 `POST /api/v1/orders` resolves the current Service price and calculates the charge on the server inside the order transaction. Quote/version behavior belongs to the later pricing/provider expansion and is not simulated here.
+Work 07 supersedes the historical Work 04 order contract: `POST /api/v1/quotes` stores the server-calculated price snapshot; `POST /api/v1/orders` consumes `quoteId` and reserves funds without posting a purchase. `GET /api/v1/wallet` retains `{ balance, currency }` compatibility with `balance` representing available funds, not posted funds. Price-version tables in the blueprint are not runtime dependencies of this snapshot implementation.
 
 ---
 

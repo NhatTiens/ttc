@@ -54,11 +54,12 @@ const services = await json("/api/v1/services");
 const service = services.find((item) => item.status === "Active");
 assert(service, "No ACTIVE service available for smoke test");
 const quantity = service.min;
-const expectedCharge = Math.ceil(service.ratePerThousand * quantity / 1000);
+const quote = await json("/api/v1/quotes", { method: "POST", body: JSON.stringify({ serviceId: service.id, quantity }) }, 201);
+const expectedCharge = quote.charge;
 assert(walletBefore.balance >= expectedCharge, `Seed wallet is too small for smoke order: need ${expectedCharge}`);
 const smokeId = Date.now().toString(36);
 const orderKey = `smoke-order-${smokeId}`;
-const orderPayload = { serviceId: service.id, targetUrl: `https://example.com/work4-smoke/${smokeId}`, quantity };
+const orderPayload = { quoteId: quote.id, targetUrl: `https://example.com/work4-smoke/${smokeId}` };
 const order = await json("/api/v1/orders", {
   method: "POST",
   headers: { "Idempotency-Key": orderKey },
@@ -74,7 +75,7 @@ assert(replayedOrder.id === order.id, "Order Idempotency-Key replay created a di
 const orderDetail = await json(`/api/v1/orders/${encodeURIComponent(order.id)}`);
 assert(orderDetail.id === order.id && orderDetail.timeline?.length >= 1, "Order detail/timeline persistence failed");
 const walletAfterOrder = await json("/api/v1/wallet");
-assert(walletAfterOrder.balance === walletBefore.balance - expectedCharge, "Wallet debit does not match server-side charge");
+assert(walletAfterOrder.balance === walletBefore.balance - expectedCharge, "Wallet reservation does not match server quote");
 
 const methods = await json("/api/v1/deposit-methods");
 const method = methods.find((item) => item.enabled);
@@ -121,7 +122,7 @@ await json("/api/v1/me/notifications", {
 });
 
 const transactions = await json("/api/v1/wallet/transactions");
-assert(transactions.some((item) => item.reference === order.id && item.type === "Purchase"), "Purchase ledger entry missing");
+assert(!transactions.some((item) => item.reference === order.id && item.type === "Purchase"), "Unaccepted order must not post a purchase");
 assert(transactions.some((item) => item.reference === deposit.id && item.type === "Deposit" && item.status === "Pending"), "Pending deposit ledger entry missing");
 
 console.log(`PASS order ${order.id}`);

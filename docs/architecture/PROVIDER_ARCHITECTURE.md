@@ -1,5 +1,7 @@
 # Tương Tác Pro — Provider Architecture
 
+The contracts below describe the original extended blueprint. Runtime signatures and capabilities are authoritative in `packages/providers/src/contracts.ts`. Work 07 uses a PostgreSQL durable queue, order-scoped submission admission, and claim-fenced job updates. `PREPARED`/`SENDING` replay cannot blindly resend a create. Accepted submission, reservation capture and the initial poll job commit together. Unknown submission (including create HTTP 5xx) holds funds for manual review; explicit rejection releases only the hold. Refund totals are monotonic and late polling cannot reopen a financially settled terminal order. Historical pre-debited orders require a verified PURCHASE ledger and are not captured twice.
+
 ## 1. Rule số 1
 
 Provider API chỉ được gọi từ server-side worker/backend. Browser không bao giờ nhận API key, provider base URL riêng tư hoặc raw provider payload.

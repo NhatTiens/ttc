@@ -56,6 +56,7 @@ export type OrderMinAggregateOutputType = {
   status: $Enums.OrderStatus | null
   idempotencyKey: string | null
   requestFingerprint: string | null
+  quoteId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -74,6 +75,7 @@ export type OrderMaxAggregateOutputType = {
   status: $Enums.OrderStatus | null
   idempotencyKey: string | null
   requestFingerprint: string | null
+  quoteId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -92,6 +94,7 @@ export type OrderCountAggregateOutputType = {
   status: number
   idempotencyKey: number
   requestFingerprint: number
+  quoteId: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -128,6 +131,7 @@ export type OrderMinAggregateInputType = {
   status?: true
   idempotencyKey?: true
   requestFingerprint?: true
+  quoteId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -146,6 +150,7 @@ export type OrderMaxAggregateInputType = {
   status?: true
   idempotencyKey?: true
   requestFingerprint?: true
+  quoteId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -164,6 +169,7 @@ export type OrderCountAggregateInputType = {
   status?: true
   idempotencyKey?: true
   requestFingerprint?: true
+  quoteId?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -269,6 +275,7 @@ export type OrderGroupByOutputType = {
   status: $Enums.OrderStatus
   idempotencyKey: string
   requestFingerprint: string
+  quoteId: string | null
   createdAt: Date
   updatedAt: Date
   _count: OrderCountAggregateOutputType | null
@@ -310,10 +317,13 @@ export type OrderWhereInput = {
   status?: Prisma.EnumOrderStatusFilter<"Order"> | $Enums.OrderStatus
   idempotencyKey?: Prisma.StringFilter<"Order"> | string
   requestFingerprint?: Prisma.StringFilter<"Order"> | string
+  quoteId?: Prisma.UuidNullableFilter<"Order"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   service?: Prisma.XOR<Prisma.ServiceScalarRelationFilter, Prisma.ServiceWhereInput>
+  quote?: Prisma.XOR<Prisma.OrderQuoteNullableScalarRelationFilter, Prisma.OrderQuoteWhereInput> | null
+  reservation?: Prisma.XOR<Prisma.WalletReservationNullableScalarRelationFilter, Prisma.WalletReservationWhereInput> | null
   logs?: Prisma.OrderLogListRelationFilter
   providerOrder?: Prisma.XOR<Prisma.ProviderOrderNullableScalarRelationFilter, Prisma.ProviderOrderWhereInput> | null
   providerJobs?: Prisma.ProviderJobListRelationFilter
@@ -335,10 +345,13 @@ export type OrderOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
+  quoteId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   service?: Prisma.ServiceOrderByWithRelationInput
+  quote?: Prisma.OrderQuoteOrderByWithRelationInput
+  reservation?: Prisma.WalletReservationOrderByWithRelationInput
   logs?: Prisma.OrderLogOrderByRelationAggregateInput
   providerOrder?: Prisma.ProviderOrderOrderByWithRelationInput
   providerJobs?: Prisma.ProviderJobOrderByRelationAggregateInput
@@ -349,6 +362,7 @@ export type OrderOrderByWithRelationInput = {
 export type OrderWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   publicId?: string
+  quoteId?: string
   userId_idempotencyKey?: Prisma.OrderUserIdIdempotencyKeyCompoundUniqueInput
   AND?: Prisma.OrderWhereInput | Prisma.OrderWhereInput[]
   OR?: Prisma.OrderWhereInput[]
@@ -368,12 +382,14 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   service?: Prisma.XOR<Prisma.ServiceScalarRelationFilter, Prisma.ServiceWhereInput>
+  quote?: Prisma.XOR<Prisma.OrderQuoteNullableScalarRelationFilter, Prisma.OrderQuoteWhereInput> | null
+  reservation?: Prisma.XOR<Prisma.WalletReservationNullableScalarRelationFilter, Prisma.WalletReservationWhereInput> | null
   logs?: Prisma.OrderLogListRelationFilter
   providerOrder?: Prisma.XOR<Prisma.ProviderOrderNullableScalarRelationFilter, Prisma.ProviderOrderWhereInput> | null
   providerJobs?: Prisma.ProviderJobListRelationFilter
   providerAttempts?: Prisma.ProviderOrderAttemptListRelationFilter
   providerOperationLogs?: Prisma.ProviderOperationLogListRelationFilter
-}, "id" | "publicId" | "userId_idempotencyKey">
+}, "id" | "publicId" | "quoteId" | "userId_idempotencyKey">
 
 export type OrderOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -389,6 +405,7 @@ export type OrderOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
+  quoteId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.OrderCountOrderByAggregateInput
@@ -415,6 +432,7 @@ export type OrderScalarWhereWithAggregatesInput = {
   status?: Prisma.EnumOrderStatusWithAggregatesFilter<"Order"> | $Enums.OrderStatus
   idempotencyKey?: Prisma.StringWithAggregatesFilter<"Order"> | string
   requestFingerprint?: Prisma.StringWithAggregatesFilter<"Order"> | string
+  quoteId?: Prisma.UuidNullableWithAggregatesFilter<"Order"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Order"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Order"> | Date | string
 }
@@ -435,6 +453,8 @@ export type OrderCreateInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutOrdersInput
   service: Prisma.ServiceCreateNestedOneWithoutOrdersInput
+  quote?: Prisma.OrderQuoteCreateNestedOneWithoutOrderInput
+  reservation?: Prisma.WalletReservationCreateNestedOneWithoutOrderInput
   logs?: Prisma.OrderLogCreateNestedManyWithoutOrderInput
   providerOrder?: Prisma.ProviderOrderCreateNestedOneWithoutOrderInput
   providerJobs?: Prisma.ProviderJobCreateNestedManyWithoutOrderInput
@@ -456,8 +476,10 @@ export type OrderUncheckedCreateInput = {
   status?: $Enums.OrderStatus
   idempotencyKey: string
   requestFingerprint: string
+  quoteId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  reservation?: Prisma.WalletReservationUncheckedCreateNestedOneWithoutOrderInput
   logs?: Prisma.OrderLogUncheckedCreateNestedManyWithoutOrderInput
   providerOrder?: Prisma.ProviderOrderUncheckedCreateNestedOneWithoutOrderInput
   providerJobs?: Prisma.ProviderJobUncheckedCreateNestedManyWithoutOrderInput
@@ -481,6 +503,8 @@ export type OrderUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutOrdersNestedInput
   service?: Prisma.ServiceUpdateOneRequiredWithoutOrdersNestedInput
+  quote?: Prisma.OrderQuoteUpdateOneWithoutOrderNestedInput
+  reservation?: Prisma.WalletReservationUpdateOneWithoutOrderNestedInput
   logs?: Prisma.OrderLogUpdateManyWithoutOrderNestedInput
   providerOrder?: Prisma.ProviderOrderUpdateOneWithoutOrderNestedInput
   providerJobs?: Prisma.ProviderJobUpdateManyWithoutOrderNestedInput
@@ -502,8 +526,10 @@ export type OrderUncheckedUpdateInput = {
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  quoteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reservation?: Prisma.WalletReservationUncheckedUpdateOneWithoutOrderNestedInput
   logs?: Prisma.OrderLogUncheckedUpdateManyWithoutOrderNestedInput
   providerOrder?: Prisma.ProviderOrderUncheckedUpdateOneWithoutOrderNestedInput
   providerJobs?: Prisma.ProviderJobUncheckedUpdateManyWithoutOrderNestedInput
@@ -525,6 +551,7 @@ export type OrderCreateManyInput = {
   status?: $Enums.OrderStatus
   idempotencyKey: string
   requestFingerprint: string
+  quoteId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -559,6 +586,7 @@ export type OrderUncheckedUpdateManyInput = {
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  quoteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -571,6 +599,16 @@ export type OrderListRelationFilter = {
 
 export type OrderOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type OrderScalarRelationFilter = {
+  is?: Prisma.OrderWhereInput
+  isNot?: Prisma.OrderWhereInput
+}
+
+export type OrderNullableScalarRelationFilter = {
+  is?: Prisma.OrderWhereInput | null
+  isNot?: Prisma.OrderWhereInput | null
 }
 
 export type OrderUserIdIdempotencyKeyCompoundUniqueInput = {
@@ -592,6 +630,7 @@ export type OrderCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
+  quoteId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -618,6 +657,7 @@ export type OrderMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
+  quoteId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -636,6 +676,7 @@ export type OrderMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   requestFingerprint?: Prisma.SortOrder
+  quoteId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -646,16 +687,6 @@ export type OrderSumOrderByAggregateInput = {
   refundedMinor?: Prisma.SortOrder
   startCount?: Prisma.SortOrder
   remaining?: Prisma.SortOrder
-}
-
-export type OrderScalarRelationFilter = {
-  is?: Prisma.OrderWhereInput
-  isNot?: Prisma.OrderWhereInput
-}
-
-export type OrderNullableScalarRelationFilter = {
-  is?: Prisma.OrderWhereInput | null
-  isNot?: Prisma.OrderWhereInput | null
 }
 
 export type OrderCreateNestedManyWithoutUserInput = {
@@ -700,6 +731,20 @@ export type OrderUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.OrderScalarWhereInput | Prisma.OrderScalarWhereInput[]
 }
 
+export type OrderCreateNestedOneWithoutReservationInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutReservationInput, Prisma.OrderUncheckedCreateWithoutReservationInput>
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutReservationInput
+  connect?: Prisma.OrderWhereUniqueInput
+}
+
+export type OrderUpdateOneRequiredWithoutReservationNestedInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutReservationInput, Prisma.OrderUncheckedCreateWithoutReservationInput>
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutReservationInput
+  upsert?: Prisma.OrderUpsertWithoutReservationInput
+  connect?: Prisma.OrderWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrderUpdateToOneWithWhereWithoutReservationInput, Prisma.OrderUpdateWithoutReservationInput>, Prisma.OrderUncheckedUpdateWithoutReservationInput>
+}
+
 export type OrderCreateNestedManyWithoutServiceInput = {
   create?: Prisma.XOR<Prisma.OrderCreateWithoutServiceInput, Prisma.OrderUncheckedCreateWithoutServiceInput> | Prisma.OrderCreateWithoutServiceInput[] | Prisma.OrderUncheckedCreateWithoutServiceInput[]
   connectOrCreate?: Prisma.OrderCreateOrConnectWithoutServiceInput | Prisma.OrderCreateOrConnectWithoutServiceInput[]
@@ -740,6 +785,38 @@ export type OrderUncheckedUpdateManyWithoutServiceNestedInput = {
   update?: Prisma.OrderUpdateWithWhereUniqueWithoutServiceInput | Prisma.OrderUpdateWithWhereUniqueWithoutServiceInput[]
   updateMany?: Prisma.OrderUpdateManyWithWhereWithoutServiceInput | Prisma.OrderUpdateManyWithWhereWithoutServiceInput[]
   deleteMany?: Prisma.OrderScalarWhereInput | Prisma.OrderScalarWhereInput[]
+}
+
+export type OrderCreateNestedOneWithoutQuoteInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutQuoteInput, Prisma.OrderUncheckedCreateWithoutQuoteInput>
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutQuoteInput
+  connect?: Prisma.OrderWhereUniqueInput
+}
+
+export type OrderUncheckedCreateNestedOneWithoutQuoteInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutQuoteInput, Prisma.OrderUncheckedCreateWithoutQuoteInput>
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutQuoteInput
+  connect?: Prisma.OrderWhereUniqueInput
+}
+
+export type OrderUpdateOneWithoutQuoteNestedInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutQuoteInput, Prisma.OrderUncheckedCreateWithoutQuoteInput>
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutQuoteInput
+  upsert?: Prisma.OrderUpsertWithoutQuoteInput
+  disconnect?: Prisma.OrderWhereInput | boolean
+  delete?: Prisma.OrderWhereInput | boolean
+  connect?: Prisma.OrderWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrderUpdateToOneWithWhereWithoutQuoteInput, Prisma.OrderUpdateWithoutQuoteInput>, Prisma.OrderUncheckedUpdateWithoutQuoteInput>
+}
+
+export type OrderUncheckedUpdateOneWithoutQuoteNestedInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutQuoteInput, Prisma.OrderUncheckedCreateWithoutQuoteInput>
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutQuoteInput
+  upsert?: Prisma.OrderUpsertWithoutQuoteInput
+  disconnect?: Prisma.OrderWhereInput | boolean
+  delete?: Prisma.OrderWhereInput | boolean
+  connect?: Prisma.OrderWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrderUpdateToOneWithWhereWithoutQuoteInput, Prisma.OrderUpdateWithoutQuoteInput>, Prisma.OrderUncheckedUpdateWithoutQuoteInput>
 }
 
 export type EnumOrderStatusFieldUpdateOperationsInput = {
@@ -835,6 +912,8 @@ export type OrderCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   service: Prisma.ServiceCreateNestedOneWithoutOrdersInput
+  quote?: Prisma.OrderQuoteCreateNestedOneWithoutOrderInput
+  reservation?: Prisma.WalletReservationCreateNestedOneWithoutOrderInput
   logs?: Prisma.OrderLogCreateNestedManyWithoutOrderInput
   providerOrder?: Prisma.ProviderOrderCreateNestedOneWithoutOrderInput
   providerJobs?: Prisma.ProviderJobCreateNestedManyWithoutOrderInput
@@ -855,8 +934,10 @@ export type OrderUncheckedCreateWithoutUserInput = {
   status?: $Enums.OrderStatus
   idempotencyKey: string
   requestFingerprint: string
+  quoteId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  reservation?: Prisma.WalletReservationUncheckedCreateNestedOneWithoutOrderInput
   logs?: Prisma.OrderLogUncheckedCreateNestedManyWithoutOrderInput
   providerOrder?: Prisma.ProviderOrderUncheckedCreateNestedOneWithoutOrderInput
   providerJobs?: Prisma.ProviderJobUncheckedCreateNestedManyWithoutOrderInput
@@ -907,8 +988,121 @@ export type OrderScalarWhereInput = {
   status?: Prisma.EnumOrderStatusFilter<"Order"> | $Enums.OrderStatus
   idempotencyKey?: Prisma.StringFilter<"Order"> | string
   requestFingerprint?: Prisma.StringFilter<"Order"> | string
+  quoteId?: Prisma.UuidNullableFilter<"Order"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Order"> | Date | string
+}
+
+export type OrderCreateWithoutReservationInput = {
+  id?: string
+  publicId: string
+  targetUrl: string
+  quantity: number
+  chargeMinor: bigint | number
+  refundedMinor?: bigint | number
+  startCount?: number | null
+  remaining: number
+  status?: $Enums.OrderStatus
+  idempotencyKey: string
+  requestFingerprint: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutOrdersInput
+  service: Prisma.ServiceCreateNestedOneWithoutOrdersInput
+  quote?: Prisma.OrderQuoteCreateNestedOneWithoutOrderInput
+  logs?: Prisma.OrderLogCreateNestedManyWithoutOrderInput
+  providerOrder?: Prisma.ProviderOrderCreateNestedOneWithoutOrderInput
+  providerJobs?: Prisma.ProviderJobCreateNestedManyWithoutOrderInput
+  providerAttempts?: Prisma.ProviderOrderAttemptCreateNestedManyWithoutOrderInput
+  providerOperationLogs?: Prisma.ProviderOperationLogCreateNestedManyWithoutOrderInput
+}
+
+export type OrderUncheckedCreateWithoutReservationInput = {
+  id?: string
+  publicId: string
+  userId: string
+  serviceId: string
+  targetUrl: string
+  quantity: number
+  chargeMinor: bigint | number
+  refundedMinor?: bigint | number
+  startCount?: number | null
+  remaining: number
+  status?: $Enums.OrderStatus
+  idempotencyKey: string
+  requestFingerprint: string
+  quoteId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  logs?: Prisma.OrderLogUncheckedCreateNestedManyWithoutOrderInput
+  providerOrder?: Prisma.ProviderOrderUncheckedCreateNestedOneWithoutOrderInput
+  providerJobs?: Prisma.ProviderJobUncheckedCreateNestedManyWithoutOrderInput
+  providerAttempts?: Prisma.ProviderOrderAttemptUncheckedCreateNestedManyWithoutOrderInput
+  providerOperationLogs?: Prisma.ProviderOperationLogUncheckedCreateNestedManyWithoutOrderInput
+}
+
+export type OrderCreateOrConnectWithoutReservationInput = {
+  where: Prisma.OrderWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrderCreateWithoutReservationInput, Prisma.OrderUncheckedCreateWithoutReservationInput>
+}
+
+export type OrderUpsertWithoutReservationInput = {
+  update: Prisma.XOR<Prisma.OrderUpdateWithoutReservationInput, Prisma.OrderUncheckedUpdateWithoutReservationInput>
+  create: Prisma.XOR<Prisma.OrderCreateWithoutReservationInput, Prisma.OrderUncheckedCreateWithoutReservationInput>
+  where?: Prisma.OrderWhereInput
+}
+
+export type OrderUpdateToOneWithWhereWithoutReservationInput = {
+  where?: Prisma.OrderWhereInput
+  data: Prisma.XOR<Prisma.OrderUpdateWithoutReservationInput, Prisma.OrderUncheckedUpdateWithoutReservationInput>
+}
+
+export type OrderUpdateWithoutReservationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  publicId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  chargeMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  refundedMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  startCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  remaining?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutOrdersNestedInput
+  service?: Prisma.ServiceUpdateOneRequiredWithoutOrdersNestedInput
+  quote?: Prisma.OrderQuoteUpdateOneWithoutOrderNestedInput
+  logs?: Prisma.OrderLogUpdateManyWithoutOrderNestedInput
+  providerOrder?: Prisma.ProviderOrderUpdateOneWithoutOrderNestedInput
+  providerJobs?: Prisma.ProviderJobUpdateManyWithoutOrderNestedInput
+  providerAttempts?: Prisma.ProviderOrderAttemptUpdateManyWithoutOrderNestedInput
+  providerOperationLogs?: Prisma.ProviderOperationLogUpdateManyWithoutOrderNestedInput
+}
+
+export type OrderUncheckedUpdateWithoutReservationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  publicId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  chargeMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  refundedMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  startCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  remaining?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  quoteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  logs?: Prisma.OrderLogUncheckedUpdateManyWithoutOrderNestedInput
+  providerOrder?: Prisma.ProviderOrderUncheckedUpdateOneWithoutOrderNestedInput
+  providerJobs?: Prisma.ProviderJobUncheckedUpdateManyWithoutOrderNestedInput
+  providerAttempts?: Prisma.ProviderOrderAttemptUncheckedUpdateManyWithoutOrderNestedInput
+  providerOperationLogs?: Prisma.ProviderOperationLogUncheckedUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderCreateWithoutServiceInput = {
@@ -926,6 +1120,8 @@ export type OrderCreateWithoutServiceInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutOrdersInput
+  quote?: Prisma.OrderQuoteCreateNestedOneWithoutOrderInput
+  reservation?: Prisma.WalletReservationCreateNestedOneWithoutOrderInput
   logs?: Prisma.OrderLogCreateNestedManyWithoutOrderInput
   providerOrder?: Prisma.ProviderOrderCreateNestedOneWithoutOrderInput
   providerJobs?: Prisma.ProviderJobCreateNestedManyWithoutOrderInput
@@ -946,8 +1142,10 @@ export type OrderUncheckedCreateWithoutServiceInput = {
   status?: $Enums.OrderStatus
   idempotencyKey: string
   requestFingerprint: string
+  quoteId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  reservation?: Prisma.WalletReservationUncheckedCreateNestedOneWithoutOrderInput
   logs?: Prisma.OrderLogUncheckedCreateNestedManyWithoutOrderInput
   providerOrder?: Prisma.ProviderOrderUncheckedCreateNestedOneWithoutOrderInput
   providerJobs?: Prisma.ProviderJobUncheckedCreateNestedManyWithoutOrderInput
@@ -981,6 +1179,118 @@ export type OrderUpdateManyWithWhereWithoutServiceInput = {
   data: Prisma.XOR<Prisma.OrderUpdateManyMutationInput, Prisma.OrderUncheckedUpdateManyWithoutServiceInput>
 }
 
+export type OrderCreateWithoutQuoteInput = {
+  id?: string
+  publicId: string
+  targetUrl: string
+  quantity: number
+  chargeMinor: bigint | number
+  refundedMinor?: bigint | number
+  startCount?: number | null
+  remaining: number
+  status?: $Enums.OrderStatus
+  idempotencyKey: string
+  requestFingerprint: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutOrdersInput
+  service: Prisma.ServiceCreateNestedOneWithoutOrdersInput
+  reservation?: Prisma.WalletReservationCreateNestedOneWithoutOrderInput
+  logs?: Prisma.OrderLogCreateNestedManyWithoutOrderInput
+  providerOrder?: Prisma.ProviderOrderCreateNestedOneWithoutOrderInput
+  providerJobs?: Prisma.ProviderJobCreateNestedManyWithoutOrderInput
+  providerAttempts?: Prisma.ProviderOrderAttemptCreateNestedManyWithoutOrderInput
+  providerOperationLogs?: Prisma.ProviderOperationLogCreateNestedManyWithoutOrderInput
+}
+
+export type OrderUncheckedCreateWithoutQuoteInput = {
+  id?: string
+  publicId: string
+  userId: string
+  serviceId: string
+  targetUrl: string
+  quantity: number
+  chargeMinor: bigint | number
+  refundedMinor?: bigint | number
+  startCount?: number | null
+  remaining: number
+  status?: $Enums.OrderStatus
+  idempotencyKey: string
+  requestFingerprint: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  reservation?: Prisma.WalletReservationUncheckedCreateNestedOneWithoutOrderInput
+  logs?: Prisma.OrderLogUncheckedCreateNestedManyWithoutOrderInput
+  providerOrder?: Prisma.ProviderOrderUncheckedCreateNestedOneWithoutOrderInput
+  providerJobs?: Prisma.ProviderJobUncheckedCreateNestedManyWithoutOrderInput
+  providerAttempts?: Prisma.ProviderOrderAttemptUncheckedCreateNestedManyWithoutOrderInput
+  providerOperationLogs?: Prisma.ProviderOperationLogUncheckedCreateNestedManyWithoutOrderInput
+}
+
+export type OrderCreateOrConnectWithoutQuoteInput = {
+  where: Prisma.OrderWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrderCreateWithoutQuoteInput, Prisma.OrderUncheckedCreateWithoutQuoteInput>
+}
+
+export type OrderUpsertWithoutQuoteInput = {
+  update: Prisma.XOR<Prisma.OrderUpdateWithoutQuoteInput, Prisma.OrderUncheckedUpdateWithoutQuoteInput>
+  create: Prisma.XOR<Prisma.OrderCreateWithoutQuoteInput, Prisma.OrderUncheckedCreateWithoutQuoteInput>
+  where?: Prisma.OrderWhereInput
+}
+
+export type OrderUpdateToOneWithWhereWithoutQuoteInput = {
+  where?: Prisma.OrderWhereInput
+  data: Prisma.XOR<Prisma.OrderUpdateWithoutQuoteInput, Prisma.OrderUncheckedUpdateWithoutQuoteInput>
+}
+
+export type OrderUpdateWithoutQuoteInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  publicId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  chargeMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  refundedMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  startCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  remaining?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutOrdersNestedInput
+  service?: Prisma.ServiceUpdateOneRequiredWithoutOrdersNestedInput
+  reservation?: Prisma.WalletReservationUpdateOneWithoutOrderNestedInput
+  logs?: Prisma.OrderLogUpdateManyWithoutOrderNestedInput
+  providerOrder?: Prisma.ProviderOrderUpdateOneWithoutOrderNestedInput
+  providerJobs?: Prisma.ProviderJobUpdateManyWithoutOrderNestedInput
+  providerAttempts?: Prisma.ProviderOrderAttemptUpdateManyWithoutOrderNestedInput
+  providerOperationLogs?: Prisma.ProviderOperationLogUpdateManyWithoutOrderNestedInput
+}
+
+export type OrderUncheckedUpdateWithoutQuoteInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  publicId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  chargeMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  refundedMinor?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  startCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  remaining?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reservation?: Prisma.WalletReservationUncheckedUpdateOneWithoutOrderNestedInput
+  logs?: Prisma.OrderLogUncheckedUpdateManyWithoutOrderNestedInput
+  providerOrder?: Prisma.ProviderOrderUncheckedUpdateOneWithoutOrderNestedInput
+  providerJobs?: Prisma.ProviderJobUncheckedUpdateManyWithoutOrderNestedInput
+  providerAttempts?: Prisma.ProviderOrderAttemptUncheckedUpdateManyWithoutOrderNestedInput
+  providerOperationLogs?: Prisma.ProviderOperationLogUncheckedUpdateManyWithoutOrderNestedInput
+}
+
 export type OrderCreateWithoutLogsInput = {
   id?: string
   publicId: string
@@ -997,6 +1307,8 @@ export type OrderCreateWithoutLogsInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutOrdersInput
   service: Prisma.ServiceCreateNestedOneWithoutOrdersInput
+  quote?: Prisma.OrderQuoteCreateNestedOneWithoutOrderInput
+  reservation?: Prisma.WalletReservationCreateNestedOneWithoutOrderInput
   providerOrder?: Prisma.ProviderOrderCreateNestedOneWithoutOrderInput
   providerJobs?: Prisma.ProviderJobCreateNestedManyWithoutOrderInput
   providerAttempts?: Prisma.ProviderOrderAttemptCreateNestedManyWithoutOrderInput
@@ -1017,8 +1329,10 @@ export type OrderUncheckedCreateWithoutLogsInput = {
   status?: $Enums.OrderStatus
   idempotencyKey: string
   requestFingerprint: string
+  quoteId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  reservation?: Prisma.WalletReservationUncheckedCreateNestedOneWithoutOrderInput
   providerOrder?: Prisma.ProviderOrderUncheckedCreateNestedOneWithoutOrderInput
   providerJobs?: Prisma.ProviderJobUncheckedCreateNestedManyWithoutOrderInput
   providerAttempts?: Prisma.ProviderOrderAttemptUncheckedCreateNestedManyWithoutOrderInput
@@ -1057,6 +1371,8 @@ export type OrderUpdateWithoutLogsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutOrdersNestedInput
   service?: Prisma.ServiceUpdateOneRequiredWithoutOrdersNestedInput
+  quote?: Prisma.OrderQuoteUpdateOneWithoutOrderNestedInput
+  reservation?: Prisma.WalletReservationUpdateOneWithoutOrderNestedInput
   providerOrder?: Prisma.ProviderOrderUpdateOneWithoutOrderNestedInput
   providerJobs?: Prisma.ProviderJobUpdateManyWithoutOrderNestedInput
   providerAttempts?: Prisma.ProviderOrderAttemptUpdateManyWithoutOrderNestedInput
@@ -1077,8 +1393,10 @@ export type OrderUncheckedUpdateWithoutLogsInput = {
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  quoteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reservation?: Prisma.WalletReservationUncheckedUpdateOneWithoutOrderNestedInput
   providerOrder?: Prisma.ProviderOrderUncheckedUpdateOneWithoutOrderNestedInput
   providerJobs?: Prisma.ProviderJobUncheckedUpdateManyWithoutOrderNestedInput
   providerAttempts?: Prisma.ProviderOrderAttemptUncheckedUpdateManyWithoutOrderNestedInput
@@ -1101,6 +1419,8 @@ export type OrderCreateWithoutProviderOrderInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutOrdersInput
   service: Prisma.ServiceCreateNestedOneWithoutOrdersInput
+  quote?: Prisma.OrderQuoteCreateNestedOneWithoutOrderInput
+  reservation?: Prisma.WalletReservationCreateNestedOneWithoutOrderInput
   logs?: Prisma.OrderLogCreateNestedManyWithoutOrderInput
   providerJobs?: Prisma.ProviderJobCreateNestedManyWithoutOrderInput
   providerAttempts?: Prisma.ProviderOrderAttemptCreateNestedManyWithoutOrderInput
@@ -1121,8 +1441,10 @@ export type OrderUncheckedCreateWithoutProviderOrderInput = {
   status?: $Enums.OrderStatus
   idempotencyKey: string
   requestFingerprint: string
+  quoteId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  reservation?: Prisma.WalletReservationUncheckedCreateNestedOneWithoutOrderInput
   logs?: Prisma.OrderLogUncheckedCreateNestedManyWithoutOrderInput
   providerJobs?: Prisma.ProviderJobUncheckedCreateNestedManyWithoutOrderInput
   providerAttempts?: Prisma.ProviderOrderAttemptUncheckedCreateNestedManyWithoutOrderInput
@@ -1161,6 +1483,8 @@ export type OrderUpdateWithoutProviderOrderInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutOrdersNestedInput
   service?: Prisma.ServiceUpdateOneRequiredWithoutOrdersNestedInput
+  quote?: Prisma.OrderQuoteUpdateOneWithoutOrderNestedInput
+  reservation?: Prisma.WalletReservationUpdateOneWithoutOrderNestedInput
   logs?: Prisma.OrderLogUpdateManyWithoutOrderNestedInput
   providerJobs?: Prisma.ProviderJobUpdateManyWithoutOrderNestedInput
   providerAttempts?: Prisma.ProviderOrderAttemptUpdateManyWithoutOrderNestedInput
@@ -1181,8 +1505,10 @@ export type OrderUncheckedUpdateWithoutProviderOrderInput = {
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  quoteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reservation?: Prisma.WalletReservationUncheckedUpdateOneWithoutOrderNestedInput
   logs?: Prisma.OrderLogUncheckedUpdateManyWithoutOrderNestedInput
   providerJobs?: Prisma.ProviderJobUncheckedUpdateManyWithoutOrderNestedInput
   providerAttempts?: Prisma.ProviderOrderAttemptUncheckedUpdateManyWithoutOrderNestedInput
@@ -1205,6 +1531,8 @@ export type OrderCreateWithoutProviderAttemptsInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutOrdersInput
   service: Prisma.ServiceCreateNestedOneWithoutOrdersInput
+  quote?: Prisma.OrderQuoteCreateNestedOneWithoutOrderInput
+  reservation?: Prisma.WalletReservationCreateNestedOneWithoutOrderInput
   logs?: Prisma.OrderLogCreateNestedManyWithoutOrderInput
   providerOrder?: Prisma.ProviderOrderCreateNestedOneWithoutOrderInput
   providerJobs?: Prisma.ProviderJobCreateNestedManyWithoutOrderInput
@@ -1225,8 +1553,10 @@ export type OrderUncheckedCreateWithoutProviderAttemptsInput = {
   status?: $Enums.OrderStatus
   idempotencyKey: string
   requestFingerprint: string
+  quoteId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  reservation?: Prisma.WalletReservationUncheckedCreateNestedOneWithoutOrderInput
   logs?: Prisma.OrderLogUncheckedCreateNestedManyWithoutOrderInput
   providerOrder?: Prisma.ProviderOrderUncheckedCreateNestedOneWithoutOrderInput
   providerJobs?: Prisma.ProviderJobUncheckedCreateNestedManyWithoutOrderInput
@@ -1265,6 +1595,8 @@ export type OrderUpdateWithoutProviderAttemptsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutOrdersNestedInput
   service?: Prisma.ServiceUpdateOneRequiredWithoutOrdersNestedInput
+  quote?: Prisma.OrderQuoteUpdateOneWithoutOrderNestedInput
+  reservation?: Prisma.WalletReservationUpdateOneWithoutOrderNestedInput
   logs?: Prisma.OrderLogUpdateManyWithoutOrderNestedInput
   providerOrder?: Prisma.ProviderOrderUpdateOneWithoutOrderNestedInput
   providerJobs?: Prisma.ProviderJobUpdateManyWithoutOrderNestedInput
@@ -1285,8 +1617,10 @@ export type OrderUncheckedUpdateWithoutProviderAttemptsInput = {
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  quoteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reservation?: Prisma.WalletReservationUncheckedUpdateOneWithoutOrderNestedInput
   logs?: Prisma.OrderLogUncheckedUpdateManyWithoutOrderNestedInput
   providerOrder?: Prisma.ProviderOrderUncheckedUpdateOneWithoutOrderNestedInput
   providerJobs?: Prisma.ProviderJobUncheckedUpdateManyWithoutOrderNestedInput
@@ -1309,6 +1643,8 @@ export type OrderCreateWithoutProviderJobsInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutOrdersInput
   service: Prisma.ServiceCreateNestedOneWithoutOrdersInput
+  quote?: Prisma.OrderQuoteCreateNestedOneWithoutOrderInput
+  reservation?: Prisma.WalletReservationCreateNestedOneWithoutOrderInput
   logs?: Prisma.OrderLogCreateNestedManyWithoutOrderInput
   providerOrder?: Prisma.ProviderOrderCreateNestedOneWithoutOrderInput
   providerAttempts?: Prisma.ProviderOrderAttemptCreateNestedManyWithoutOrderInput
@@ -1329,8 +1665,10 @@ export type OrderUncheckedCreateWithoutProviderJobsInput = {
   status?: $Enums.OrderStatus
   idempotencyKey: string
   requestFingerprint: string
+  quoteId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  reservation?: Prisma.WalletReservationUncheckedCreateNestedOneWithoutOrderInput
   logs?: Prisma.OrderLogUncheckedCreateNestedManyWithoutOrderInput
   providerOrder?: Prisma.ProviderOrderUncheckedCreateNestedOneWithoutOrderInput
   providerAttempts?: Prisma.ProviderOrderAttemptUncheckedCreateNestedManyWithoutOrderInput
@@ -1369,6 +1707,8 @@ export type OrderUpdateWithoutProviderJobsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutOrdersNestedInput
   service?: Prisma.ServiceUpdateOneRequiredWithoutOrdersNestedInput
+  quote?: Prisma.OrderQuoteUpdateOneWithoutOrderNestedInput
+  reservation?: Prisma.WalletReservationUpdateOneWithoutOrderNestedInput
   logs?: Prisma.OrderLogUpdateManyWithoutOrderNestedInput
   providerOrder?: Prisma.ProviderOrderUpdateOneWithoutOrderNestedInput
   providerAttempts?: Prisma.ProviderOrderAttemptUpdateManyWithoutOrderNestedInput
@@ -1389,8 +1729,10 @@ export type OrderUncheckedUpdateWithoutProviderJobsInput = {
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  quoteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reservation?: Prisma.WalletReservationUncheckedUpdateOneWithoutOrderNestedInput
   logs?: Prisma.OrderLogUncheckedUpdateManyWithoutOrderNestedInput
   providerOrder?: Prisma.ProviderOrderUncheckedUpdateOneWithoutOrderNestedInput
   providerAttempts?: Prisma.ProviderOrderAttemptUncheckedUpdateManyWithoutOrderNestedInput
@@ -1413,6 +1755,8 @@ export type OrderCreateWithoutProviderOperationLogsInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutOrdersInput
   service: Prisma.ServiceCreateNestedOneWithoutOrdersInput
+  quote?: Prisma.OrderQuoteCreateNestedOneWithoutOrderInput
+  reservation?: Prisma.WalletReservationCreateNestedOneWithoutOrderInput
   logs?: Prisma.OrderLogCreateNestedManyWithoutOrderInput
   providerOrder?: Prisma.ProviderOrderCreateNestedOneWithoutOrderInput
   providerJobs?: Prisma.ProviderJobCreateNestedManyWithoutOrderInput
@@ -1433,8 +1777,10 @@ export type OrderUncheckedCreateWithoutProviderOperationLogsInput = {
   status?: $Enums.OrderStatus
   idempotencyKey: string
   requestFingerprint: string
+  quoteId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  reservation?: Prisma.WalletReservationUncheckedCreateNestedOneWithoutOrderInput
   logs?: Prisma.OrderLogUncheckedCreateNestedManyWithoutOrderInput
   providerOrder?: Prisma.ProviderOrderUncheckedCreateNestedOneWithoutOrderInput
   providerJobs?: Prisma.ProviderJobUncheckedCreateNestedManyWithoutOrderInput
@@ -1473,6 +1819,8 @@ export type OrderUpdateWithoutProviderOperationLogsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutOrdersNestedInput
   service?: Prisma.ServiceUpdateOneRequiredWithoutOrdersNestedInput
+  quote?: Prisma.OrderQuoteUpdateOneWithoutOrderNestedInput
+  reservation?: Prisma.WalletReservationUpdateOneWithoutOrderNestedInput
   logs?: Prisma.OrderLogUpdateManyWithoutOrderNestedInput
   providerOrder?: Prisma.ProviderOrderUpdateOneWithoutOrderNestedInput
   providerJobs?: Prisma.ProviderJobUpdateManyWithoutOrderNestedInput
@@ -1493,8 +1841,10 @@ export type OrderUncheckedUpdateWithoutProviderOperationLogsInput = {
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  quoteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reservation?: Prisma.WalletReservationUncheckedUpdateOneWithoutOrderNestedInput
   logs?: Prisma.OrderLogUncheckedUpdateManyWithoutOrderNestedInput
   providerOrder?: Prisma.ProviderOrderUncheckedUpdateOneWithoutOrderNestedInput
   providerJobs?: Prisma.ProviderJobUncheckedUpdateManyWithoutOrderNestedInput
@@ -1514,6 +1864,7 @@ export type OrderCreateManyUserInput = {
   status?: $Enums.OrderStatus
   idempotencyKey: string
   requestFingerprint: string
+  quoteId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1533,6 +1884,8 @@ export type OrderUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   service?: Prisma.ServiceUpdateOneRequiredWithoutOrdersNestedInput
+  quote?: Prisma.OrderQuoteUpdateOneWithoutOrderNestedInput
+  reservation?: Prisma.WalletReservationUpdateOneWithoutOrderNestedInput
   logs?: Prisma.OrderLogUpdateManyWithoutOrderNestedInput
   providerOrder?: Prisma.ProviderOrderUpdateOneWithoutOrderNestedInput
   providerJobs?: Prisma.ProviderJobUpdateManyWithoutOrderNestedInput
@@ -1553,8 +1906,10 @@ export type OrderUncheckedUpdateWithoutUserInput = {
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  quoteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reservation?: Prisma.WalletReservationUncheckedUpdateOneWithoutOrderNestedInput
   logs?: Prisma.OrderLogUncheckedUpdateManyWithoutOrderNestedInput
   providerOrder?: Prisma.ProviderOrderUncheckedUpdateOneWithoutOrderNestedInput
   providerJobs?: Prisma.ProviderJobUncheckedUpdateManyWithoutOrderNestedInput
@@ -1575,6 +1930,7 @@ export type OrderUncheckedUpdateManyWithoutUserInput = {
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  quoteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1592,6 +1948,7 @@ export type OrderCreateManyServiceInput = {
   status?: $Enums.OrderStatus
   idempotencyKey: string
   requestFingerprint: string
+  quoteId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1611,6 +1968,8 @@ export type OrderUpdateWithoutServiceInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutOrdersNestedInput
+  quote?: Prisma.OrderQuoteUpdateOneWithoutOrderNestedInput
+  reservation?: Prisma.WalletReservationUpdateOneWithoutOrderNestedInput
   logs?: Prisma.OrderLogUpdateManyWithoutOrderNestedInput
   providerOrder?: Prisma.ProviderOrderUpdateOneWithoutOrderNestedInput
   providerJobs?: Prisma.ProviderJobUpdateManyWithoutOrderNestedInput
@@ -1631,8 +1990,10 @@ export type OrderUncheckedUpdateWithoutServiceInput = {
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  quoteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reservation?: Prisma.WalletReservationUncheckedUpdateOneWithoutOrderNestedInput
   logs?: Prisma.OrderLogUncheckedUpdateManyWithoutOrderNestedInput
   providerOrder?: Prisma.ProviderOrderUncheckedUpdateOneWithoutOrderNestedInput
   providerJobs?: Prisma.ProviderJobUncheckedUpdateManyWithoutOrderNestedInput
@@ -1653,6 +2014,7 @@ export type OrderUncheckedUpdateManyWithoutServiceInput = {
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   requestFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  quoteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1729,10 +2091,13 @@ export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   status?: boolean
   idempotencyKey?: boolean
   requestFingerprint?: boolean
+  quoteId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   service?: boolean | Prisma.ServiceDefaultArgs<ExtArgs>
+  quote?: boolean | Prisma.Order$quoteArgs<ExtArgs>
+  reservation?: boolean | Prisma.Order$reservationArgs<ExtArgs>
   logs?: boolean | Prisma.Order$logsArgs<ExtArgs>
   providerOrder?: boolean | Prisma.Order$providerOrderArgs<ExtArgs>
   providerJobs?: boolean | Prisma.Order$providerJobsArgs<ExtArgs>
@@ -1755,10 +2120,12 @@ export type OrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   status?: boolean
   idempotencyKey?: boolean
   requestFingerprint?: boolean
+  quoteId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   service?: boolean | Prisma.ServiceDefaultArgs<ExtArgs>
+  quote?: boolean | Prisma.Order$quoteArgs<ExtArgs>
 }, ExtArgs["result"]["order"]>
 
 export type OrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1775,10 +2142,12 @@ export type OrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   status?: boolean
   idempotencyKey?: boolean
   requestFingerprint?: boolean
+  quoteId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   service?: boolean | Prisma.ServiceDefaultArgs<ExtArgs>
+  quote?: boolean | Prisma.Order$quoteArgs<ExtArgs>
 }, ExtArgs["result"]["order"]>
 
 export type OrderSelectScalar = {
@@ -1795,14 +2164,17 @@ export type OrderSelectScalar = {
   status?: boolean
   idempotencyKey?: boolean
   requestFingerprint?: boolean
+  quoteId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "publicId" | "userId" | "serviceId" | "targetUrl" | "quantity" | "chargeMinor" | "refundedMinor" | "startCount" | "remaining" | "status" | "idempotencyKey" | "requestFingerprint" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
+export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "publicId" | "userId" | "serviceId" | "targetUrl" | "quantity" | "chargeMinor" | "refundedMinor" | "startCount" | "remaining" | "status" | "idempotencyKey" | "requestFingerprint" | "quoteId" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
 export type OrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   service?: boolean | Prisma.ServiceDefaultArgs<ExtArgs>
+  quote?: boolean | Prisma.Order$quoteArgs<ExtArgs>
+  reservation?: boolean | Prisma.Order$reservationArgs<ExtArgs>
   logs?: boolean | Prisma.Order$logsArgs<ExtArgs>
   providerOrder?: boolean | Prisma.Order$providerOrderArgs<ExtArgs>
   providerJobs?: boolean | Prisma.Order$providerJobsArgs<ExtArgs>
@@ -1813,10 +2185,12 @@ export type OrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 export type OrderIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   service?: boolean | Prisma.ServiceDefaultArgs<ExtArgs>
+  quote?: boolean | Prisma.Order$quoteArgs<ExtArgs>
 }
 export type OrderIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   service?: boolean | Prisma.ServiceDefaultArgs<ExtArgs>
+  quote?: boolean | Prisma.Order$quoteArgs<ExtArgs>
 }
 
 export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1824,6 +2198,8 @@ export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
     service: Prisma.$ServicePayload<ExtArgs>
+    quote: Prisma.$OrderQuotePayload<ExtArgs> | null
+    reservation: Prisma.$WalletReservationPayload<ExtArgs> | null
     logs: Prisma.$OrderLogPayload<ExtArgs>[]
     providerOrder: Prisma.$ProviderOrderPayload<ExtArgs> | null
     providerJobs: Prisma.$ProviderJobPayload<ExtArgs>[]
@@ -1844,6 +2220,7 @@ export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     status: $Enums.OrderStatus
     idempotencyKey: string
     requestFingerprint: string
+    quoteId: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["order"]>
@@ -2242,6 +2619,8 @@ export interface Prisma__OrderClient<T, Null = never, ExtArgs extends runtime.Ty
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   service<T extends Prisma.ServiceDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ServiceDefaultArgs<ExtArgs>>): Prisma.Prisma__ServiceClient<runtime.Types.Result.GetResult<Prisma.$ServicePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  quote<T extends Prisma.Order$quoteArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$quoteArgs<ExtArgs>>): Prisma.Prisma__OrderQuoteClient<runtime.Types.Result.GetResult<Prisma.$OrderQuotePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  reservation<T extends Prisma.Order$reservationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$reservationArgs<ExtArgs>>): Prisma.Prisma__WalletReservationClient<runtime.Types.Result.GetResult<Prisma.$WalletReservationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   logs<T extends Prisma.Order$logsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$logsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   providerOrder<T extends Prisma.Order$providerOrderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$providerOrderArgs<ExtArgs>>): Prisma.Prisma__ProviderOrderClient<runtime.Types.Result.GetResult<Prisma.$ProviderOrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   providerJobs<T extends Prisma.Order$providerJobsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$providerJobsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProviderJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2289,6 +2668,7 @@ export interface OrderFieldRefs {
   readonly status: Prisma.FieldRef<"Order", 'OrderStatus'>
   readonly idempotencyKey: Prisma.FieldRef<"Order", 'String'>
   readonly requestFingerprint: Prisma.FieldRef<"Order", 'String'>
+  readonly quoteId: Prisma.FieldRef<"Order", 'String'>
   readonly createdAt: Prisma.FieldRef<"Order", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Order", 'DateTime'>
 }
@@ -2689,6 +3069,44 @@ export type OrderDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Limit how many Orders to delete.
    */
   limit?: number
+}
+
+/**
+ * Order.quote
+ */
+export type Order$quoteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the OrderQuote
+   */
+  select?: Prisma.OrderQuoteSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the OrderQuote
+   */
+  omit?: Prisma.OrderQuoteOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OrderQuoteInclude<ExtArgs> | null
+  where?: Prisma.OrderQuoteWhereInput
+}
+
+/**
+ * Order.reservation
+ */
+export type Order$reservationArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the WalletReservation
+   */
+  select?: Prisma.WalletReservationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the WalletReservation
+   */
+  omit?: Prisma.WalletReservationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WalletReservationInclude<ExtArgs> | null
+  where?: Prisma.WalletReservationWhereInput
 }
 
 /**

@@ -189,6 +189,18 @@ async function main() {
       await db.$transaction(async (tx) => {
         const currentWallet = await tx.wallet.findUniqueOrThrow({ where: { id: wallet.id } });
         const charge = 3100n;
+        const quote = await tx.orderQuote.create({
+          data: {
+            userId: user.id,
+            serviceId: "svc_fb_follow_01",
+            quantity: 100,
+            ratePerThousandMinor: 31000n,
+            chargeMinor: charge,
+            currency: "VND",
+            expiresAt: new Date(Date.now() + 5 * 60_000),
+            consumedAt: new Date()
+          }
+        });
         const order = await tx.order.create({
           data: {
             publicId: sampleOrderPublicId,
@@ -200,17 +212,13 @@ async function main() {
             remaining: 100,
             status: OrderStatus.PENDING,
             idempotencyKey: "seed:sample-order",
-            requestFingerprint: "seed-sample-order"
+            requestFingerprint: "seed-sample-order",
+            quoteId: quote.id
           }
         });
-        await tx.wallet.update({ where: { id: wallet.id }, data: { balanceMinor: { decrement: charge } } });
-        await tx.walletTransaction.create({
-          data: {
-            walletId: wallet.id, type: WalletTransactionType.PURCHASE, status: WalletTransactionStatus.COMPLETED, amountMinor: -charge,
-            balanceBeforeMinor: currentWallet.balanceMinor, balanceAfterMinor: currentWallet.balanceMinor - charge, referenceType: "ORDER",
-            referenceId: sampleOrderPublicId, description: `Đơn hàng development ${sampleOrderPublicId}`, idempotencyKey: "seed:sample-order-purchase"
-          }
-        });
+        if (currentWallet.balanceMinor - currentWallet.reservedMinor < charge) throw new Error("Seed wallet has insufficient available balance.");
+        await tx.wallet.update({ where: { id: wallet.id }, data: { reservedMinor: { increment: charge } } });
+        await tx.walletReservation.create({ data: { walletId: wallet.id, orderId: order.id, amountMinor: charge } });
         await tx.orderLog.create({ data: { orderId: order.id, toStatus: OrderStatus.PENDING, message: "Đơn mẫu development đang chờ xử lý." } });
       });
     }

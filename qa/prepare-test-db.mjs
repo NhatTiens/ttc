@@ -1,9 +1,11 @@
 import { existsSync } from "node:fs";
 import { spawnSync } from "node:child_process";
+import { assertSafeTestDatabaseUrl } from "./test-database-safety.mjs";
 
 if (existsSync(".env")) process.loadEnvFile(".env");
 
 const testUrl = process.env.TEST_DATABASE_URL;
+assertSafeTestDatabaseUrl(testUrl, process.env.DATABASE_URL);
 if (!testUrl) {
   console.error("TEST_DATABASE_URL is required. Copy .env.example to .env or export the variable before running backend tests.");
   process.exit(1);

@@ -62,6 +62,12 @@ enum WalletTransactionStatus {
   REFUNDED
 }
 
+enum WalletReservationStatus {
+  RESERVED
+  CAPTURED
+  RELEASED
+}
+
 enum DepositMethodType {
   BANK
   QR
@@ -95,7 +101,6 @@ enum SupportSenderType {
   CUSTOMER
   ADMIN
 }
-
 
 enum ProviderStatus {
   ACTIVE
@@ -176,32 +181,33 @@ enum ProviderJobStatus {
 }
 
 model User {
-  id                       String                 @id @default(uuid()) @db.Uuid
-  email                    String                 @unique @db.VarChar(320)
-  passwordHash             String                 @map("password_hash") @db.Text
-  name                     String                 @db.VarChar(120)
-  phone                    String?                @db.VarChar(32)
-  role                     UserRole               @default(CUSTOMER)
-  status                   UserStatus             @default(ACTIVE)
-  emailVerifiedAt          DateTime?              @map("email_verified_at") @db.Timestamptz(3)
-  twoFactorEnabled         Boolean                @default(false) @map("two_factor_enabled")
-  lastPasswordChangeAt     DateTime               @default(now()) @map("last_password_change_at") @db.Timestamptz(3)
-  sessionVersion           Int                    @default(1) @map("session_version")
-  createdAt                DateTime               @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt                DateTime               @updatedAt @map("updated_at") @db.Timestamptz(3)
-  accounts                 Account[]
-  sessions                 Session[]
-  wallet                   Wallet?
-  notificationPreference   NotificationPreference?
-  orders                   Order[]
-  deposits                 Deposit[]
-  supportTickets           SupportTicket[]
-  supportMessages          SupportMessage[]       @relation("SupportMessageSender")
-  adminWalletTransactions  WalletTransaction[]    @relation("WalletTransactionAdmin")
-  adminAuditLogs            AdminAuditLog[]         @relation("AdminAuditActor")
-  servicePriceChanges       ServicePriceHistory[]   @relation("ServicePriceHistoryAdmin")
-  systemSettingsUpdated     SystemSetting[]         @relation("SystemSettingUpdater")
-  providerAuditMappings     ServiceProviderMapping[] @relation("ProviderMappingAdmin")
+  id                      String                   @id @default(uuid()) @db.Uuid
+  email                   String                   @unique @db.VarChar(320)
+  passwordHash            String                   @map("password_hash") @db.Text
+  name                    String                   @db.VarChar(120)
+  phone                   String?                  @db.VarChar(32)
+  role                    UserRole                 @default(CUSTOMER)
+  status                  UserStatus               @default(ACTIVE)
+  emailVerifiedAt         DateTime?                @map("email_verified_at") @db.Timestamptz(3)
+  twoFactorEnabled        Boolean                  @default(false) @map("two_factor_enabled")
+  lastPasswordChangeAt    DateTime                 @default(now()) @map("last_password_change_at") @db.Timestamptz(3)
+  sessionVersion          Int                      @default(1) @map("session_version")
+  createdAt               DateTime                 @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt               DateTime                 @updatedAt @map("updated_at") @db.Timestamptz(3)
+  accounts                Account[]
+  sessions                Session[]
+  wallet                  Wallet?
+  notificationPreference  NotificationPreference?
+  orders                  Order[]
+  orderQuotes             OrderQuote[]
+  deposits                Deposit[]
+  supportTickets          SupportTicket[]
+  supportMessages         SupportMessage[]         @relation("SupportMessageSender")
+  adminWalletTransactions WalletTransaction[]      @relation("WalletTransactionAdmin")
+  adminAuditLogs          AdminAuditLog[]          @relation("AdminAuditActor")
+  servicePriceChanges     ServicePriceHistory[]    @relation("ServicePriceHistoryAdmin")
+  systemSettingsUpdated   SystemSetting[]          @relation("SystemSettingUpdater")
+  providerAuditMappings   ServiceProviderMapping[] @relation("ProviderMappingAdmin")
 
   @@map("users")
 }
@@ -268,6 +274,7 @@ model Wallet {
   updatedAt     DateTime            @updatedAt @map("updated_at") @db.Timestamptz(3)
   user          User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   transactions  WalletTransaction[]
+  reservations  WalletReservation[]
 
   @@map("wallets")
 }
@@ -297,6 +304,23 @@ model WalletTransaction {
   @@map("wallet_transactions")
 }
 
+model WalletReservation {
+  id          String                  @id @default(uuid()) @db.Uuid
+  walletId    String                  @map("wallet_id") @db.Uuid
+  orderId     String                  @unique @map("order_id") @db.Uuid
+  amountMinor BigInt                  @map("amount_minor")
+  status      WalletReservationStatus @default(RESERVED)
+  capturedAt  DateTime?               @map("captured_at") @db.Timestamptz(3)
+  releasedAt  DateTime?               @map("released_at") @db.Timestamptz(3)
+  createdAt   DateTime                @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime                @updatedAt @map("updated_at") @db.Timestamptz(3)
+  wallet      Wallet                  @relation(fields: [walletId], references: [id], onDelete: Restrict)
+  order       Order                   @relation(fields: [orderId], references: [id], onDelete: Restrict)
+
+  @@index([walletId, status, createdAt])
+  @@map("wallet_reservations")
+}
+
 model ServiceCategory {
   id        String    @id @db.VarChar(64)
   name      String    @db.VarChar(120)
@@ -310,52 +334,76 @@ model ServiceCategory {
 }
 
 model Service {
-  id                   String          @id @db.VarChar(64)
-  code                 String          @unique @db.VarChar(64)
-  name                 String          @db.VarChar(180)
-  description          String          @db.Text
+  id                   String                   @id @db.VarChar(64)
+  code                 String                   @unique @db.VarChar(64)
+  name                 String                   @db.VarChar(180)
+  description          String                   @db.Text
   platform             SocialPlatform
-  categoryId           String          @map("category_id") @db.VarChar(64)
-  ratePerThousandMinor BigInt          @map("rate_per_thousand_minor")
+  categoryId           String                   @map("category_id") @db.VarChar(64)
+  ratePerThousandMinor BigInt                   @map("rate_per_thousand_minor")
   min                  Int
   max                  Int
-  averageTime          String          @map("average_time") @db.VarChar(80)
-  status               ServiceStatus   @default(ACTIVE)
-  popular              Boolean         @default(false)
-  createdAt            DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt            DateTime        @updatedAt @map("updated_at") @db.Timestamptz(3)
-  category             ServiceCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  averageTime          String                   @map("average_time") @db.VarChar(80)
+  status               ServiceStatus            @default(ACTIVE)
+  popular              Boolean                  @default(false)
+  createdAt            DateTime                 @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt            DateTime                 @updatedAt @map("updated_at") @db.Timestamptz(3)
+  category             ServiceCategory          @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   orders               Order[]
   priceHistory         ServicePriceHistory[]
   providerMappings     ServiceProviderMapping[]
+  orderQuotes          OrderQuote[]
 
   @@index([platform, status])
   @@index([categoryId, status])
   @@map("services")
 }
 
+model OrderQuote {
+  id                   String    @id @default(uuid()) @db.Uuid
+  userId               String    @map("user_id") @db.Uuid
+  serviceId            String    @map("service_id") @db.VarChar(64)
+  quantity             Int
+  ratePerThousandMinor BigInt    @map("rate_per_thousand_minor")
+  chargeMinor          BigInt    @map("charge_minor")
+  currency             String    @default("VND") @db.Char(3)
+  expiresAt            DateTime  @map("expires_at") @db.Timestamptz(3)
+  consumedAt           DateTime? @map("consumed_at") @db.Timestamptz(3)
+  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  service              Service   @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  order                Order?
+
+  @@index([userId, expiresAt])
+  @@index([serviceId, createdAt(sort: Desc)])
+  @@map("order_quotes")
+}
+
 model Order {
-  id             String      @id @default(uuid()) @db.Uuid
-  publicId       String      @unique @map("public_id") @db.VarChar(32)
-  userId         String      @map("user_id") @db.Uuid
-  serviceId      String      @map("service_id") @db.VarChar(64)
-  targetUrl      String      @map("target_url") @db.Text
-  quantity       Int
-  chargeMinor    BigInt      @map("charge_minor")
-  refundedMinor  BigInt      @default(0) @map("refunded_minor")
-  startCount     Int?        @map("start_count")
-  remaining      Int
-  status         OrderStatus @default(PENDING)
-  idempotencyKey String      @map("idempotency_key") @db.VarChar(128)
-  requestFingerprint String  @map("request_fingerprint") @db.VarChar(64)
-  createdAt      DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt      DateTime    @updatedAt @map("updated_at") @db.Timestamptz(3)
-  user           User        @relation(fields: [userId], references: [id], onDelete: Restrict)
-  service        Service     @relation(fields: [serviceId], references: [id], onDelete: Restrict)
-  logs           OrderLog[]
-  providerOrder  ProviderOrder?
-  providerJobs   ProviderJob[]
-  providerAttempts ProviderOrderAttempt[]
+  id                    String                 @id @default(uuid()) @db.Uuid
+  publicId              String                 @unique @map("public_id") @db.VarChar(32)
+  userId                String                 @map("user_id") @db.Uuid
+  serviceId             String                 @map("service_id") @db.VarChar(64)
+  targetUrl             String                 @map("target_url") @db.Text
+  quantity              Int
+  chargeMinor           BigInt                 @map("charge_minor")
+  refundedMinor         BigInt                 @default(0) @map("refunded_minor")
+  startCount            Int?                   @map("start_count")
+  remaining             Int
+  status                OrderStatus            @default(PENDING)
+  idempotencyKey        String                 @map("idempotency_key") @db.VarChar(128)
+  requestFingerprint    String                 @map("request_fingerprint") @db.VarChar(64)
+  quoteId               String?                @unique @map("quote_id") @db.Uuid
+  createdAt             DateTime               @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt             DateTime               @updatedAt @map("updated_at") @db.Timestamptz(3)
+  user                  User                   @relation(fields: [userId], references: [id], onDelete: Restrict)
+  service               Service                @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  quote                 OrderQuote?            @relation(fields: [quoteId], references: [id], onDelete: Restrict)
+  reservation           WalletReservation?
+  logs                  OrderLog[]
+  providerOrder         ProviderOrder?
+  providerJobs          ProviderJob[]
+  providerAttempts      ProviderOrderAttempt[]
   providerOperationLogs ProviderOperationLog[]
 
   @@unique([userId, idempotencyKey])
@@ -418,17 +466,17 @@ model Deposit {
 }
 
 model Payment {
-  id                String        @id @default(uuid()) @db.Uuid
-  depositId         String        @map("deposit_id") @db.Uuid
-  gateway           String        @db.VarChar(64)
-  externalPaymentId String?       @map("external_payment_id") @db.VarChar(255)
-  amountMinor       BigInt        @map("amount_minor")
-  currency          String        @default("VND") @db.Char(3)
-  status            PaymentStatus @default(PENDING)
-  idempotencyKey    String?       @unique @map("idempotency_key") @db.VarChar(128)
-  createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt         DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
-  deposit           Deposit       @relation(fields: [depositId], references: [id], onDelete: Restrict)
+  id                String         @id @default(uuid()) @db.Uuid
+  depositId         String         @map("deposit_id") @db.Uuid
+  gateway           String         @db.VarChar(64)
+  externalPaymentId String?        @map("external_payment_id") @db.VarChar(255)
+  amountMinor       BigInt         @map("amount_minor")
+  currency          String         @default("VND") @db.Char(3)
+  status            PaymentStatus  @default(PENDING)
+  idempotencyKey    String?        @unique @map("idempotency_key") @db.VarChar(128)
+  createdAt         DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime       @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deposit           Deposit        @relation(fields: [depositId], references: [id], onDelete: Restrict)
   events            PaymentEvent[]
 
   @@unique([gateway, externalPaymentId])
@@ -437,17 +485,17 @@ model Payment {
 }
 
 model PaymentEvent {
-  id              String   @id @default(uuid()) @db.Uuid
-  paymentId       String?  @map("payment_id") @db.Uuid
-  gateway         String   @db.VarChar(64)
-  externalEventId String   @map("external_event_id") @db.VarChar(255)
-  payloadHash     String   @map("payload_hash") @db.VarChar(128)
+  id              String    @id @default(uuid()) @db.Uuid
+  paymentId       String?   @map("payment_id") @db.Uuid
+  gateway         String    @db.VarChar(64)
+  externalEventId String    @map("external_event_id") @db.VarChar(255)
+  payloadHash     String    @map("payload_hash") @db.VarChar(128)
   payload         Json?
-  signatureValid  Boolean  @default(false) @map("signature_valid")
+  signatureValid  Boolean   @default(false) @map("signature_valid")
   processedAt     DateTime? @map("processed_at") @db.Timestamptz(3)
-  errorCode       String?  @map("error_code") @db.VarChar(80)
-  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
-  payment         Payment? @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+  errorCode       String?   @map("error_code") @db.VarChar(80)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  payment         Payment?  @relation(fields: [paymentId], references: [id], onDelete: SetNull)
 
   @@unique([gateway, externalEventId])
   @@index([paymentId])
@@ -498,17 +546,16 @@ model NotificationPreference {
   @@map("notification_preferences")
 }
 
-
 model ServicePriceHistory {
-  id                   String   @id @default(uuid()) @db.Uuid
-  serviceId            String   @map("service_id") @db.VarChar(64)
-  previousRateMinor    BigInt   @map("previous_rate_minor")
-  newRateMinor         BigInt   @map("new_rate_minor")
-  adminUserId          String   @map("admin_user_id") @db.Uuid
-  reason               String?  @db.VarChar(255)
-  createdAt            DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
-  service              Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
-  adminUser            User     @relation("ServicePriceHistoryAdmin", fields: [adminUserId], references: [id], onDelete: Restrict)
+  id                String   @id @default(uuid()) @db.Uuid
+  serviceId         String   @map("service_id") @db.VarChar(64)
+  previousRateMinor BigInt   @map("previous_rate_minor")
+  newRateMinor      BigInt   @map("new_rate_minor")
+  adminUserId       String   @map("admin_user_id") @db.Uuid
+  reason            String?  @db.VarChar(255)
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  service           Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  adminUser         User     @relation("ServicePriceHistoryAdmin", fields: [adminUserId], references: [id], onDelete: Restrict)
 
   @@index([serviceId, createdAt(sort: Desc)])
   @@index([adminUserId, createdAt(sort: Desc)])
@@ -536,78 +583,78 @@ model AdminAuditLog {
 }
 
 model SystemSetting {
-  id                    String   @id @default("default") @db.VarChar(32)
-  siteName              String   @default("Tương Tác Pro") @map("site_name") @db.VarChar(120)
-  supportEmail          String   @default("support@example.com") @map("support_email") @db.VarChar(320)
-  maintenanceMode       Boolean  @default(false) @map("maintenance_mode")
-  minimumDepositMinor   BigInt   @default(50000) @map("minimum_deposit_minor")
-  orderCreationEnabled  Boolean  @default(true) @map("order_creation_enabled")
-  supportEnabled        Boolean  @default(true) @map("support_enabled")
-  updatedByUserId       String?  @map("updated_by_user_id") @db.Uuid
-  createdAt             DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt             DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
-  updatedByUser         User?    @relation("SystemSettingUpdater", fields: [updatedByUserId], references: [id], onDelete: SetNull)
+  id                   String   @id @default("default") @db.VarChar(32)
+  siteName             String   @default("Tương Tác Pro") @map("site_name") @db.VarChar(120)
+  supportEmail         String   @default("support@example.com") @map("support_email") @db.VarChar(320)
+  maintenanceMode      Boolean  @default(false) @map("maintenance_mode")
+  minimumDepositMinor  BigInt   @default(50000) @map("minimum_deposit_minor")
+  orderCreationEnabled Boolean  @default(true) @map("order_creation_enabled")
+  supportEnabled       Boolean  @default(true) @map("support_enabled")
+  updatedByUserId      String?  @map("updated_by_user_id") @db.Uuid
+  createdAt            DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt            DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  updatedByUser        User?    @relation("SystemSettingUpdater", fields: [updatedByUserId], references: [id], onDelete: SetNull)
 
   @@map("system_settings")
 }
 
 model Provider {
-  id                String          @id @default(uuid()) @db.Uuid
-  code              String          @unique @db.VarChar(32)
-  name              String          @db.VarChar(120)
-  status            ProviderStatus  @default(DISABLED)
-  health            ProviderHealth  @default(UNKNOWN)
-  baseUrl           String?         @map("base_url") @db.VarChar(500)
-  enabled           Boolean         @default(false)
-  priority          Int             @default(100)
-  timeoutMs             Int             @default(10000) @map("timeout_ms")
-  maxConcurrentRequests Int             @default(1) @map("max_concurrent_requests")
-  minRequestIntervalMs  Int             @default(250) @map("min_request_interval_ms")
-  nextRequestAt         DateTime?       @map("next_request_at") @db.Timestamptz(3)
-  balanceMinor      BigInt?         @map("balance_minor")
-  balanceCurrency   String?         @map("balance_currency") @db.VarChar(16)
-  lastBalanceSyncAt DateTime?       @map("last_balance_sync_at") @db.Timestamptz(3)
-  lastHealthAt      DateTime?       @map("last_health_at") @db.Timestamptz(3)
-  lastSuccessfulAt  DateTime?       @map("last_successful_at") @db.Timestamptz(3)
-  lastErrorCode     String?         @map("last_error_code") @db.VarChar(80)
-  createdAt         DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt         DateTime        @updatedAt @map("updated_at") @db.Timestamptz(3)
-  services          ProviderService[]
-  providerOrders    ProviderOrder[]
-  attempts          ProviderOrderAttempt[]
-  jobs              ProviderJob[]
-  operationLogs     ProviderOperationLog[]
-  balanceSnapshots  ProviderBalanceSnapshot[]
-  requestLeases     ProviderRequestLease[]
+  id                    String                    @id @default(uuid()) @db.Uuid
+  code                  String                    @unique @db.VarChar(32)
+  name                  String                    @db.VarChar(120)
+  status                ProviderStatus            @default(DISABLED)
+  health                ProviderHealth            @default(UNKNOWN)
+  baseUrl               String?                   @map("base_url") @db.VarChar(500)
+  enabled               Boolean                   @default(false)
+  priority              Int                       @default(100)
+  timeoutMs             Int                       @default(10000) @map("timeout_ms")
+  maxConcurrentRequests Int                       @default(1) @map("max_concurrent_requests")
+  minRequestIntervalMs  Int                       @default(250) @map("min_request_interval_ms")
+  nextRequestAt         DateTime?                 @map("next_request_at") @db.Timestamptz(3)
+  balanceMinor          BigInt?                   @map("balance_minor")
+  balanceCurrency       String?                   @map("balance_currency") @db.VarChar(16)
+  lastBalanceSyncAt     DateTime?                 @map("last_balance_sync_at") @db.Timestamptz(3)
+  lastHealthAt          DateTime?                 @map("last_health_at") @db.Timestamptz(3)
+  lastSuccessfulAt      DateTime?                 @map("last_successful_at") @db.Timestamptz(3)
+  lastErrorCode         String?                   @map("last_error_code") @db.VarChar(80)
+  createdAt             DateTime                  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt             DateTime                  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  services              ProviderService[]
+  providerOrders        ProviderOrder[]
+  attempts              ProviderOrderAttempt[]
+  jobs                  ProviderJob[]
+  operationLogs         ProviderOperationLog[]
+  balanceSnapshots      ProviderBalanceSnapshot[]
+  requestLeases         ProviderRequestLease[]
 
   @@index([enabled, status, priority])
   @@map("providers")
 }
 
 model ProviderService {
-  id                    String                @id @default(uuid()) @db.Uuid
-  providerId            String                @map("provider_id") @db.Uuid
-  externalServiceId     String                @map("external_service_id") @db.VarChar(255)
-  name                  String                @db.VarChar(255)
-  category              String?               @db.VarChar(120)
-  platform              SocialPlatform?
-  providerRateMinor     BigInt                @map("provider_rate_minor")
-  rateUnit              Int                   @default(1000) @map("rate_unit")
-  currency              String                @default("VND") @db.VarChar(16)
-  min                   Int
-  max                   Int
-  supportsRefill        Boolean               @default(false) @map("supports_refill")
-  supportsCancel        Boolean               @default(false) @map("supports_cancel")
-  status                ProviderServiceStatus @default(AVAILABLE)
-  rawMetadata           Json?                 @map("raw_metadata")
-  lastSyncedAt          DateTime              @map("last_synced_at") @db.Timestamptz(3)
-  createdAt             DateTime              @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt             DateTime              @updatedAt @map("updated_at") @db.Timestamptz(3)
-  provider              Provider              @relation(fields: [providerId], references: [id], onDelete: Restrict)
-  mappings              ServiceProviderMapping[]
-  priceHistory          ProviderPriceHistory[]
-  providerOrders        ProviderOrder[]
-  attempts              ProviderOrderAttempt[]
+  id                String                   @id @default(uuid()) @db.Uuid
+  providerId        String                   @map("provider_id") @db.Uuid
+  externalServiceId String                   @map("external_service_id") @db.VarChar(255)
+  name              String                   @db.VarChar(255)
+  category          String?                  @db.VarChar(120)
+  platform          SocialPlatform?
+  providerRateMinor BigInt                   @map("provider_rate_minor")
+  rateUnit          Int                      @default(1000) @map("rate_unit")
+  currency          String                   @default("VND") @db.VarChar(16)
+  min               Int
+  max               Int
+  supportsRefill    Boolean                  @default(false) @map("supports_refill")
+  supportsCancel    Boolean                  @default(false) @map("supports_cancel")
+  status            ProviderServiceStatus    @default(AVAILABLE)
+  rawMetadata       Json?                    @map("raw_metadata")
+  lastSyncedAt      DateTime                 @map("last_synced_at") @db.Timestamptz(3)
+  createdAt         DateTime                 @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime                 @updatedAt @map("updated_at") @db.Timestamptz(3)
+  provider          Provider                 @relation(fields: [providerId], references: [id], onDelete: Restrict)
+  mappings          ServiceProviderMapping[]
+  priceHistory      ProviderPriceHistory[]
+  providerOrders    ProviderOrder[]
+  attempts          ProviderOrderAttempt[]
 
   @@unique([providerId, externalServiceId])
   @@index([providerId, status, lastSyncedAt(sort: Desc)])
@@ -643,48 +690,48 @@ model ServiceProviderMapping {
 }
 
 model ProviderPriceHistory {
-  id                  String          @id @default(uuid()) @db.Uuid
-  providerServiceId   String          @map("provider_service_id") @db.Uuid
-  previousRateMinor   BigInt          @map("previous_rate_minor")
-  newRateMinor        BigInt          @map("new_rate_minor")
-  source              String          @db.VarChar(64)
-  createdAt           DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
-  providerService     ProviderService @relation(fields: [providerServiceId], references: [id], onDelete: Cascade)
+  id                String          @id @default(uuid()) @db.Uuid
+  providerServiceId String          @map("provider_service_id") @db.Uuid
+  previousRateMinor BigInt          @map("previous_rate_minor")
+  newRateMinor      BigInt          @map("new_rate_minor")
+  source            String          @db.VarChar(64)
+  createdAt         DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
+  providerService   ProviderService @relation(fields: [providerServiceId], references: [id], onDelete: Cascade)
 
   @@index([providerServiceId, createdAt(sort: Desc)])
   @@map("provider_price_history")
 }
 
 model ProviderOrder {
-  id                         String                  @id @default(uuid()) @db.Uuid
-  orderId                    String                  @unique @map("order_id") @db.Uuid
-  providerId                 String                  @map("provider_id") @db.Uuid
-  providerServiceId          String                  @map("provider_service_id") @db.Uuid
-  externalOrderId            String?                 @map("external_order_id") @db.VarChar(255)
-  clientReference            String                  @unique @map("client_reference") @db.VarChar(128)
-  submissionState            ProviderSubmissionState @default(PENDING) @map("submission_state")
-  status                     ProviderOrderStatus     @default(CREATED)
-  attemptCount               Int                     @default(0) @map("attempt_count")
-  providerRateSnapshotMinor  BigInt                  @map("provider_rate_snapshot_minor")
-  rateUnitSnapshot           Int                     @map("rate_unit_snapshot")
-  providerCostMinor          BigInt                  @map("provider_cost_minor")
-  customerChargeMinor        BigInt                  @map("customer_charge_minor")
-  grossMarginMinor           BigInt                  @map("gross_margin_minor")
-  currency                   String                  @default("VND") @db.VarChar(16)
-  requestPayload             Json?                   @map("request_payload")
-  responsePayload            Json?                   @map("response_payload")
-  submittedAt                DateTime?               @map("submitted_at") @db.Timestamptz(3)
-  lastCheckedAt              DateTime?               @map("last_checked_at") @db.Timestamptz(3)
-  nextPollAt                 DateTime?               @map("next_poll_at") @db.Timestamptz(3)
-  lastErrorCode              String?                 @map("last_error_code") @db.VarChar(80)
-  lastErrorMessage           String?                 @map("last_error_message") @db.VarChar(500)
-  createdAt                  DateTime                @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt                  DateTime                @updatedAt @map("updated_at") @db.Timestamptz(3)
-  order                      Order                   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  provider                   Provider                @relation(fields: [providerId], references: [id], onDelete: Restrict)
-  providerService            ProviderService         @relation(fields: [providerServiceId], references: [id], onDelete: Restrict)
-  attempts                   ProviderOrderAttempt[]
-  jobs                       ProviderJob[]
+  id                        String                  @id @default(uuid()) @db.Uuid
+  orderId                   String                  @unique @map("order_id") @db.Uuid
+  providerId                String                  @map("provider_id") @db.Uuid
+  providerServiceId         String                  @map("provider_service_id") @db.Uuid
+  externalOrderId           String?                 @map("external_order_id") @db.VarChar(255)
+  clientReference           String                  @unique @map("client_reference") @db.VarChar(128)
+  submissionState           ProviderSubmissionState @default(PENDING) @map("submission_state")
+  status                    ProviderOrderStatus     @default(CREATED)
+  attemptCount              Int                     @default(0) @map("attempt_count")
+  providerRateSnapshotMinor BigInt                  @map("provider_rate_snapshot_minor")
+  rateUnitSnapshot          Int                     @map("rate_unit_snapshot")
+  providerCostMinor         BigInt                  @map("provider_cost_minor")
+  customerChargeMinor       BigInt                  @map("customer_charge_minor")
+  grossMarginMinor          BigInt                  @map("gross_margin_minor")
+  currency                  String                  @default("VND") @db.VarChar(16)
+  requestPayload            Json?                   @map("request_payload")
+  responsePayload           Json?                   @map("response_payload")
+  submittedAt               DateTime?               @map("submitted_at") @db.Timestamptz(3)
+  lastCheckedAt             DateTime?               @map("last_checked_at") @db.Timestamptz(3)
+  nextPollAt                DateTime?               @map("next_poll_at") @db.Timestamptz(3)
+  lastErrorCode             String?                 @map("last_error_code") @db.VarChar(80)
+  lastErrorMessage          String?                 @map("last_error_message") @db.VarChar(500)
+  createdAt                 DateTime                @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt                 DateTime                @updatedAt @map("updated_at") @db.Timestamptz(3)
+  order                     Order                   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider                  Provider                @relation(fields: [providerId], references: [id], onDelete: Restrict)
+  providerService           ProviderService         @relation(fields: [providerServiceId], references: [id], onDelete: Restrict)
+  attempts                  ProviderOrderAttempt[]
+  jobs                      ProviderJob[]
 
   @@unique([providerId, externalOrderId])
   @@index([providerId, status, updatedAt])
@@ -694,26 +741,26 @@ model ProviderOrder {
 }
 
 model ProviderOrderAttempt {
-  id                      String                  @id @default(uuid()) @db.Uuid
-  orderId                 String                  @map("order_id") @db.Uuid
-  providerOrderRecordId   String?                 @map("provider_order_record_id") @db.Uuid
-  providerId              String                  @map("provider_id") @db.Uuid
-  providerServiceId       String                  @map("provider_service_id") @db.Uuid
-  action                  String                  @default("CREATE") @db.VarChar(32)
-  attemptNo               Int                     @map("attempt_no")
-  providerIdempotencyKey  String?                 @map("provider_idempotency_key") @db.VarChar(128)
-  clientReference         String?                 @map("client_reference") @db.VarChar(128)
-  requestHash             String                  @map("request_hash") @db.VarChar(64)
-  state                   ProviderSubmissionState @default(PREPARED)
-  httpStatus              Int?                    @map("http_status")
-  externalOrderId         String?                 @map("external_order_id") @db.VarChar(255)
-  errorCode               String?                 @map("error_code") @db.VarChar(80)
-  startedAt               DateTime                @default(now()) @map("started_at") @db.Timestamptz(3)
-  finishedAt              DateTime?               @map("finished_at") @db.Timestamptz(3)
-  order                   Order                   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  providerOrder           ProviderOrder?          @relation(fields: [providerOrderRecordId], references: [id], onDelete: SetNull)
-  provider                Provider                @relation(fields: [providerId], references: [id], onDelete: Restrict)
-  providerService         ProviderService         @relation(fields: [providerServiceId], references: [id], onDelete: Restrict)
+  id                     String                  @id @default(uuid()) @db.Uuid
+  orderId                String                  @map("order_id") @db.Uuid
+  providerOrderRecordId  String?                 @map("provider_order_record_id") @db.Uuid
+  providerId             String                  @map("provider_id") @db.Uuid
+  providerServiceId      String                  @map("provider_service_id") @db.Uuid
+  action                 String                  @default("CREATE") @db.VarChar(32)
+  attemptNo              Int                     @map("attempt_no")
+  providerIdempotencyKey String?                 @map("provider_idempotency_key") @db.VarChar(128)
+  clientReference        String?                 @map("client_reference") @db.VarChar(128)
+  requestHash            String                  @map("request_hash") @db.VarChar(64)
+  state                  ProviderSubmissionState @default(PREPARED)
+  httpStatus             Int?                    @map("http_status")
+  externalOrderId        String?                 @map("external_order_id") @db.VarChar(255)
+  errorCode              String?                 @map("error_code") @db.VarChar(80)
+  startedAt              DateTime                @default(now()) @map("started_at") @db.Timestamptz(3)
+  finishedAt             DateTime?               @map("finished_at") @db.Timestamptz(3)
+  order                  Order                   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  providerOrder          ProviderOrder?          @relation(fields: [providerOrderRecordId], references: [id], onDelete: SetNull)
+  provider               Provider                @relation(fields: [providerId], references: [id], onDelete: Restrict)
+  providerService        ProviderService         @relation(fields: [providerServiceId], references: [id], onDelete: Restrict)
 
   @@unique([orderId, action, attemptNo])
   @@index([providerId, providerIdempotencyKey])
@@ -723,27 +770,27 @@ model ProviderOrderAttempt {
 }
 
 model ProviderJob {
-  id                String            @id @default(uuid()) @db.Uuid
-  type              ProviderJobType
-  status            ProviderJobStatus @default(PENDING)
-  dedupeKey         String            @unique @map("dedupe_key") @db.VarChar(180)
-  providerId        String?           @map("provider_id") @db.Uuid
-  orderId           String?           @map("order_id") @db.Uuid
-  providerOrderId   String?           @map("provider_order_id") @db.Uuid
-  payload           Json?
-  runAt             DateTime          @default(now()) @map("run_at") @db.Timestamptz(3)
-  attempts          Int               @default(0)
-  maxAttempts       Int               @default(6) @map("max_attempts")
-  lockedAt          DateTime?         @map("locked_at") @db.Timestamptz(3)
-  lockedBy          String?           @map("locked_by") @db.VarChar(120)
-  lastErrorCode     String?           @map("last_error_code") @db.VarChar(80)
-  lastErrorMessage  String?           @map("last_error_message") @db.VarChar(500)
-  completedAt       DateTime?         @map("completed_at") @db.Timestamptz(3)
-  createdAt         DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt         DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
-  provider          Provider?         @relation(fields: [providerId], references: [id], onDelete: Cascade)
-  order             Order?            @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  providerOrder     ProviderOrder?    @relation(fields: [providerOrderId], references: [id], onDelete: Cascade)
+  id               String            @id @default(uuid()) @db.Uuid
+  type             ProviderJobType
+  status           ProviderJobStatus @default(PENDING)
+  dedupeKey        String            @unique @map("dedupe_key") @db.VarChar(180)
+  providerId       String?           @map("provider_id") @db.Uuid
+  orderId          String?           @map("order_id") @db.Uuid
+  providerOrderId  String?           @map("provider_order_id") @db.Uuid
+  payload          Json?
+  runAt            DateTime          @default(now()) @map("run_at") @db.Timestamptz(3)
+  attempts         Int               @default(0)
+  maxAttempts      Int               @default(6) @map("max_attempts")
+  lockedAt         DateTime?         @map("locked_at") @db.Timestamptz(3)
+  lockedBy         String?           @map("locked_by") @db.VarChar(120)
+  lastErrorCode    String?           @map("last_error_code") @db.VarChar(80)
+  lastErrorMessage String?           @map("last_error_message") @db.VarChar(500)
+  completedAt      DateTime?         @map("completed_at") @db.Timestamptz(3)
+  createdAt        DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
+  provider         Provider?         @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  order            Order?            @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  providerOrder    ProviderOrder?    @relation(fields: [providerOrderId], references: [id], onDelete: Cascade)
 
   @@index([status, runAt])
   @@index([providerId, status, runAt])
@@ -752,19 +799,19 @@ model ProviderJob {
 }
 
 model ProviderOperationLog {
-  id                String    @id @default(uuid()) @db.Uuid
-  providerId        String    @map("provider_id") @db.Uuid
-  orderId           String?   @map("order_id") @db.Uuid
-  operation         String    @db.VarChar(64)
-  externalOrderId   String?   @map("external_order_id") @db.VarChar(255)
-  durationMs        Int?      @map("duration_ms")
-  result            String    @db.VarChar(48)
-  attempt           Int       @default(1)
-  errorCode         String?   @map("error_code") @db.VarChar(80)
-  metadata          Json?
-  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
-  provider          Provider  @relation(fields: [providerId], references: [id], onDelete: Cascade)
-  order             Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  id              String   @id @default(uuid()) @db.Uuid
+  providerId      String   @map("provider_id") @db.Uuid
+  orderId         String?  @map("order_id") @db.Uuid
+  operation       String   @db.VarChar(64)
+  externalOrderId String?  @map("external_order_id") @db.VarChar(255)
+  durationMs      Int?     @map("duration_ms")
+  result          String   @db.VarChar(48)
+  attempt         Int      @default(1)
+  errorCode       String?  @map("error_code") @db.VarChar(80)
+  metadata        Json?
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  provider        Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  order           Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
 
   @@index([providerId, createdAt(sort: Desc)])
   @@index([orderId, createdAt(sort: Desc)])
@@ -773,24 +820,24 @@ model ProviderOperationLog {
 }
 
 model ProviderBalanceSnapshot {
-  id            String    @id @default(uuid()) @db.Uuid
-  providerId    String    @map("provider_id") @db.Uuid
-  amountMinor   BigInt    @map("amount_minor")
-  currency      String    @db.VarChar(16)
-  capturedAt    DateTime  @default(now()) @map("captured_at") @db.Timestamptz(3)
-  provider      Provider  @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  id          String   @id @default(uuid()) @db.Uuid
+  providerId  String   @map("provider_id") @db.Uuid
+  amountMinor BigInt   @map("amount_minor")
+  currency    String   @db.VarChar(16)
+  capturedAt  DateTime @default(now()) @map("captured_at") @db.Timestamptz(3)
+  provider    Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
 
   @@index([providerId, capturedAt(sort: Desc)])
   @@map("provider_balance_snapshots")
 }
 
 model ProviderRequestLease {
-  id          String   @id @default(uuid()) @db.Uuid
-  providerId  String   @map("provider_id") @db.Uuid
-  workerId    String   @map("worker_id") @db.VarChar(120)
-  acquiredAt  DateTime @default(now()) @map("acquired_at") @db.Timestamptz(3)
-  expiresAt   DateTime @map("expires_at") @db.Timestamptz(3)
-  provider    Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  id         String   @id @default(uuid()) @db.Uuid
+  providerId String   @map("provider_id") @db.Uuid
+  workerId   String   @map("worker_id") @db.VarChar(120)
+  acquiredAt DateTime @default(now()) @map("acquired_at") @db.Timestamptz(3)
+  expiresAt  DateTime @map("expires_at") @db.Timestamptz(3)
+  provider   Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
 
   @@index([providerId, expiresAt])
   @@map("provider_request_leases")

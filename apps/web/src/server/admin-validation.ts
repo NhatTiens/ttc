@@ -20,7 +20,7 @@ export const adminOrderQuerySchema = z.object({
   search: z.string().trim().max(160).optional(),
   customer: z.string().trim().max(320).optional(),
   serviceId: z.string().trim().max(64).optional(),
-  platform: z.enum(["FACEBOOK", "TIKTOK", "INSTAGRAM", "YOUTUBE", "THREADS", "all"]).default("all"),
+  platform: z.enum(["FACEBOOK", "TIKTOK", "INSTAGRAM", "YOUTUBE", "THREADS", "GOOGLE", "all"]).default("all"),
   status: z.enum(["PENDING", "VALIDATING", "SUBMITTED", "PROCESSING", "COMPLETED", "PARTIAL", "FAILED", "CANCELLED", "REFUNDED", "all"]).default("all"),
   dateRange: z.enum(["all", "today", "7d", "30d", "90d"]).default("all"),
   ...pageFields
@@ -28,7 +28,7 @@ export const adminOrderQuerySchema = z.object({
 export const orderRefundSchema = z.object({ reason: z.string().trim().min(4).max(255) });
 export const adminServiceQuerySchema = z.object({
   search: z.string().trim().max(160).optional(),
-  platform: z.enum(["FACEBOOK", "TIKTOK", "INSTAGRAM", "YOUTUBE", "THREADS", "all"]).default("all"),
+  platform: z.enum(["FACEBOOK", "TIKTOK", "INSTAGRAM", "YOUTUBE", "THREADS", "GOOGLE", "all"]).default("all"),
   category: z.string().trim().max(64).optional(),
   status: z.enum(["ACTIVE", "MAINTENANCE", "DISABLED", "all"]).default("all"),
   ...pageFields
@@ -37,7 +37,7 @@ export const adminServiceSchema = z.object({
   code: z.string().trim().min(2).max(64).regex(/^[A-Za-z0-9_-]+$/),
   name: z.string().trim().min(3).max(180),
   description: z.string().trim().min(3).max(5000),
-  platform: z.enum(["FACEBOOK", "TIKTOK", "INSTAGRAM", "YOUTUBE", "THREADS"]),
+  platform: z.enum(["FACEBOOK", "TIKTOK", "INSTAGRAM", "YOUTUBE", "THREADS", "GOOGLE"]),
   categoryId: z.string().trim().min(1).max(64),
   ratePerThousand: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER),
   min: z.number().int().min(1).max(10_000_000),

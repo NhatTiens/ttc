@@ -10,7 +10,8 @@ export function sanitizeProviderValue(value: unknown, depth = 0): unknown {
   if (typeof value === "object") {
     const output: Record<string, unknown> = {};
     for (const [key, item] of Object.entries(value as Record<string, unknown>).slice(0, 100)) {
-      output[key] = sensitiveKey.test(key) ? REDACTED : sanitizeProviderValue(item, depth + 1);
+      const normalizedKey = key.replace(/([a-z0-9])([A-Z])/g, "$1_$2");
+      Object.defineProperty(output, key, { value: sensitiveKey.test(normalizedKey) ? REDACTED : sanitizeProviderValue(item, depth + 1), enumerable: true, configurable: true, writable: true });
     }
     return output;
   }
@@ -18,5 +19,7 @@ export function sanitizeProviderValue(value: unknown, depth = 0): unknown {
 }
 
 export function sanitizeProviderErrorMessage(message: string): string {
-  return message.replace(/(bearer\s+)[^\s]+/gi, "$1[REDACTED]").slice(0, 500);
+  return message
+    .replace(/((?:api[_-]?key|access[_-]?token|refresh[_-]?token|secret|password|authorization|key)\s*[:=]\s*)("[^"]*"|'[^']*'|[^\s&,;]+)/gi, "$1[REDACTED]")
+    .replace(/(bearer\s+)[^\s]+/gi, "$1[REDACTED]").slice(0, 500);
 }

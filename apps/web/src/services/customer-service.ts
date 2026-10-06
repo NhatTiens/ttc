@@ -12,6 +12,7 @@ export class CustomerService {
   getService(id: string) { return this.repository.getService(id); }
   listOrders(filters?: OrderFilters) { return this.repository.listOrders(filters); }
   getOrder(id: string) { return this.repository.getOrder(id); }
+  createQuote(serviceId: string, quantity: number) { return this.repository.createQuote(serviceId, quantity); }
   createOrder(input: Parameters<CustomerRepository["createOrder"]>[0]) { return this.repository.createOrder(input); }
   getWallet() { return this.repository.getWallet(); }
   listWalletTransactions() { return this.repository.listWalletTransactions(); }

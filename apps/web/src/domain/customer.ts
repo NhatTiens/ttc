@@ -17,6 +17,17 @@ export type CustomerProfile = {
 
 export type Wallet = { balance: number; currency: "VND" };
 
+export type OrderQuote = {
+  id: string;
+  serviceId: string;
+  serviceName: string;
+  quantity: number;
+  ratePerThousand: number;
+  charge: number;
+  currency: "VND";
+  expiresAt: string;
+};
+
 export type ServiceCategory = {
   id: string;
   name: string;
@@ -80,9 +91,8 @@ export type OrderFilters = {
 };
 
 export type CreateOrderInput = {
-  serviceId: string;
+  quoteId: string;
   targetUrl: string;
-  quantity: number;
 };
 
 export type WalletTransaction = {

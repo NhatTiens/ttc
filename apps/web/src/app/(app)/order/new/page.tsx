@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
@@ -13,7 +13,7 @@ import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
 import { useToast } from "@/components/ui/toast";
 import { PlatformLabel, ServiceStatusBadge } from "@/components/customer/customer-ui";
 import { useCustomerSession } from "@/components/customer/customer-session";
-import type { SocialPlatform } from "@/domain/customer";
+import type { OrderQuote, SocialPlatform } from "@/domain/customer";
 import { customerService } from "@/services/customer-service";
 import { useAsyncResource } from "@/hooks/use-async-resource";
 import { calculateOrderCost, formatCurrency, formatNumber } from "@/lib/format";
@@ -38,6 +38,9 @@ function NewOrderPageContent() {
   const [quantity, setQuantity] = useState<number | null>(null);
   const [errors, setErrors] = useState<{ service?: string; targetUrl?: string; quantity?: string }>({});
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [quote, setQuote] = useState<OrderQuote | null>(null);
+  const quoteRequest = useRef(0);
+  const [quoting, setQuoting] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [createdOrderId, setCreatedOrderId] = useState<string | null>(null);
 
@@ -58,17 +61,23 @@ function NewOrderPageContent() {
   const insufficientBalance = Boolean(resource.data && estimatedCost > resource.data.wallet.balance);
 
   function changePlatform(nextPlatform: SocialPlatform) {
+    quoteRequest.current += 1;
+    setQuoting(false);
     setPlatform(nextPlatform);
     const first = resource.data?.services.find((item) => item.platform === nextPlatform && item.status === "Active");
     setServiceId(first?.id ?? "");
     setQuantity(first?.min ?? 100);
+    setQuote(null);
     setErrors({});
   }
 
   function changeService(nextServiceId: string) {
+    quoteRequest.current += 1;
+    setQuoting(false);
     setServiceId(nextServiceId);
     const service = resource.data?.services.find((item) => item.id === nextServiceId);
     if (service) setQuantity(service.min);
+    setQuote(null);
     setErrors((current) => ({ ...current, service: undefined, quantity: undefined }));
   }
 
@@ -80,20 +89,39 @@ function NewOrderPageContent() {
     if (linkError) nextErrors.targetUrl = linkError;
     if (selectedService && (activeQuantity < selectedService.min || activeQuantity > selectedService.max)) nextErrors.quantity = `Số lượng phải từ ${formatNumber(selectedService.min)} đến ${formatNumber(selectedService.max)}.`;
     setErrors(nextErrors);
-    return Object.keys(nextErrors).length === 0 && !insufficientBalance;
+    return Object.keys(nextErrors).length === 0;
   }
 
-  function requestConfirmation() {
-    if (validateForm()) setConfirmOpen(true);
+  async function requestConfirmation() {
+    if (!selectedService || !validateForm()) return;
+    const requestVersion = ++quoteRequest.current;
+    setQuoting(true);
+    try {
+      const nextQuote = await customerService.createQuote(selectedService.id, activeQuantity);
+      if (requestVersion !== quoteRequest.current) return;
+      setQuote(nextQuote);
+      setConfirmOpen(true);
+    } catch (reason) {
+      if (requestVersion === quoteRequest.current) toast({ tone: "error", title: "Không thể tạo báo giá", description: reason instanceof Error ? reason.message : "Vui lòng thử lại." });
+    } finally {
+      if (requestVersion === quoteRequest.current) setQuoting(false);
+    }
   }
 
   async function submitOrder() {
-    if (!selectedService || !validateForm()) return;
+    if (!selectedService || !quote || !validateForm()) return;
+    if (quote.serviceId !== selectedService.id || quote.quantity !== activeQuantity) {
+      setQuote(null);
+      setConfirmOpen(false);
+      toast({ tone: "error", title: "Thông tin đơn đã thay đổi", description: "Vui lòng lấy báo giá mới trước khi tạo đơn." });
+      return;
+    }
     setSubmitting(true);
     try {
-      const order = await customerService.createOrder({ serviceId: selectedService.id, targetUrl, quantity: activeQuantity });
+      const order = await customerService.createOrder({ quoteId: quote.id, targetUrl });
       setCreatedOrderId(order.id);
       setConfirmOpen(false);
+      setQuote(null);
       refreshSession();
       resource.reload();
       toast({ tone: "success", title: "Đơn hàng đã tạo", description: `${order.id} đã được đưa vào hàng chờ xử lý.` });
@@ -145,7 +173,7 @@ function NewOrderPageContent() {
             <div className="form-section"><span className="step-badge">3</span><div><h2>Nhập thông tin đơn</h2><p>Kiểm tra link công khai và số lượng trước khi xác nhận.</p></div></div>
             <div className="form-stack">
               <Input label="URL" required value={targetUrl} onChange={(event) => { setTargetUrl(event.currentTarget.value); setErrors((current) => ({ ...current, targetUrl: undefined })); }} error={errors.targetUrl} placeholder="https://..." inputMode="url" />
-              <NumberInput label="Số lượng" required value={activeQuantity} min={selectedService?.min} max={selectedService?.max} step={selectedService ? Math.max(1, Math.min(100, selectedService.min)) : 1} onValueChange={(value) => { setQuantity(value); setErrors((current) => ({ ...current, quantity: undefined })); }} error={errors.quantity} hint={selectedService ? `Cho phép: ${formatNumber(selectedService.min)} - ${formatNumber(selectedService.max)}` : "Vui lòng chọn dịch vụ trước."} disabled={!selectedService} />
+              <NumberInput label="Số lượng" required value={activeQuantity} min={selectedService?.min} max={selectedService?.max} step={selectedService ? Math.max(1, Math.min(100, selectedService.min)) : 1} onValueChange={(value) => { quoteRequest.current += 1; setQuoting(false); setQuantity(value); setQuote(null); setErrors((current) => ({ ...current, quantity: undefined })); }} error={errors.quantity} hint={selectedService ? `Cho phép: ${formatNumber(selectedService.min)} - ${formatNumber(selectedService.max)}` : "Vui lòng chọn dịch vụ trước."} disabled={!selectedService} />
             </div>
           </Card>
         </div>
@@ -162,14 +190,14 @@ function NewOrderPageContent() {
               <div><dt>Số dư sau đơn</dt><dd>{formatCurrency(Math.max(0, resource.data.wallet.balance - estimatedCost))}</dd></div>
             </dl>
             {insufficientBalance ? <div className="inline-alert inline-alert--error" role="alert">Số dư không đủ. Vui lòng nạp thêm tiền trước khi tạo đơn.</div> : null}
-            <Button size="lg" className="full-width" disabled={!selectedService || selectedService.status !== "Active" || insufficientBalance} onClick={requestConfirmation}>Kiểm tra & xác nhận</Button>
+            <Button size="lg" className="full-width" loading={quoting} disabled={!selectedService || selectedService.status !== "Active"} onClick={requestConfirmation}>Kiểm tra & xác nhận</Button>
             {insufficientBalance ? <Link href="/wallet/deposit" className="button button--outline button--md full-width">Nạp tiền</Link> : null}
           </Card>
         </aside>
       </div>
 
-      <Modal open={confirmOpen} onOpenChange={setConfirmOpen} title="Xác nhận tạo đơn" description="Kiểm tra lại thông tin trước khi gửi yêu cầu." footer={<><Button variant="outline" onClick={() => setConfirmOpen(false)} disabled={submitting}>Quay lại</Button><Button onClick={submitOrder} loading={submitting}>Tạo đơn</Button></>}>
-        <dl className="confirm-summary"><div><dt>Dịch vụ</dt><dd>{selectedService?.name}</dd></div><div><dt>URL</dt><dd className="break-text">{targetUrl}</dd></div><div><dt>Số lượng</dt><dd>{formatNumber(activeQuantity)}</dd></div><div><dt>Chi phí dự kiến</dt><dd><strong>{formatCurrency(estimatedCost)}</strong></dd></div><div><dt>Số dư ví</dt><dd>{formatCurrency(resource.data.wallet.balance)}</dd></div></dl>
+      <Modal open={confirmOpen} onOpenChange={setConfirmOpen} title="Xác nhận tạo đơn" description="Giá bên dưới đã được máy chủ khóa đến thời điểm hết hạn báo giá." footer={<><Button variant="outline" onClick={() => setConfirmOpen(false)} disabled={submitting}>Quay lại</Button><Button onClick={submitOrder} loading={submitting} disabled={!quote}>Tạo đơn</Button></>}>
+        <dl className="confirm-summary"><div><dt>Dịch vụ</dt><dd>{quote?.serviceName ?? selectedService?.name}</dd></div><div><dt>URL</dt><dd className="break-text">{targetUrl}</dd></div><div><dt>Số lượng</dt><dd>{formatNumber(quote?.quantity ?? activeQuantity)}</dd></div><div><dt>Chi phí đã báo</dt><dd><strong>{formatCurrency(quote?.charge ?? estimatedCost)}</strong></dd></div><div><dt>Báo giá hết hạn</dt><dd>{quote ? new Date(quote.expiresAt).toLocaleTimeString("vi-VN") : "--"}</dd></div><div><dt>Số dư khả dụng</dt><dd>{formatCurrency(resource.data.wallet.balance)}</dd></div></dl>
       </Modal>
     </div>
   );

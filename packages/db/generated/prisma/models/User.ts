@@ -285,6 +285,7 @@ export type UserWhereInput = {
   wallet?: Prisma.XOR<Prisma.WalletNullableScalarRelationFilter, Prisma.WalletWhereInput> | null
   notificationPreference?: Prisma.XOR<Prisma.NotificationPreferenceNullableScalarRelationFilter, Prisma.NotificationPreferenceWhereInput> | null
   orders?: Prisma.OrderListRelationFilter
+  orderQuotes?: Prisma.OrderQuoteListRelationFilter
   deposits?: Prisma.DepositListRelationFilter
   supportTickets?: Prisma.SupportTicketListRelationFilter
   supportMessages?: Prisma.SupportMessageListRelationFilter
@@ -314,6 +315,7 @@ export type UserOrderByWithRelationInput = {
   wallet?: Prisma.WalletOrderByWithRelationInput
   notificationPreference?: Prisma.NotificationPreferenceOrderByWithRelationInput
   orders?: Prisma.OrderOrderByRelationAggregateInput
+  orderQuotes?: Prisma.OrderQuoteOrderByRelationAggregateInput
   deposits?: Prisma.DepositOrderByRelationAggregateInput
   supportTickets?: Prisma.SupportTicketOrderByRelationAggregateInput
   supportMessages?: Prisma.SupportMessageOrderByRelationAggregateInput
@@ -346,6 +348,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   wallet?: Prisma.XOR<Prisma.WalletNullableScalarRelationFilter, Prisma.WalletWhereInput> | null
   notificationPreference?: Prisma.XOR<Prisma.NotificationPreferenceNullableScalarRelationFilter, Prisma.NotificationPreferenceWhereInput> | null
   orders?: Prisma.OrderListRelationFilter
+  orderQuotes?: Prisma.OrderQuoteListRelationFilter
   deposits?: Prisma.DepositListRelationFilter
   supportTickets?: Prisma.SupportTicketListRelationFilter
   supportMessages?: Prisma.SupportMessageListRelationFilter
@@ -415,6 +418,7 @@ export type UserCreateInput = {
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderQuotes?: Prisma.OrderQuoteCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
@@ -444,6 +448,7 @@ export type UserUncheckedCreateInput = {
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderQuotes?: Prisma.OrderQuoteUncheckedCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
@@ -473,6 +478,7 @@ export type UserUpdateInput = {
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderQuotes?: Prisma.OrderQuoteUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
@@ -502,6 +508,7 @@ export type UserUncheckedUpdateInput = {
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderQuotes?: Prisma.OrderQuoteUncheckedUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
@@ -720,6 +727,20 @@ export type UserUpdateOneWithoutAdminWalletTransactionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAdminWalletTransactionsInput, Prisma.UserUpdateWithoutAdminWalletTransactionsInput>, Prisma.UserUncheckedUpdateWithoutAdminWalletTransactionsInput>
 }
 
+export type UserCreateNestedOneWithoutOrderQuotesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutOrderQuotesInput, Prisma.UserUncheckedCreateWithoutOrderQuotesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutOrderQuotesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutOrderQuotesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutOrderQuotesInput, Prisma.UserUncheckedCreateWithoutOrderQuotesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutOrderQuotesInput
+  upsert?: Prisma.UserUpsertWithoutOrderQuotesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutOrderQuotesInput, Prisma.UserUpdateWithoutOrderQuotesInput>, Prisma.UserUncheckedUpdateWithoutOrderQuotesInput>
+}
+
 export type UserCreateNestedOneWithoutOrdersInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutOrdersInput, Prisma.UserUncheckedCreateWithoutOrdersInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutOrdersInput
@@ -870,6 +891,7 @@ export type UserCreateWithoutAccountsInput = {
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderQuotes?: Prisma.OrderQuoteCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
@@ -898,6 +920,7 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderQuotes?: Prisma.OrderQuoteUncheckedCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
@@ -942,6 +965,7 @@ export type UserUpdateWithoutAccountsInput = {
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderQuotes?: Prisma.OrderQuoteUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
@@ -970,6 +994,7 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderQuotes?: Prisma.OrderQuoteUncheckedUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
@@ -998,6 +1023,7 @@ export type UserCreateWithoutSessionsInput = {
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderQuotes?: Prisma.OrderQuoteCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
@@ -1026,6 +1052,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderQuotes?: Prisma.OrderQuoteUncheckedCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
@@ -1070,6 +1097,7 @@ export type UserUpdateWithoutSessionsInput = {
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderQuotes?: Prisma.OrderQuoteUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
@@ -1098,6 +1126,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderQuotes?: Prisma.OrderQuoteUncheckedUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
@@ -1126,6 +1155,7 @@ export type UserCreateWithoutWalletInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderQuotes?: Prisma.OrderQuoteCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
@@ -1154,6 +1184,7 @@ export type UserUncheckedCreateWithoutWalletInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderQuotes?: Prisma.OrderQuoteUncheckedCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
@@ -1198,6 +1229,7 @@ export type UserUpdateWithoutWalletInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderQuotes?: Prisma.OrderQuoteUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
@@ -1226,6 +1258,7 @@ export type UserUncheckedUpdateWithoutWalletInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderQuotes?: Prisma.OrderQuoteUncheckedUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
@@ -1255,6 +1288,7 @@ export type UserCreateWithoutAdminWalletTransactionsInput = {
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderQuotes?: Prisma.OrderQuoteCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
@@ -1283,6 +1317,7 @@ export type UserUncheckedCreateWithoutAdminWalletTransactionsInput = {
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderQuotes?: Prisma.OrderQuoteUncheckedCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
@@ -1327,6 +1362,7 @@ export type UserUpdateWithoutAdminWalletTransactionsInput = {
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderQuotes?: Prisma.OrderQuoteUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
@@ -1355,9 +1391,142 @@ export type UserUncheckedUpdateWithoutAdminWalletTransactionsInput = {
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderQuotes?: Prisma.OrderQuoteUncheckedUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminUserNestedInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedUpdateManyWithoutAdminUserNestedInput
+  systemSettingsUpdated?: Prisma.SystemSettingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserCreateWithoutOrderQuotesInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  emailVerifiedAt?: Date | string | null
+  twoFactorEnabled?: boolean
+  lastPasswordChangeAt?: Date | string
+  sessionVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  deposits?: Prisma.DepositCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
+  supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
+  adminWalletTransactions?: Prisma.WalletTransactionCreateNestedManyWithoutAdminUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogCreateNestedManyWithoutAdminUserInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryCreateNestedManyWithoutAdminUserInput
+  systemSettingsUpdated?: Prisma.SystemSettingCreateNestedManyWithoutUpdatedByUserInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserUncheckedCreateWithoutOrderQuotesInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  name: string
+  phone?: string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  emailVerifiedAt?: Date | string | null
+  twoFactorEnabled?: boolean
+  lastPasswordChangeAt?: Date | string
+  sessionVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  deposits?: Prisma.DepositUncheckedCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
+  supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
+  adminWalletTransactions?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminUserInput
+  adminAuditLogs?: Prisma.AdminAuditLogUncheckedCreateNestedManyWithoutAdminUserInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedCreateNestedManyWithoutAdminUserInput
+  systemSettingsUpdated?: Prisma.SystemSettingUncheckedCreateNestedManyWithoutUpdatedByUserInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUncheckedCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserCreateOrConnectWithoutOrderQuotesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutOrderQuotesInput, Prisma.UserUncheckedCreateWithoutOrderQuotesInput>
+}
+
+export type UserUpsertWithoutOrderQuotesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutOrderQuotesInput, Prisma.UserUncheckedUpdateWithoutOrderQuotesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutOrderQuotesInput, Prisma.UserUncheckedCreateWithoutOrderQuotesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutOrderQuotesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutOrderQuotesInput, Prisma.UserUncheckedUpdateWithoutOrderQuotesInput>
+}
+
+export type UserUpdateWithoutOrderQuotesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastPasswordChangeAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  deposits?: Prisma.DepositUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
+  supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
+  adminWalletTransactions?: Prisma.WalletTransactionUpdateManyWithoutAdminUserNestedInput
+  adminAuditLogs?: Prisma.AdminAuditLogUpdateManyWithoutAdminUserNestedInput
+  servicePriceChanges?: Prisma.ServicePriceHistoryUpdateManyWithoutAdminUserNestedInput
+  systemSettingsUpdated?: Prisma.SystemSettingUpdateManyWithoutUpdatedByUserNestedInput
+  providerAuditMappings?: Prisma.ServiceProviderMappingUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutOrderQuotesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  twoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastPasswordChangeAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessionVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  deposits?: Prisma.DepositUncheckedUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
+  supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
+  adminWalletTransactions?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminUserNestedInput
   adminAuditLogs?: Prisma.AdminAuditLogUncheckedUpdateManyWithoutAdminUserNestedInput
   servicePriceChanges?: Prisma.ServicePriceHistoryUncheckedUpdateManyWithoutAdminUserNestedInput
   systemSettingsUpdated?: Prisma.SystemSettingUncheckedUpdateManyWithoutUpdatedByUserNestedInput
@@ -1382,6 +1551,7 @@ export type UserCreateWithoutOrdersInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  orderQuotes?: Prisma.OrderQuoteCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
@@ -1410,6 +1580,7 @@ export type UserUncheckedCreateWithoutOrdersInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  orderQuotes?: Prisma.OrderQuoteUncheckedCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
@@ -1454,6 +1625,7 @@ export type UserUpdateWithoutOrdersInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  orderQuotes?: Prisma.OrderQuoteUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
@@ -1482,6 +1654,7 @@ export type UserUncheckedUpdateWithoutOrdersInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  orderQuotes?: Prisma.OrderQuoteUncheckedUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
@@ -1511,6 +1684,7 @@ export type UserCreateWithoutDepositsInput = {
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderQuotes?: Prisma.OrderQuoteCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
   adminWalletTransactions?: Prisma.WalletTransactionCreateNestedManyWithoutAdminUserInput
@@ -1539,6 +1713,7 @@ export type UserUncheckedCreateWithoutDepositsInput = {
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderQuotes?: Prisma.OrderQuoteUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
   adminWalletTransactions?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminUserInput
@@ -1583,6 +1758,7 @@ export type UserUpdateWithoutDepositsInput = {
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderQuotes?: Prisma.OrderQuoteUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
   adminWalletTransactions?: Prisma.WalletTransactionUpdateManyWithoutAdminUserNestedInput
@@ -1611,6 +1787,7 @@ export type UserUncheckedUpdateWithoutDepositsInput = {
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderQuotes?: Prisma.OrderQuoteUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
   adminWalletTransactions?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminUserNestedInput
@@ -1639,6 +1816,7 @@ export type UserCreateWithoutSupportTicketsInput = {
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderQuotes?: Prisma.OrderQuoteCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
   adminWalletTransactions?: Prisma.WalletTransactionCreateNestedManyWithoutAdminUserInput
@@ -1667,6 +1845,7 @@ export type UserUncheckedCreateWithoutSupportTicketsInput = {
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderQuotes?: Prisma.OrderQuoteUncheckedCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositUncheckedCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
   adminWalletTransactions?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminUserInput
@@ -1711,6 +1890,7 @@ export type UserUpdateWithoutSupportTicketsInput = {
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderQuotes?: Prisma.OrderQuoteUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
   adminWalletTransactions?: Prisma.WalletTransactionUpdateManyWithoutAdminUserNestedInput
@@ -1739,6 +1919,7 @@ export type UserUncheckedUpdateWithoutSupportTicketsInput = {
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderQuotes?: Prisma.OrderQuoteUncheckedUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUncheckedUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
   adminWalletTransactions?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminUserNestedInput
@@ -1767,6 +1948,7 @@ export type UserCreateWithoutSupportMessagesInput = {
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderQuotes?: Prisma.OrderQuoteCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
   adminWalletTransactions?: Prisma.WalletTransactionCreateNestedManyWithoutAdminUserInput
@@ -1795,6 +1977,7 @@ export type UserUncheckedCreateWithoutSupportMessagesInput = {
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderQuotes?: Prisma.OrderQuoteUncheckedCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
   adminWalletTransactions?: Prisma.WalletTransactionUncheckedCreateNestedManyWithoutAdminUserInput
@@ -1839,6 +2022,7 @@ export type UserUpdateWithoutSupportMessagesInput = {
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderQuotes?: Prisma.OrderQuoteUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
   adminWalletTransactions?: Prisma.WalletTransactionUpdateManyWithoutAdminUserNestedInput
@@ -1867,6 +2051,7 @@ export type UserUncheckedUpdateWithoutSupportMessagesInput = {
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderQuotes?: Prisma.OrderQuoteUncheckedUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
   adminWalletTransactions?: Prisma.WalletTransactionUncheckedUpdateManyWithoutAdminUserNestedInput
@@ -1894,6 +2079,7 @@ export type UserCreateWithoutNotificationPreferenceInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderQuotes?: Prisma.OrderQuoteCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
@@ -1922,6 +2108,7 @@ export type UserUncheckedCreateWithoutNotificationPreferenceInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderQuotes?: Prisma.OrderQuoteUncheckedCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
@@ -1966,6 +2153,7 @@ export type UserUpdateWithoutNotificationPreferenceInput = {
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderQuotes?: Prisma.OrderQuoteUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
@@ -1994,6 +2182,7 @@ export type UserUncheckedUpdateWithoutNotificationPreferenceInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderQuotes?: Prisma.OrderQuoteUncheckedUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
@@ -2023,6 +2212,7 @@ export type UserCreateWithoutServicePriceChangesInput = {
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderQuotes?: Prisma.OrderQuoteCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
@@ -2051,6 +2241,7 @@ export type UserUncheckedCreateWithoutServicePriceChangesInput = {
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderQuotes?: Prisma.OrderQuoteUncheckedCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
@@ -2095,6 +2286,7 @@ export type UserUpdateWithoutServicePriceChangesInput = {
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderQuotes?: Prisma.OrderQuoteUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
@@ -2123,6 +2315,7 @@ export type UserUncheckedUpdateWithoutServicePriceChangesInput = {
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderQuotes?: Prisma.OrderQuoteUncheckedUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
@@ -2151,6 +2344,7 @@ export type UserCreateWithoutAdminAuditLogsInput = {
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderQuotes?: Prisma.OrderQuoteCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
@@ -2179,6 +2373,7 @@ export type UserUncheckedCreateWithoutAdminAuditLogsInput = {
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderQuotes?: Prisma.OrderQuoteUncheckedCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
@@ -2223,6 +2418,7 @@ export type UserUpdateWithoutAdminAuditLogsInput = {
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderQuotes?: Prisma.OrderQuoteUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
@@ -2251,6 +2447,7 @@ export type UserUncheckedUpdateWithoutAdminAuditLogsInput = {
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderQuotes?: Prisma.OrderQuoteUncheckedUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
@@ -2279,6 +2476,7 @@ export type UserCreateWithoutSystemSettingsUpdatedInput = {
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderQuotes?: Prisma.OrderQuoteCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
@@ -2307,6 +2505,7 @@ export type UserUncheckedCreateWithoutSystemSettingsUpdatedInput = {
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderQuotes?: Prisma.OrderQuoteUncheckedCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
@@ -2351,6 +2550,7 @@ export type UserUpdateWithoutSystemSettingsUpdatedInput = {
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderQuotes?: Prisma.OrderQuoteUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
@@ -2379,6 +2579,7 @@ export type UserUncheckedUpdateWithoutSystemSettingsUpdatedInput = {
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderQuotes?: Prisma.OrderQuoteUncheckedUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
@@ -2407,6 +2608,7 @@ export type UserCreateWithoutProviderAuditMappingsInput = {
   wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  orderQuotes?: Prisma.OrderQuoteCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageCreateNestedManyWithoutSenderUserInput
@@ -2435,6 +2637,7 @@ export type UserUncheckedCreateWithoutProviderAuditMappingsInput = {
   wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  orderQuotes?: Prisma.OrderQuoteUncheckedCreateNestedManyWithoutUserInput
   deposits?: Prisma.DepositUncheckedCreateNestedManyWithoutUserInput
   supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutUserInput
   supportMessages?: Prisma.SupportMessageUncheckedCreateNestedManyWithoutSenderUserInput
@@ -2479,6 +2682,7 @@ export type UserUpdateWithoutProviderAuditMappingsInput = {
   wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  orderQuotes?: Prisma.OrderQuoteUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUpdateManyWithoutSenderUserNestedInput
@@ -2507,6 +2711,7 @@ export type UserUncheckedUpdateWithoutProviderAuditMappingsInput = {
   wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  orderQuotes?: Prisma.OrderQuoteUncheckedUpdateManyWithoutUserNestedInput
   deposits?: Prisma.DepositUncheckedUpdateManyWithoutUserNestedInput
   supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutUserNestedInput
   supportMessages?: Prisma.SupportMessageUncheckedUpdateManyWithoutSenderUserNestedInput
@@ -2525,6 +2730,7 @@ export type UserCountOutputType = {
   accounts: number
   sessions: number
   orders: number
+  orderQuotes: number
   deposits: number
   supportTickets: number
   supportMessages: number
@@ -2539,6 +2745,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   accounts?: boolean | UserCountOutputTypeCountAccountsArgs
   sessions?: boolean | UserCountOutputTypeCountSessionsArgs
   orders?: boolean | UserCountOutputTypeCountOrdersArgs
+  orderQuotes?: boolean | UserCountOutputTypeCountOrderQuotesArgs
   deposits?: boolean | UserCountOutputTypeCountDepositsArgs
   supportTickets?: boolean | UserCountOutputTypeCountSupportTicketsArgs
   supportMessages?: boolean | UserCountOutputTypeCountSupportMessagesArgs
@@ -2578,6 +2785,13 @@ export type UserCountOutputTypeCountSessionsArgs<ExtArgs extends runtime.Types.E
  */
 export type UserCountOutputTypeCountOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.OrderWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountOrderQuotesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.OrderQuoteWhereInput
 }
 
 /**
@@ -2656,6 +2870,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   wallet?: boolean | Prisma.User$walletArgs<ExtArgs>
   notificationPreference?: boolean | Prisma.User$notificationPreferenceArgs<ExtArgs>
   orders?: boolean | Prisma.User$ordersArgs<ExtArgs>
+  orderQuotes?: boolean | Prisma.User$orderQuotesArgs<ExtArgs>
   deposits?: boolean | Prisma.User$depositsArgs<ExtArgs>
   supportTickets?: boolean | Prisma.User$supportTicketsArgs<ExtArgs>
   supportMessages?: boolean | Prisma.User$supportMessagesArgs<ExtArgs>
@@ -2722,6 +2937,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   wallet?: boolean | Prisma.User$walletArgs<ExtArgs>
   notificationPreference?: boolean | Prisma.User$notificationPreferenceArgs<ExtArgs>
   orders?: boolean | Prisma.User$ordersArgs<ExtArgs>
+  orderQuotes?: boolean | Prisma.User$orderQuotesArgs<ExtArgs>
   deposits?: boolean | Prisma.User$depositsArgs<ExtArgs>
   supportTickets?: boolean | Prisma.User$supportTicketsArgs<ExtArgs>
   supportMessages?: boolean | Prisma.User$supportMessagesArgs<ExtArgs>
@@ -2743,6 +2959,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     wallet: Prisma.$WalletPayload<ExtArgs> | null
     notificationPreference: Prisma.$NotificationPreferencePayload<ExtArgs> | null
     orders: Prisma.$OrderPayload<ExtArgs>[]
+    orderQuotes: Prisma.$OrderQuotePayload<ExtArgs>[]
     deposits: Prisma.$DepositPayload<ExtArgs>[]
     supportTickets: Prisma.$SupportTicketPayload<ExtArgs>[]
     supportMessages: Prisma.$SupportMessagePayload<ExtArgs>[]
@@ -3165,6 +3382,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   wallet<T extends Prisma.User$walletArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$walletArgs<ExtArgs>>): Prisma.Prisma__WalletClient<runtime.Types.Result.GetResult<Prisma.$WalletPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   notificationPreference<T extends Prisma.User$notificationPreferenceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationPreferenceArgs<ExtArgs>>): Prisma.Prisma__NotificationPreferenceClient<runtime.Types.Result.GetResult<Prisma.$NotificationPreferencePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   orders<T extends Prisma.User$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  orderQuotes<T extends Prisma.User$orderQuotesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$orderQuotesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderQuotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   deposits<T extends Prisma.User$depositsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$depositsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DepositPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   supportTickets<T extends Prisma.User$supportTicketsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$supportTicketsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportTicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   supportMessages<T extends Prisma.User$supportMessagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$supportMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -3715,6 +3933,30 @@ export type User$ordersArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   distinct?: Prisma.OrderScalarFieldEnum | Prisma.OrderScalarFieldEnum[]
+}
+
+/**
+ * User.orderQuotes
+ */
+export type User$orderQuotesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the OrderQuote
+   */
+  select?: Prisma.OrderQuoteSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the OrderQuote
+   */
+  omit?: Prisma.OrderQuoteOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OrderQuoteInclude<ExtArgs> | null
+  where?: Prisma.OrderQuoteWhereInput
+  orderBy?: Prisma.OrderQuoteOrderByWithRelationInput | Prisma.OrderQuoteOrderByWithRelationInput[]
+  cursor?: Prisma.OrderQuoteWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.OrderQuoteScalarFieldEnum | Prisma.OrderQuoteScalarFieldEnum[]
 }
 
 /**

@@ -1,5 +1,5 @@
 import type { CustomerRepository } from "@/repositories/customer-repository";
-import type { CreateOrderInput, CreateTicketInput, CustomerProfile, OrderFilters, ServiceFilters, SocialPlatform } from "@/domain/customer";
+import type { CreateOrderInput, CreateTicketInput, CustomerProfile, OrderFilters, OrderQuote, ServiceFilters, SocialPlatform } from "@/domain/customer";
 import { calculateOrderCost } from "@/lib/format";
 import { mockCategories, mockDepositMethods, mockOrders, mockProfile, mockServices, mockSupportMessages, mockTickets, mockTransactions, mockWallet } from "./mock-customer-data";
 
@@ -14,6 +14,7 @@ function includes(value: string, query: string) {
 let orderSerial = 1100;
 let ticketSerial = 40;
 let depositSerial = 10;
+const mockQuotes = new Map<string, OrderQuote>();
 
 export const mockCustomerRepository: CustomerRepository = {
   async getShellData() {
@@ -84,14 +85,30 @@ export const mockCustomerRepository: CustomerRepository = {
     return order ? { ...order } : null;
   },
 
+  async createQuote(serviceId: string, quantity: number) {
+    await delay(100);
+    const service = mockServices.find((item) => item.id === serviceId);
+    if (!service || service.status !== "Active") throw new Error("Dịch vụ đã chọn không còn khả dụng.");
+    if (!Number.isSafeInteger(quantity) || quantity < service.min || quantity > service.max) throw new Error(`Số lượng phải từ ${service.min} đến ${service.max}.`);
+    const quote: OrderQuote = {
+      id: globalThis.crypto.randomUUID(), serviceId, serviceName: service.name, quantity,
+      ratePerThousand: service.ratePerThousand, charge: calculateOrderCost(service.ratePerThousand, quantity),
+      currency: "VND", expiresAt: new Date(Date.now() + 300_000).toISOString()
+    };
+    mockQuotes.set(quote.id, quote);
+    return quote;
+  },
+
   async createOrder(input: CreateOrderInput) {
     await delay(520);
-    const service = mockServices.find((item) => item.id === input.serviceId);
+    const quote = mockQuotes.get(input.quoteId);
+    if (!quote || new Date(quote.expiresAt).getTime() <= Date.now()) throw new Error("Báo giá không còn hợp lệ.");
+    const service = mockServices.find((item) => item.id === quote.serviceId);
     if (!service) throw new Error("Dịch vụ đã chọn không còn khả dụng.");
     if (service.status !== "Active") throw new Error("Dịch vụ này hiện không nhận đơn mới.");
-    if (input.quantity < service.min || input.quantity > service.max) throw new Error(`Số lượng phải từ ${service.min} đến ${service.max}.`);
-    const charge = calculateOrderCost(service.ratePerThousand, input.quantity);
+    const charge = quote.charge;
     if (mockWallet.balance < charge) throw new Error("Số dư ví không đủ để tạo đơn này.");
+    mockQuotes.delete(input.quoteId);
     orderSerial += 1;
     const now = new Date().toISOString();
     const order = {
@@ -100,16 +117,16 @@ export const mockCustomerRepository: CustomerRepository = {
       serviceName: service.name,
       platform: service.platform,
       targetUrl: input.targetUrl,
-      quantity: input.quantity,
+      quantity: quote.quantity,
       charge,
-      remaining: input.quantity,
+      remaining: quote.quantity,
       status: "Pending" as const,
       createdAt: now,
       updatedAt: now
     };
     mockWallet.balance -= charge;
     mockOrders.unshift(order);
-    mockTransactions.unshift({ id: `TXN-MOCK-${orderSerial}`, type: "Purchase", description: `Đơn hàng ${order.id}`, amount: -charge, balanceAfter: mockWallet.balance, date: now, status: "Completed", reference: order.id });
+    // Mock wallet.balance is available funds; a pending reservation is not a posted purchase.
     return { ...order };
   },
 

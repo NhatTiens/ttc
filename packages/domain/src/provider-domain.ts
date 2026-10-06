@@ -9,6 +9,7 @@ import {
   ProviderPricingMode,
   ProviderServiceStatus,
   ProviderStatus,
+  WalletReservationStatus,
   WalletTransactionStatus,
   WalletTransactionType,
   getDb
@@ -20,7 +21,7 @@ import {
   sanitizeProviderValue,
   type NormalizedProviderService
 } from "@tuong-tac-pro/providers";
-import { DomainError } from "./errors";
+import { DomainError, isTransactionConflict } from "./errors";
 
 export type ProviderAdminActor = { userId: string; ipAddress?: string | null };
 
@@ -37,6 +38,7 @@ export type ProviderMappingInput = {
 };
 
 type JsonObject = Record<string, string | number | boolean | null>;
+const terminalOrderStatuses: ReadonlySet<OrderStatus> = new Set([OrderStatus.COMPLETED, OrderStatus.CANCELLED, OrderStatus.REFUNDED, OrderStatus.FAILED]);
 
 function errorCode(error: unknown): string {
   return typeof error === "object" && error !== null && "code" in error
@@ -54,7 +56,7 @@ async function serializable<T>(operation: (tx: Prisma.TransactionClient) => Prom
         timeout: 20000
       });
     } catch (error) {
-      if (errorCode(error) === "P2034" && attempt < attempts) continue;
+      if (isTransactionConflict(error) && attempt < attempts) continue;
       throw error;
     }
   }
@@ -397,11 +399,25 @@ export async function refundProviderOrderToTarget(input: {
   providerErrorCode?: string | null;
 }) {
   return serializable(async (tx) => {
-    const order = await tx.order.findUnique({ where: { id: input.orderId }, include: { user: { include: { wallet: true } } } });
+    const order = await tx.order.findUnique({ where: { id: input.orderId }, include: { user: { include: { wallet: true } }, reservation: true } });
     if (!order) throw new DomainError("ORDER_NOT_FOUND", "Không tìm thấy đơn hàng.", 404);
     if (!order.user.wallet) throw new DomainError("INTERNAL_ERROR", "Khách hàng chưa có ví.", 500);
-    const target = input.targetRefundMinor > order.chargeMinor ? order.chargeMinor : input.targetRefundMinor;
-    if (target < 0n) throw new DomainError("VALIDATION_ERROR", "Refund target không hợp lệ.", 400);
+    if (input.targetRefundMinor < 0n || !Number.isSafeInteger(input.remaining) || input.remaining < 0 || input.remaining > order.quantity) {
+      throw new DomainError("VALIDATION_ERROR", "Refund target hoặc remaining không hợp lệ.", 400);
+    }
+    if (order.reservation && order.reservation.status !== WalletReservationStatus.CAPTURED) {
+      throw new DomainError("RESERVATION_CONFLICT", "Không được ghi có refund cho khoản tiền chưa capture.", 409);
+    }
+    if (!order.reservation) {
+      const purchase = await tx.walletTransaction.findFirst({ where: { walletId: order.user.wallet.id, referenceType: "ORDER", referenceId: order.publicId, type: WalletTransactionType.PURCHASE, status: WalletTransactionStatus.COMPLETED, amountMinor: -order.chargeMinor } });
+      if (!purchase) throw new DomainError("RESERVATION_CONFLICT", "Đơn cũ chưa có chứng từ debit; không được ghi có refund.", 409);
+    }
+    const requestedTarget = input.targetRefundMinor > order.chargeMinor ? order.chargeMinor : input.targetRefundMinor;
+    // A late response must never lower the refunded total or reopen a terminal order.
+    if (requestedTarget < order.refundedMinor || terminalOrderStatuses.has(order.status)) {
+      return { order, refundDeltaMinor: 0n, refundTotalMinor: order.refundedMinor };
+    }
+    const target = requestedTarget;
     const delta = target - order.refundedMinor;
     if (delta > 0n) {
       const wallet = order.user.wallet;
@@ -468,7 +484,13 @@ export async function markProviderOrderStatus(input: {
   return serializable(async (tx) => {
     const providerOrder = await tx.providerOrder.findUnique({ where: { id: input.providerOrderId }, include: { order: true } });
     if (!providerOrder) throw new DomainError("ORDER_NOT_FOUND", "Không tìm thấy provider order.", 404);
+    if (terminalOrderStatuses.has(providerOrder.order.status) || providerOrder.order.status === OrderStatus.PARTIAL) return providerOrder.order;
     const remaining = input.remaining ?? providerOrder.order.remaining;
+    if (!Number.isSafeInteger(remaining) || remaining < 0 || remaining > providerOrder.order.quantity) {
+      throw new DomainError("VALIDATION_ERROR", "Provider remaining không hợp lệ.", 502);
+    }
+    const rank: Partial<Record<OrderStatus, number>> = { PENDING: 0, VALIDATING: 1, SUBMITTED: 2, PROCESSING: 3 };
+    if ((rank[input.internalStatus] ?? Infinity) < (rank[providerOrder.order.status] ?? 0)) return providerOrder.order;
     await tx.providerOrder.update({
       where: { id: providerOrder.id },
       data: { status: input.providerStatus, lastCheckedAt: new Date(), responsePayload: input.responsePayload }

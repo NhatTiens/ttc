@@ -1,8 +1,8 @@
-# Work 04 — Wallet Ledger
+# Wallet Ledger — current Work 07 contract
 
 ## Invariants
 
-For posted Work 04 transactions:
+For all runtime wallet mutations:
 
 ```text
 wallet.balance_minor >= 0
@@ -10,7 +10,7 @@ wallet.reserved_minor >= 0
 wallet.reserved_minor <= wallet.balance_minor
 ```
 
-Every actual balance change created by Work 04 has a corresponding immutable `WalletTransaction`.
+Every posted balance change has a corresponding immutable `WalletTransaction`. Reservation changes are tracked in `WalletReservation`, not in a fictitious completed PURCHASE. Available balance is `balance_minor - reserved_minor` and is the balance displayed to customers.
 
 ## Transaction semantics
 
@@ -32,7 +32,9 @@ status  COMPLETED
 amount  -charge
 ```
 
-The wallet conditional debit, purchase ledger row, Order and OrderLog are committed together in one Serializable database transaction.
+Create a server quote first, then consume it to create the order. The conditional reservation (`balance - reserved >= charge`), quote consumption, Order, unique WalletReservation, OrderLog and routing-enabled submission job commit in one Serializable transaction. Posted balance does not change.
+
+The PURCHASE above is appended only on provider acceptance. Capture decrements posted and reserved balances exactly once and persists provider acceptance/order status/initial poll in the same transaction. A definite rejection releases only the hold; unknown submission retains the hold for reconciliation. Capture and release are mutually exclusive, one-way terminal reservation states.
 
 ### Deposit request
 
@@ -57,8 +59,8 @@ Integer arithmetic (`BigInt`) is used for the authoritative result.
 
 ## Concurrency
 
-Order writes use Serializable transactions plus `balance >= charge` conditional wallet update. This protects against the classic 100,000 VND wallet receiving two concurrent 80,000 VND purchases.
+Order writes use Serializable transactions plus the atomic `balance - reserved >= charge` predicate. Wallet row locks, conditional reservation state changes and a unique capture ledger key protect concurrent capture/release and replay. Serialization and raw-SQL deadlock conflicts receive bounded retries.
 
-## Reserved balance note
+## Historical orders and refunds
 
-The earlier provider architecture introduced reservations because provider submission can have ambiguous outcomes. Work 04 explicitly has no provider and its requirement is to debit before creating a `PENDING` order. Therefore `reserved_minor` remains in the schema for the later provider Work but is not used by the Work 04 create-order path.
+Historical Work 04–06 orders may have no reservation because their purchase was posted immediately. They are never debited again; settlement/refund requires proof of the historical completed PURCHASE. Admin closure of an unsubmitted, reserved order releases funds without crediting posted balance. Accepted provider refunds append compensating REFUND credits only up to the captured charge and never decrease the cumulative refund or reopen a terminal order.

@@ -404,8 +404,10 @@ export const ModelName = {
   PasswordResetToken: 'PasswordResetToken',
   Wallet: 'Wallet',
   WalletTransaction: 'WalletTransaction',
+  WalletReservation: 'WalletReservation',
   ServiceCategory: 'ServiceCategory',
   Service: 'Service',
+  OrderQuote: 'OrderQuote',
   Order: 'Order',
   OrderLog: 'OrderLog',
   DepositMethod: 'DepositMethod',
@@ -443,7 +445,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "account" | "session" | "verificationToken" | "passwordResetToken" | "wallet" | "walletTransaction" | "serviceCategory" | "service" | "order" | "orderLog" | "depositMethod" | "deposit" | "payment" | "paymentEvent" | "supportTicket" | "supportMessage" | "notificationPreference" | "servicePriceHistory" | "adminAuditLog" | "systemSetting" | "provider" | "providerService" | "serviceProviderMapping" | "providerPriceHistory" | "providerOrder" | "providerOrderAttempt" | "providerJob" | "providerOperationLog" | "providerBalanceSnapshot" | "providerRequestLease"
+    modelProps: "user" | "account" | "session" | "verificationToken" | "passwordResetToken" | "wallet" | "walletTransaction" | "walletReservation" | "serviceCategory" | "service" | "orderQuote" | "order" | "orderLog" | "depositMethod" | "deposit" | "payment" | "paymentEvent" | "supportTicket" | "supportMessage" | "notificationPreference" | "servicePriceHistory" | "adminAuditLog" | "systemSetting" | "provider" | "providerService" | "serviceProviderMapping" | "providerPriceHistory" | "providerOrder" | "providerOrderAttempt" | "providerJob" | "providerOperationLog" | "providerBalanceSnapshot" | "providerRequestLease"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -965,6 +967,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    WalletReservation: {
+      payload: Prisma.$WalletReservationPayload<ExtArgs>
+      fields: Prisma.WalletReservationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.WalletReservationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WalletReservationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.WalletReservationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WalletReservationPayload>
+        }
+        findFirst: {
+          args: Prisma.WalletReservationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WalletReservationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.WalletReservationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WalletReservationPayload>
+        }
+        findMany: {
+          args: Prisma.WalletReservationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WalletReservationPayload>[]
+        }
+        create: {
+          args: Prisma.WalletReservationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WalletReservationPayload>
+        }
+        createMany: {
+          args: Prisma.WalletReservationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.WalletReservationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WalletReservationPayload>[]
+        }
+        delete: {
+          args: Prisma.WalletReservationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WalletReservationPayload>
+        }
+        update: {
+          args: Prisma.WalletReservationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WalletReservationPayload>
+        }
+        deleteMany: {
+          args: Prisma.WalletReservationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.WalletReservationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.WalletReservationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WalletReservationPayload>[]
+        }
+        upsert: {
+          args: Prisma.WalletReservationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WalletReservationPayload>
+        }
+        aggregate: {
+          args: Prisma.WalletReservationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateWalletReservation>
+        }
+        groupBy: {
+          args: Prisma.WalletReservationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WalletReservationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.WalletReservationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WalletReservationCountAggregateOutputType> | number
+        }
+      }
+    }
     ServiceCategory: {
       payload: Prisma.$ServiceCategoryPayload<ExtArgs>
       fields: Prisma.ServiceCategoryFieldRefs
@@ -1110,6 +1186,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ServiceCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ServiceCountAggregateOutputType> | number
+        }
+      }
+    }
+    OrderQuote: {
+      payload: Prisma.$OrderQuotePayload<ExtArgs>
+      fields: Prisma.OrderQuoteFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.OrderQuoteFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderQuotePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.OrderQuoteFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderQuotePayload>
+        }
+        findFirst: {
+          args: Prisma.OrderQuoteFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderQuotePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.OrderQuoteFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderQuotePayload>
+        }
+        findMany: {
+          args: Prisma.OrderQuoteFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderQuotePayload>[]
+        }
+        create: {
+          args: Prisma.OrderQuoteCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderQuotePayload>
+        }
+        createMany: {
+          args: Prisma.OrderQuoteCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.OrderQuoteCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderQuotePayload>[]
+        }
+        delete: {
+          args: Prisma.OrderQuoteDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderQuotePayload>
+        }
+        update: {
+          args: Prisma.OrderQuoteUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderQuotePayload>
+        }
+        deleteMany: {
+          args: Prisma.OrderQuoteDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.OrderQuoteUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.OrderQuoteUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderQuotePayload>[]
+        }
+        upsert: {
+          args: Prisma.OrderQuoteUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderQuotePayload>
+        }
+        aggregate: {
+          args: Prisma.OrderQuoteAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateOrderQuote>
+        }
+        groupBy: {
+          args: Prisma.OrderQuoteGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OrderQuoteGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.OrderQuoteCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OrderQuoteCountAggregateOutputType> | number
         }
       }
     }
@@ -2881,6 +3031,21 @@ export const WalletTransactionScalarFieldEnum = {
 export type WalletTransactionScalarFieldEnum = (typeof WalletTransactionScalarFieldEnum)[keyof typeof WalletTransactionScalarFieldEnum]
 
 
+export const WalletReservationScalarFieldEnum = {
+  id: 'id',
+  walletId: 'walletId',
+  orderId: 'orderId',
+  amountMinor: 'amountMinor',
+  status: 'status',
+  capturedAt: 'capturedAt',
+  releasedAt: 'releasedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WalletReservationScalarFieldEnum = (typeof WalletReservationScalarFieldEnum)[keyof typeof WalletReservationScalarFieldEnum]
+
+
 export const ServiceCategoryScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -2913,6 +3078,22 @@ export const ServiceScalarFieldEnum = {
 export type ServiceScalarFieldEnum = (typeof ServiceScalarFieldEnum)[keyof typeof ServiceScalarFieldEnum]
 
 
+export const OrderQuoteScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  serviceId: 'serviceId',
+  quantity: 'quantity',
+  ratePerThousandMinor: 'ratePerThousandMinor',
+  chargeMinor: 'chargeMinor',
+  currency: 'currency',
+  expiresAt: 'expiresAt',
+  consumedAt: 'consumedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type OrderQuoteScalarFieldEnum = (typeof OrderQuoteScalarFieldEnum)[keyof typeof OrderQuoteScalarFieldEnum]
+
+
 export const OrderScalarFieldEnum = {
   id: 'id',
   publicId: 'publicId',
@@ -2927,6 +3108,7 @@ export const OrderScalarFieldEnum = {
   status: 'status',
   idempotencyKey: 'idempotencyKey',
   requestFingerprint: 'requestFingerprint',
+  quoteId: 'quoteId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -3468,6 +3650,20 @@ export type ListEnumWalletTransactionStatusFieldRefInput<$PrismaModel> = FieldRe
 
 
 /**
+ * Reference to a field of type 'WalletReservationStatus'
+ */
+export type EnumWalletReservationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'WalletReservationStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'WalletReservationStatus[]'
+ */
+export type ListEnumWalletReservationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'WalletReservationStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'SocialPlatform'
  */
 export type EnumSocialPlatformFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SocialPlatform'>
@@ -3904,8 +4100,10 @@ export type GlobalOmitConfig = {
   passwordResetToken?: Prisma.PasswordResetTokenOmit
   wallet?: Prisma.WalletOmit
   walletTransaction?: Prisma.WalletTransactionOmit
+  walletReservation?: Prisma.WalletReservationOmit
   serviceCategory?: Prisma.ServiceCategoryOmit
   service?: Prisma.ServiceOmit
+  orderQuote?: Prisma.OrderQuoteOmit
   order?: Prisma.OrderOmit
   orderLog?: Prisma.OrderLogOmit
   depositMethod?: Prisma.DepositMethodOmit

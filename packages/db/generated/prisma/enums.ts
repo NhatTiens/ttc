@@ -85,6 +85,15 @@ export const WalletTransactionStatus = {
 export type WalletTransactionStatus = (typeof WalletTransactionStatus)[keyof typeof WalletTransactionStatus]
 
 
+export const WalletReservationStatus = {
+  RESERVED: 'RESERVED',
+  CAPTURED: 'CAPTURED',
+  RELEASED: 'RELEASED'
+} as const
+
+export type WalletReservationStatus = (typeof WalletReservationStatus)[keyof typeof WalletReservationStatus]
+
+
 export const DepositMethodType = {
   BANK: 'BANK',
   QR: 'QR',

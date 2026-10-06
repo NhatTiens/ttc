@@ -41,9 +41,18 @@
     "test:work6": "npm run test:providers && npm run test:backend && npm run test:worker",
     "qa:work6:static": "node qa/work6-provider-contract-check.mjs",
     "qa:work6:api": "node qa/work6-api-smoke.mjs",
+    "qa:work7:static": "node qa/work7-financial-contract-check.mjs",
+    "check:work7": "bash ./scripts/work7-verify.sh",
+    "test:qa": "node --import tsx --test qa/tests/*.test.mjs",
+    "audit:production": "npm audit --omit=dev --audit-level=high",
     "check:work6": "npm run db:validate && npm run lint:web && npm run typecheck:web && npm run typecheck:providers && npm run typecheck:worker && npm run test:work6 && npm run build:web && npm run check:offline",
     "qa:ttc:readonly": "node --import tsx qa/ttc-live-readonly.mjs",
     "qa:ttc:order": "node --import tsx qa/ttc-live-order.mjs"
+  },
+  "overrides": {
+    "@prisma/config": { "deepmerge-ts": "8.0.2" },
+    "mysql2": "3.24.5",
+    "source-map-js": "1.2.2"
   },
   "engines": {
     "node": ">=22"

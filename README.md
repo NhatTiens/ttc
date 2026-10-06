@@ -1,6 +1,6 @@
 # Tương Tác Pro
 
-Work 03 Customer Application is accepted. Work 04 integrates that UI with a real REST backend and PostgreSQL while keeping Admin, provider integration, Tương Tác Chéo, and real payment gateways out of scope.
+Current code includes the Work 04 customer backend, Work 05 admin workflow, Work 06 TTC provider/worker integration, and the Work 07 financial hardening candidate. Work 07 is **BLOCKED**, not PASS, until PostgreSQL integration gates succeed. See `REPOSITORY_FIX_REPORT.md` and `WORK7_ARCHITECTURE_HARDENING.md` for the current audit and verification evidence. Real payment gateways and automated unknown-submission reconciliation remain out of scope.
 
 ## Current architecture
 
@@ -21,8 +21,10 @@ Next.js Customer UI
 
 ```text
 apps/web                 Next.js customer UI + Auth.js + REST API
+apps/worker              durable PostgreSQL provider jobs
 packages/db              Prisma schema/client/migrations/seed
 packages/domain          money/order/wallet/support business rules
+packages/providers       verified TTC API v2 adapter
 docs/architecture        approved architecture documents
 qa                       Work 03 + Work 04 contract/runtime scripts
 ```
@@ -34,7 +36,7 @@ qa                       Work 03 + Work 04 contract/runtime scripts
 - protected customer routes;
 - customer profile/password/notification preferences in PostgreSQL;
 - service catalog seeded from Work 03;
-- atomic order creation, server-side price calculation, wallet debit, PURCHASE ledger and OrderLog;
+- server quotes and atomic order/reservation/log creation; posted debit and PURCHASE ledger only after provider acceptance;
 - Serializable/conditional-update concurrency protection;
 - order and deposit idempotency keys;
 - real wallet and transaction history;
@@ -102,13 +104,23 @@ The compose setup creates `tuong_tac_pro`; on a fresh volume its init script als
 ## Install and database setup
 
 ```bash
-npm install
+npm ci
+npm run db:generate
 npm run db:validate
 npm run db:migrate
 npm run db:seed
 ```
 
-`npm install` runs Prisma client generation. Production migration strategy is `prisma migrate deploy`; do not replace it with `db push`.
+`npm ci` runs Prisma client generation. Production migration strategy is `prisma migrate deploy`; do not replace it with `db push`.
+
+Full current verification (requires a separate PostgreSQL test database whose name ends in `_test`):
+
+```bash
+chmod +x scripts/work7-verify.sh
+./scripts/work7-verify.sh
+```
+
+On Windows, the matching fail-fast entry point is `powershell -ExecutionPolicy Bypass -File scripts/work7-verify.ps1`, or run the Bash script through Git Bash. Both scripts stop on a failed gate; a missing database is not PASS. Backend/worker integration suites delete test fixtures and must never point at a production database.
 
 Development seed defaults (development only):
 

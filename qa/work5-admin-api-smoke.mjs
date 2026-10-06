@@ -139,8 +139,9 @@ const services = await customer.api("/api/v1/services");
 const activeService = services.find((item) => item.status === "Active");
 assert(activeService, "No active service available for refund smoke");
 const walletBeforeOrder = await customer.api("/api/v1/wallet");
+const quote = await customer.api("/api/v1/quotes", { method: "POST", body: JSON.stringify({ serviceId: activeService.id, quantity: activeService.min }) }, 201);
 const order = await customer.api("/api/v1/orders", {
-  method: "POST", headers: { "Idempotency-Key": `work5-refund-order-${smokeId}` }, body: JSON.stringify({ serviceId: activeService.id, targetUrl: `https://example.com/work5-refund/${smokeId}`, quantity: activeService.min })
+  method: "POST", headers: { "Idempotency-Key": `work5-refund-order-${smokeId}` }, body: JSON.stringify({ quoteId: quote.id, targetUrl: `https://example.com/work5-refund/${smokeId}` })
 }, 201);
 await admin.api(`/api/v1/admin/orders/${encodeURIComponent(order.id)}/refund`, { method: "POST", body: JSON.stringify({ reason: "Work 05 smoke refund before provider submission" }) });
 await admin.api(`/api/v1/admin/orders/${encodeURIComponent(order.id)}/refund`, { method: "POST", body: JSON.stringify({ reason: "Work 05 smoke refund retry" }) });
@@ -169,8 +170,10 @@ const servicePayload = {
 const createdService = await admin.api("/api/v1/admin/services", { method: "POST", body: JSON.stringify(servicePayload) }, 201);
 assert(createdService.code === serviceCode, "Admin service creation failed");
 assert((await customer.api("/api/v1/services")).some((item) => item.id === createdService.id && item.status === "Active"), "Customer catalog did not reflect created service");
+const serviceQuote = await customer.api("/api/v1/quotes", { method: "POST", body: JSON.stringify({ serviceId: createdService.id, quantity: createdService.min }) }, 201);
+const disabledQuote = await customer.api("/api/v1/quotes", { method: "POST", body: JSON.stringify({ serviceId: createdService.id, quantity: createdService.min }) }, 201);
 const serviceOrder = await customer.api("/api/v1/orders", {
-  method: "POST", headers: { "Idempotency-Key": `work5-service-order-${smokeId}` }, body: JSON.stringify({ serviceId: createdService.id, targetUrl: `https://example.com/work5-service/${smokeId}`, quantity: createdService.min })
+  method: "POST", headers: { "Idempotency-Key": `work5-service-order-${smokeId}` }, body: JSON.stringify({ quoteId: serviceQuote.id, targetUrl: `https://example.com/work5-service/${smokeId}` })
 }, 201);
 const disabledService = await admin.api(`/api/v1/admin/services/${encodeURIComponent(createdService.id)}`, {
   method: "PATCH",
@@ -178,7 +181,7 @@ const disabledService = await admin.api(`/api/v1/admin/services/${encodeURICompo
 });
 assert(disabledService.status === "DISABLED" && disabledService.priceHistory.length >= 1, "Service status/price history update failed");
 await customer.expectApiError("/api/v1/orders", {
-  method: "POST", headers: { "Idempotency-Key": `work5-disabled-order-${smokeId}` }, body: JSON.stringify({ serviceId: createdService.id, targetUrl: `https://example.com/work5-disabled/${smokeId}`, quantity: createdService.min })
+  method: "POST", headers: { "Idempotency-Key": `work5-disabled-order-${smokeId}` }, body: JSON.stringify({ quoteId: disabledQuote.id, targetUrl: `https://example.com/work5-disabled/${smokeId}` })
 }, 409, "SERVICE_UNAVAILABLE");
 await admin.api(`/api/v1/admin/orders/${encodeURIComponent(serviceOrder.id)}/refund`, { method: "POST", body: JSON.stringify({ reason: "Cleanup Work 05 service smoke order" }) });
 console.log(`PASS service CRUD/status/price history ${createdService.id}`);
@@ -193,6 +196,9 @@ assert(customerThread.messages.some((message) => message.body === "Admin reply f
 console.log(`PASS support administration ${ticket.id}`);
 
 const originalSettings = await admin.api("/api/v1/admin/settings");
+const settingsService = (await customer.api("/api/v1/services")).find((item) => item.status === "Active");
+assert(settingsService, "No active service available to verify orderCreationEnabled");
+const settingsQuote = await customer.api("/api/v1/quotes", { method: "POST", body: JSON.stringify({ serviceId: settingsService.id, quantity: settingsService.min }) }, 201);
 const changedSettings = await admin.api("/api/v1/admin/settings", {
   method: "PATCH",
   body: JSON.stringify({ ...originalSettings, siteName: `Tương Tác Pro QA ${smokeId}`, orderCreationEnabled: false })
@@ -201,7 +207,7 @@ assert(changedSettings.orderCreationEnabled === false, "Admin settings update fa
 const anotherActiveService = (await customer.api("/api/v1/services")).find((item) => item.status === "Active");
 assert(anotherActiveService, "No active service available to verify orderCreationEnabled");
 await customer.expectApiError("/api/v1/orders", {
-  method: "POST", headers: { "Idempotency-Key": `work5-disabled-global-order-${smokeId}` }, body: JSON.stringify({ serviceId: anotherActiveService.id, targetUrl: `https://example.com/work5-settings/${smokeId}`, quantity: anotherActiveService.min })
+  method: "POST", headers: { "Idempotency-Key": `work5-disabled-global-order-${smokeId}` }, body: JSON.stringify({ quoteId: settingsQuote.id, targetUrl: `https://example.com/work5-settings/${smokeId}` })
 }, 409, "SERVICE_UNAVAILABLE");
 await admin.api("/api/v1/admin/settings", {
   method: "PATCH",

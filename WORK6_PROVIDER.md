@@ -11,7 +11,7 @@ Customer UI
   -> Tương Tác Pro REST API
     -> Customer/Order Domain
       -> PostgreSQL transaction
-        -> orders + wallet ledger + provider_jobs
+        -> orders + wallet reservation + provider_jobs
           -> apps/worker
             -> ProviderRegistry
               -> ProviderAdapter
@@ -60,8 +60,8 @@ When `PROVIDER_ROUTING_ENABLED=true`:
 2. It must have an enabled ACTIVE mapping.
 3. The provider service must be AVAILABLE.
 4. The provider must be enabled and ACTIVE.
-5. Only then may the wallet debit/order transaction commit.
-6. A deterministic durable `SUBMIT_ORDER` job is written in the same transaction.
+5. Only then may the wallet reservation/order transaction commit; posted balance is not debited yet.
+6. A deterministic durable `SUBMIT_ORDER` job is written in the same transaction. Provider acceptance captures the reservation; explicit rejection releases it; unknown submission keeps it reserved.
 
 Customer catalog reads apply the same routing filter while routing is enabled, so unmapped provider products are never published directly.
 

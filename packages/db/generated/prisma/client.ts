@@ -77,6 +77,11 @@ export type Wallet = Prisma.WalletModel
  */
 export type WalletTransaction = Prisma.WalletTransactionModel
 /**
+ * Model WalletReservation
+ * 
+ */
+export type WalletReservation = Prisma.WalletReservationModel
+/**
  * Model ServiceCategory
  * 
  */
@@ -86,6 +91,11 @@ export type ServiceCategory = Prisma.ServiceCategoryModel
  * 
  */
 export type Service = Prisma.ServiceModel
+/**
+ * Model OrderQuote
+ * 
+ */
+export type OrderQuote = Prisma.OrderQuoteModel
 /**
  * Model Order
  * 

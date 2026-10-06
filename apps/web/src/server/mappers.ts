@@ -1,6 +1,6 @@
 import type {
   Deposit, DepositMethod, NotificationPreference, Order, OrderLog, Service, ServiceCategory, SupportMessage,
-  SupportTicket, User, Wallet, WalletTransaction
+  SupportTicket, User, Wallet, WalletTransaction, OrderQuote
 } from "@tuong-tac-pro/db";
 import { moneyToSafeNumber } from "@tuong-tac-pro/domain";
 
@@ -38,6 +38,20 @@ export function toService(service: Service) {
     id: service.id, code: service.code, platform: platformMap[service.platform], category: service.categoryId, name: service.name,
     description: service.description, ratePerThousand: moneyToSafeNumber(service.ratePerThousandMinor), min: service.min, max: service.max,
     status: serviceStatusMap[service.status], averageTime: service.averageTime, popular: service.popular
+  };
+}
+
+type QuoteWithService = OrderQuote & { service: Service };
+export function toOrderQuote(quote: QuoteWithService) {
+  return {
+    id: quote.id,
+    serviceId: quote.serviceId,
+    serviceName: quote.service.name,
+    quantity: quote.quantity,
+    ratePerThousand: moneyToSafeNumber(quote.ratePerThousandMinor),
+    charge: moneyToSafeNumber(quote.chargeMinor),
+    currency: "VND" as const,
+    expiresAt: quote.expiresAt.toISOString()
   };
 }
 

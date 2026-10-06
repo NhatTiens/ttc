@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import {
   OrderStatus,
+  Prisma,
   ProviderHealth,
   ProviderJobStatus,
   ProviderJobType,
@@ -9,14 +10,17 @@ import {
   ProviderServiceStatus,
   ProviderSubmissionState,
   ProviderStatus,
+  WalletReservationStatus,
   getDb,
   type ProviderJob
 } from "@tuong-tac-pro/db";
 import {
   applyProviderServiceSync,
+  captureOrderReservationInTransaction,
   enqueueProviderJob,
   markProviderOrderStatus,
   partialRefundTarget,
+  releaseOrderReservationInTransaction,
   refundProviderOrderToTarget
 } from "@tuong-tac-pro/domain";
 import {
@@ -33,7 +37,7 @@ import {
   type ProviderAdapter,
   type ProviderRegistry
 } from "@tuong-tac-pro/providers";
-import { completeProviderJob, failProviderJob, manualReviewProviderJob, retryProviderJob } from "./queue";
+import { completeProviderJob, failProviderJob, manualReviewProviderJob, providerJobClaimWhere, retryProviderJob } from "./queue";
 import { withProviderRequestLease } from "./rate-limit";
 
 const INITIAL_POLL_MS = Number(process.env.PROVIDER_POLL_INITIAL_MS || 60_000);
@@ -42,7 +46,9 @@ const MAX_POLL_MS = Number(process.env.PROVIDER_POLL_MAX_MS || 20 * 60_000);
 const TERMINAL_INTERNAL_ORDER_STATUSES: ReadonlySet<OrderStatus> = new Set<OrderStatus>([
   OrderStatus.COMPLETED,
   OrderStatus.REFUNDED,
-  OrderStatus.CANCELLED
+  OrderStatus.CANCELLED,
+  OrderStatus.FAILED,
+  OrderStatus.PARTIAL
 ]);
 
 const MANUAL_REVIEW_SUBMISSION_STATES: ReadonlySet<ProviderSubmissionState> = new Set<ProviderSubmissionState>([
@@ -187,19 +193,40 @@ async function schedulePoll(providerOrderId: string, providerId: string, orderId
   });
 }
 
-async function finalRefundForSubmissionFailure(providerOrderId: string, code: string, message: string) {
+async function finalReleaseForSubmissionFailure(providerOrderId: string, code: string, message: string) {
   const db = getDb();
   const providerOrder = await db.providerOrder.findUniqueOrThrow({ where: { id: providerOrderId }, include: { order: true } });
-  await refundProviderOrderToTarget({
-    orderId: providerOrder.orderId,
-    targetRefundMinor: providerOrder.order.chargeMinor,
-    finalStatus: OrderStatus.FAILED,
-    remaining: providerOrder.order.quantity,
-    reason: `Provider submission failed: ${message}`,
-    providerOrderId,
-    providerOrderStatus: ProviderOrderStatus.FAILED,
-    providerSubmissionState: "REJECTED",
-    providerErrorCode: code
+  if (!await db.walletReservation.findUnique({ where: { orderId: providerOrder.orderId } })) {
+    await refundProviderOrderToTarget({ orderId: providerOrder.orderId, targetRefundMinor: providerOrder.order.chargeMinor, finalStatus: OrderStatus.FAILED, remaining: providerOrder.order.quantity, reason: sanitizeProviderErrorMessage(message), providerOrderId, providerOrderStatus: ProviderOrderStatus.FAILED, providerSubmissionState: "REJECTED", providerErrorCode: code });
+    return;
+  }
+  await db.$transaction(async (tx) => {
+    const released = await releaseOrderReservationInTransaction(tx, providerOrder.orderId);
+    await tx.providerOrder.update({
+      where: { id: providerOrderId },
+      data: {
+        status: ProviderOrderStatus.FAILED,
+        submissionState: ProviderSubmissionState.REJECTED,
+        lastCheckedAt: new Date(),
+        lastErrorCode: code,
+        lastErrorMessage: sanitizeProviderErrorMessage(message)
+      }
+    });
+    const order = await tx.order.update({
+      where: { id: providerOrder.orderId },
+      data: { status: OrderStatus.FAILED, remaining: providerOrder.order.quantity }
+    });
+    if (released.changed || providerOrder.order.status !== OrderStatus.FAILED) {
+      await tx.orderLog.create({
+        data: {
+          orderId: order.id,
+          fromStatus: providerOrder.order.status,
+          toStatus: OrderStatus.FAILED,
+          message: "Provider từ chối đơn; khoản giữ tiền đã được giải phóng.",
+          metadata: { providerOrderId, providerErrorCode: code }
+        }
+      });
+    }
   });
 }
 
@@ -209,9 +236,11 @@ async function handleSubmitOrder(job: ProviderJob, registry: ProviderRegistry) {
   const order = await db.order.findUnique({ where: { id: job.orderId }, include: { service: true, providerOrder: true } });
   if (!order) throw new ProviderAdapterError("PROVIDER_INVALID_REQUEST", "Internal order no longer exists.");
   if (order.providerOrder?.submissionState === ProviderSubmissionState.ACCEPTED) return;
+  if (order.providerOrder?.submissionState === ProviderSubmissionState.REJECTED) return;
   if (TERMINAL_INTERNAL_ORDER_STATUSES.has(order.status)) return;
   if (MANUAL_REVIEW_SUBMISSION_STATES.has(order.providerOrder?.submissionState ?? ProviderSubmissionState.PENDING)) {
-    throw new ProviderAdapterError("PROVIDER_UNKNOWN_ERROR", "Order is already waiting for manual provider review.");
+    await manualReviewProviderJob(job, "UNKNOWN_SUBMISSION", "Order is already waiting for manual provider review.");
+    return;
   }
 
   const mappingWhere = {
@@ -243,8 +272,24 @@ async function handleSubmitOrder(job: ProviderJob, registry: ProviderRegistry) {
   const providerCostMinor = calculateProviderCost(providerService.providerRateMinor, order.quantity, providerService.rateUnit);
   const marginMinor = grossMargin(order.chargeMinor, providerCostMinor);
   const clientReference = `ttp:${order.publicId}`;
-  let providerOrder = order.providerOrder ?? await db.providerOrder.create({
-    data: {
+  // Serialize admission by internal order, not only by queue job ID. Duplicate
+  // jobs have different IDs, and stale claims must not blindly resend a create.
+  const prepared = await db.$transaction(async (tx) => {
+    await tx.$queryRaw(Prisma.sql`SELECT "id" FROM "orders" WHERE "id" = ${order.id}::uuid FOR UPDATE`);
+    const current = await tx.order.findUniqueOrThrow({ where: { id: order.id }, include: { providerOrder: true, reservation: true } });
+    if (TERMINAL_INTERNAL_ORDER_STATUSES.has(current.status) || current.providerOrder?.submissionState === ProviderSubmissionState.ACCEPTED || current.providerOrder?.submissionState === ProviderSubmissionState.REJECTED) return null;
+    if (current.reservation && current.reservation.status !== WalletReservationStatus.RESERVED) {
+      throw new ProviderAdapterError("PROVIDER_INVALID_REQUEST", "Order funds are no longer reserved; submission is forbidden.");
+    }
+    if (!current.reservation) {
+      const purchase = await tx.walletTransaction.findFirst({ where: { referenceType: "ORDER", referenceId: current.publicId, type: "PURCHASE", status: "COMPLETED", amountMinor: -current.chargeMinor, wallet: { userId: current.userId } } });
+      if (!purchase) throw new ProviderAdapterError("PROVIDER_INVALID_REQUEST", "Legacy order has no verified purchase ledger; submission is forbidden.");
+    }
+    if (current.providerOrder && ![ProviderSubmissionState.PENDING, ProviderSubmissionState.SAFE_TO_RETRY].some((state) => state === current.providerOrder!.submissionState)) {
+      return { record: current.providerOrder, busy: true };
+    }
+    if (current.providerOrder && (current.providerOrder.providerServiceId !== providerService.id || current.providerOrder.providerId !== provider.id)) return { record: current.providerOrder, busy: true };
+    const record = current.providerOrder ?? await tx.providerOrder.create({ data: {
       orderId: order.id,
       providerId: provider.id,
       providerServiceId: providerService.id,
@@ -256,8 +301,17 @@ async function handleSubmitOrder(job: ProviderJob, registry: ProviderRegistry) {
       grossMarginMinor: marginMinor,
       currency: providerService.currency,
       requestPayload: sanitizeProviderValue({ externalServiceId: providerService.externalServiceId, quantity: order.quantity, targetHash: createHash("sha256").update(order.targetUrl).digest("hex") }) as object
-    }
+    } });
+    const claimed = await tx.providerOrder.update({ where: { id: record.id }, data: { submissionState: ProviderSubmissionState.PREPARED } });
+    await tx.order.update({ where: { id: order.id }, data: { status: OrderStatus.VALIDATING } });
+    return { record: claimed, busy: false };
   });
+  if (!prepared) return;
+  if (prepared.busy) {
+    await manualReviewProviderJob(job, "SUBMISSION_IN_PROGRESS", "An existing submission is prepared, sending or awaiting review; reconcile it before resending.");
+    return;
+  }
+  let providerOrder = prepared.record;
 
   if (!hasSafeMargin(order.chargeMinor, providerCostMinor, mapping.minimumMarginMinor)) {
     await db.$transaction([
@@ -298,32 +352,46 @@ async function handleSubmitOrder(job: ProviderJob, registry: ProviderRegistry) {
   });
   await db.order.update({ where: { id: order.id }, data: { status: OrderStatus.VALIDATING } });
   const startedAt = Date.now();
+  let acceptedExternalId: string | undefined;
+  let financialSettlementCommitted = false;
 
   try {
-    const result = await withProviderRequestLease(provider.id, `job:${job.id}:create`, provider.timeoutMs, () => adapter.createOrder(createInput));
+    const result = await withProviderRequestLease(provider.id, `job:${job.id}:create`, provider.timeoutMs, async () => {
+      if (!await db.providerJob.findFirst({ where: providerJobClaimWhere(job), select: { id: true } })) {
+        throw new ProviderAdapterError("PROVIDER_UNKNOWN_ERROR", "Submission claim was superseded; reconciliation is required.", { ambiguousSideEffect: true });
+      }
+      return adapter.createOrder(createInput);
+    });
     if (result.outcome === "UNKNOWN") {
       await db.$transaction([
         db.providerOrderAttempt.update({ where: { id: attempt.id }, data: { state: ProviderSubmissionState.UNKNOWN_SUBMISSION, httpStatus: result.httpStatus ?? null, errorCode: result.code, finishedAt: new Date() } }),
-        db.providerOrder.update({ where: { id: providerOrder.id }, data: { submissionState: ProviderSubmissionState.UNKNOWN_SUBMISSION, status: ProviderOrderStatus.UNKNOWN, lastErrorCode: result.code, lastErrorMessage: result.message.slice(0, 500), responsePayload: sanitizeProviderValue(result.raw) as object | undefined } })
+        db.providerOrder.update({ where: { id: providerOrder.id }, data: { submissionState: ProviderSubmissionState.UNKNOWN_SUBMISSION, status: ProviderOrderStatus.UNKNOWN, lastErrorCode: result.code, lastErrorMessage: sanitizeProviderErrorMessage(result.message), responsePayload: sanitizeProviderValue(result.raw) as object | undefined } })
       ]);
       await operationLog({ providerId: provider.id, orderId: order.id, operation: "CREATE_ORDER", startedAt, result: "UNKNOWN", attempt: attemptNo, errorCode: result.code });
-      await manualReviewProviderJob(job.id, "UNKNOWN_SUBMISSION", result.message);
+      await manualReviewProviderJob(job, "UNKNOWN_SUBMISSION", sanitizeProviderErrorMessage(result.message));
       return;
     }
     if (result.outcome === "REJECTED") {
       await db.providerOrderAttempt.update({ where: { id: attempt.id }, data: { state: ProviderSubmissionState.REJECTED, httpStatus: result.httpStatus ?? null, errorCode: result.code, finishedAt: new Date() } });
-      await operationLog({ providerId: provider.id, orderId: order.id, operation: "CREATE_ORDER", startedAt, result: "REJECTED", attempt: attemptNo, errorCode: result.code });
       if (result.retryable && job.attempts < job.maxAttempts && adapter.capabilities.supportsCreateIdempotency) {
-        await db.providerOrder.update({ where: { id: providerOrder.id }, data: { submissionState: ProviderSubmissionState.SAFE_TO_RETRY, lastErrorCode: result.code, lastErrorMessage: result.message.slice(0, 500) } });
+        await db.providerOrder.update({ where: { id: providerOrder.id }, data: { submissionState: ProviderSubmissionState.SAFE_TO_RETRY, lastErrorCode: result.code, lastErrorMessage: sanitizeProviderErrorMessage(result.message) } });
         await retryProviderJob(job, result.code, result.message);
         return;
       }
-      await finalRefundForSubmissionFailure(providerOrder.id, result.code, result.message);
+      await finalReleaseForSubmissionFailure(providerOrder.id, result.code, result.message);
+      financialSettlementCommitted = true;
+      await operationLog({ providerId: provider.id, orderId: order.id, operation: "CREATE_ORDER", startedAt, result: "REJECTED", attempt: attemptNo, errorCode: result.code });
       return;
     }
 
-    const pair = statusPair(result.status ?? "SUBMITTED");
-    const internalStatus = pair.internal === OrderStatus.COMPLETED ? OrderStatus.COMPLETED : pair.internal;
+    acceptedExternalId = result.externalOrderId;
+    if (!acceptedExternalId?.trim()) throw new ProviderAdapterError("PROVIDER_MALFORMED_RESPONSE", "Accepted create did not include an external order ID.", { ambiguousSideEffect: true });
+    // Create acceptance proves admission, not a complete refund decision. The
+    // create contract has no remaining count; confirm partial/failure states
+    // through polling so they cannot strand captured funds without a refund.
+    const admittedStatus = result.status === "COMPLETED" || result.status === "PROCESSING" ? result.status : "SUBMITTED";
+    const pair = statusPair(admittedStatus);
+    const internalStatus = pair.internal;
     const remaining = internalStatus === OrderStatus.COMPLETED ? 0 : order.remaining;
     await db.$transaction(async (tx) => {
       await tx.providerOrderAttempt.update({
@@ -342,17 +410,34 @@ async function handleSubmitOrder(job: ProviderJob, registry: ProviderRegistry) {
           lastErrorMessage: null
         }
       });
+      const reservation = await tx.walletReservation.findUnique({ where: { orderId: order.id } });
+      if (reservation) await captureOrderReservationInTransaction(tx, order.id);
+      else {
+        // Work 04–06 orders were already debited. Never debit them again.
+        const purchase = await tx.walletTransaction.findFirst({ where: { referenceType: "ORDER", referenceId: order.publicId, type: "PURCHASE", status: "COMPLETED", amountMinor: -order.chargeMinor, wallet: { userId: order.userId } } });
+        if (!purchase) throw new ProviderAdapterError("PROVIDER_INVALID_REQUEST", "Legacy order has neither a reservation nor a verified purchase ledger.", { ambiguousSideEffect: true });
+      }
       await tx.order.update({ where: { id: order.id }, data: { status: internalStatus, remaining } });
       await tx.orderLog.create({
         data: { orderId: order.id, fromStatus: OrderStatus.VALIDATING, toStatus: internalStatus, message: "Đơn đã được provider chấp nhận.", metadata: { providerOrderId: providerOrder.id } }
       });
+      if (internalStatus !== OrderStatus.COMPLETED) {
+        const runAt = new Date(Date.now() + INITIAL_POLL_MS);
+        await tx.providerOrder.update({ where: { id: providerOrder.id }, data: { nextPollAt: runAt } });
+        await enqueueProviderJob(tx, { type: ProviderJobType.POLL_ORDER_STATUS, dedupeKey: `initial-poll:${providerOrder.id}`, providerId: provider.id, orderId: order.id, providerOrderId: providerOrder.id, runAt });
+      }
     });
+    financialSettlementCommitted = true;
     await markProviderHealth(provider.id, ProviderHealth.HEALTHY);
     await operationLog({ providerId: provider.id, orderId: order.id, externalOrderId: result.externalOrderId, operation: "CREATE_ORDER", startedAt, result: "SUCCESS", attempt: attemptNo });
-    if (internalStatus !== OrderStatus.COMPLETED) await schedulePoll(providerOrder.id, provider.id, order.id, INITIAL_POLL_MS);
   } catch (error) {
+    if (financialSettlementCommitted) {
+      // Logging/health failures after commit must not rewrite accepted finance.
+      await manualReviewProviderJob(job, "POST_SETTLEMENT_ERROR", "Provider financial settlement committed; ancillary operation failed. Do not resend create or change settled funds.");
+      return;
+    }
     const providerError = toProviderAdapterError(error, true);
-    const decision = decideProviderRetry(providerError, job.attempts, job.maxAttempts, {
+    const decision = acceptedExternalId ? { action: "MANUAL_REVIEW" as const, code: "UNKNOWN_SUBMISSION" } : decideProviderRetry(providerError, job.attempts, job.maxAttempts, {
       sideEffecting: true,
       providerSupportsIdempotency: adapter.capabilities.supportsCreateIdempotency
     });
@@ -367,9 +452,9 @@ async function handleSubmitOrder(job: ProviderJob, registry: ProviderRegistry) {
     });
     await operationLog({ providerId: provider.id, orderId: order.id, operation: "CREATE_ORDER", startedAt, result: decision.action, attempt: attemptNo, errorCode: providerError.code });
     const safeMessage = sanitizeProviderErrorMessage(providerError.message);
-    if (decision.action === "MANUAL_REVIEW") {
-      await db.providerOrder.update({ where: { id: providerOrder.id }, data: { submissionState: ProviderSubmissionState.UNKNOWN_SUBMISSION, status: ProviderOrderStatus.UNKNOWN, lastErrorCode: providerError.code, lastErrorMessage: safeMessage } });
-      await manualReviewProviderJob(job.id, "UNKNOWN_SUBMISSION", safeMessage);
+    if (decision.action === "MANUAL_REVIEW" || (decision.action === "FAIL" && providerError.ambiguousSideEffect)) {
+      await db.providerOrder.update({ where: { id: providerOrder.id }, data: { submissionState: ProviderSubmissionState.UNKNOWN_SUBMISSION, status: ProviderOrderStatus.UNKNOWN, ...(acceptedExternalId ? { externalOrderId: acceptedExternalId } : {}), lastErrorCode: providerError.code, lastErrorMessage: safeMessage } });
+      await manualReviewProviderJob(job, "UNKNOWN_SUBMISSION", safeMessage);
       return;
     }
     if (decision.action === "RETRY") {
@@ -377,7 +462,7 @@ async function handleSubmitOrder(job: ProviderJob, registry: ProviderRegistry) {
       await retryProviderJob(job, providerError.code, safeMessage, decision.delayMs);
       return;
     }
-    await finalRefundForSubmissionFailure(providerOrder.id, providerError.code, safeMessage);
+    await finalReleaseForSubmissionFailure(providerOrder.id, providerError.code, safeMessage);
   }
 }
 
@@ -389,6 +474,10 @@ async function handlePoll(job: ProviderJob, registry: ProviderRegistry) {
     include: { provider: true, order: true }
   });
   if (!providerOrder || !providerOrder.externalOrderId) return;
+  if (providerOrder.submissionState !== ProviderSubmissionState.ACCEPTED) {
+    await manualReviewProviderJob(job, "UNKNOWN_SUBMISSION", "Polling cannot settle a create that has not been reconciled and captured.");
+    return;
+  }
   if (TERMINAL_PROVIDER_ORDER_STATUSES.has(providerOrder.status)) return;
   const adapter = adapterFor(registry, providerOrder.provider.code);
   const startedAt = Date.now();
@@ -399,7 +488,7 @@ async function handlePoll(job: ProviderJob, registry: ProviderRegistry) {
 
     if (result.status === "PARTIAL") {
       if (!Number.isInteger(result.remaining) || result.remaining === undefined || result.remaining < 0 || result.remaining > providerOrder.order.quantity) {
-        await manualReviewProviderJob(job.id, "PROVIDER_MALFORMED_RESPONSE", "PARTIAL status requires a valid remaining count.");
+        await manualReviewProviderJob(job, "PROVIDER_MALFORMED_RESPONSE", "PARTIAL status requires a valid remaining count.");
         return;
       }
       const target = partialRefundTarget(providerOrder.order.chargeMinor, result.remaining, providerOrder.order.quantity);
@@ -460,12 +549,13 @@ async function handlePoll(job: ProviderJob, registry: ProviderRegistry) {
       await retryProviderJob(job, providerError.code, sanitizeProviderErrorMessage(providerError.message));
       return;
     }
-    await manualReviewProviderJob(job.id, providerError.code, sanitizeProviderErrorMessage(providerError.message));
+    await manualReviewProviderJob(job, providerError.code, sanitizeProviderErrorMessage(providerError.message));
   }
 }
 
 export async function processProviderJob(job: ProviderJob, registry: ProviderRegistry = createDefaultProviderRegistry()): Promise<void> {
   if (job.status !== ProviderJobStatus.RUNNING) return;
+  if (!await getDb().providerJob.findFirst({ where: providerJobClaimWhere(job), select: { id: true } })) return;
   try {
     switch (job.type) {
       case ProviderJobType.TEST_CONNECTION:
@@ -484,16 +574,16 @@ export async function processProviderJob(job: ProviderJob, registry: ProviderReg
         await handlePoll(job, registry);
         break;
       default:
-        await failProviderJob(job.id, "UNSUPPORTED_JOB", `Unsupported provider job: ${String(job.type)}`);
+        await failProviderJob(job, "UNSUPPORTED_JOB", `Unsupported provider job: ${String(job.type)}`);
         return;
     }
     const latest = await getDb().providerJob.findUnique({ where: { id: job.id } });
-    if (latest?.status === ProviderJobStatus.RUNNING) await completeProviderJob(job.id);
+    if (latest?.status === ProviderJobStatus.RUNNING) await completeProviderJob(job);
   } catch (error) {
     const providerError = toProviderAdapterError(error, false);
     const message = sanitizeProviderErrorMessage(providerError.message);
     if (providerError.code === "PROVIDER_CONFIGURATION_MISSING" || providerError.code === "PROVIDER_UNAUTHORIZED" || providerError.code === "PROVIDER_INSUFFICIENT_BALANCE" || providerError.code === "PROVIDER_SERVICE_UNAVAILABLE" || providerError.code === "PROVIDER_INVALID_REQUEST") {
-      await manualReviewProviderJob(job.id, providerError.code, message);
+      await manualReviewProviderJob(job, providerError.code, message);
       if (job.providerId) await markProviderHealth(job.providerId, ProviderHealth.DEGRADED, providerError.code);
       return;
     }
@@ -501,6 +591,6 @@ export async function processProviderJob(job: ProviderJob, registry: ProviderReg
       await retryProviderJob(job, providerError.code, message);
       return;
     }
-    await failProviderJob(job.id, providerError.code, message);
+    await failProviderJob(job, providerError.code, message);
   }
 }

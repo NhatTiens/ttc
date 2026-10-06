@@ -7,19 +7,21 @@ import {
   SupportTicketStatus,
   UserRole,
   UserStatus,
+  WalletReservationStatus,
   WalletTransactionStatus,
   WalletTransactionType,
   getDb
 } from "@tuong-tac-pro/db";
-import { DomainError } from "./errors";
+import { DomainError, isTransactionConflict } from "./errors";
 import { createPublicId } from "./id";
+import { releaseOrderReservationInTransaction } from "./wallet-domain";
 
 export type AdminActor = { userId: string; ipAddress?: string | null };
 export type AdminServiceInput = {
   code: string;
   name: string;
   description: string;
-  platform: "FACEBOOK" | "TIKTOK" | "INSTAGRAM" | "YOUTUBE" | "THREADS";
+  platform: "FACEBOOK" | "TIKTOK" | "INSTAGRAM" | "YOUTUBE" | "THREADS" | "GOOGLE";
   categoryId: string;
   ratePerThousandMinor: bigint;
   min: number;
@@ -56,7 +58,7 @@ async function serializable<T>(operation: (tx: Prisma.TransactionClient) => Prom
         timeout: 15000
       });
     } catch (error) {
-      if (errorCode(error) === "P2034" && attempt < attempts) continue;
+      if (isTransactionConflict(error) && attempt < attempts) continue;
       throw error;
     }
   }
@@ -278,7 +280,7 @@ const refundableStatuses = new Set<OrderStatus>([
 
 export async function refundOrder(actor: AdminActor, publicId: string, reason: string) {
   return serializable(async (tx) => {
-    const order = await tx.order.findUnique({ where: { publicId }, include: { user: { include: { wallet: true } }, providerOrder: true } });
+    const order = await tx.order.findUnique({ where: { publicId }, include: { user: { include: { wallet: true } }, providerOrder: true, reservation: true } });
     if (!order) throw new DomainError("ORDER_NOT_FOUND", "Không tìm thấy đơn hàng.", 404);
     if (order.status === OrderStatus.REFUNDED) return order;
     if (!refundableStatuses.has(order.status)) {
@@ -289,35 +291,48 @@ export async function refundOrder(actor: AdminActor, publicId: string, reason: s
     }
     const wallet = order.user.wallet;
     if (!wallet) throw new DomainError("INTERNAL_ERROR", "Khách hàng chưa có ví.", 500);
+    const releasesReservation = order.reservation?.status === WalletReservationStatus.RESERVED;
+    const settlesWithoutCredit = order.reservation !== null && order.reservation.status !== WalletReservationStatus.CAPTURED;
+    if (!order.reservation) {
+      const purchase = await tx.walletTransaction.findFirst({
+        where: { walletId: wallet.id, referenceType: "ORDER", referenceId: order.publicId, type: WalletTransactionType.PURCHASE, status: WalletTransactionStatus.COMPLETED, amountMinor: -order.chargeMinor }
+      });
+      if (!purchase) throw new DomainError("RESERVATION_CONFLICT", "Đơn cũ không có giao dịch mua đã ghi sổ; cần kiểm tra thủ công trước khi hoàn tiền.", 409);
+    }
+    if (releasesReservation) await releaseOrderReservationInTransaction(tx, order.id);
     const updated = await tx.order.updateMany({
       where: { id: order.id, status: order.status },
-      data: { status: OrderStatus.REFUNDED, remaining: 0, refundedMinor: order.chargeMinor }
+      data: { status: OrderStatus.REFUNDED, remaining: 0, refundedMinor: settlesWithoutCredit ? 0n : order.chargeMinor }
     });
     if (updated.count !== 1) throw new DomainError("DUPLICATE_REQUEST", "Đơn hàng đã được thay đổi bởi một thao tác khác.", 409);
-    const nextBalance = wallet.balanceMinor + order.chargeMinor;
-    await tx.wallet.update({ where: { id: wallet.id }, data: { balanceMinor: nextBalance } });
-    await tx.walletTransaction.create({
-      data: {
-        walletId: wallet.id,
-        type: WalletTransactionType.REFUND,
-        status: WalletTransactionStatus.COMPLETED,
-        amountMinor: order.chargeMinor,
-        balanceBeforeMinor: wallet.balanceMinor,
-        balanceAfterMinor: nextBalance,
-        referenceType: "ORDER",
-        referenceId: order.publicId,
-        description: `Hoàn tiền đơn ${order.publicId}`,
-        idempotencyKey: `admin-refund:${order.id}`,
-        adminUserId: actor.userId,
-        reason: reason.trim()
-      }
-    });
+    const nextBalance = settlesWithoutCredit ? wallet.balanceMinor : wallet.balanceMinor + order.chargeMinor;
+    if (!settlesWithoutCredit) {
+      await tx.wallet.update({ where: { id: wallet.id }, data: { balanceMinor: nextBalance } });
+      await tx.walletTransaction.create({
+        data: {
+          walletId: wallet.id,
+          type: WalletTransactionType.REFUND,
+          status: WalletTransactionStatus.COMPLETED,
+          amountMinor: order.chargeMinor,
+          balanceBeforeMinor: wallet.balanceMinor,
+          balanceAfterMinor: nextBalance,
+          referenceType: "ORDER",
+          referenceId: order.publicId,
+          description: `Hoàn tiền đơn ${order.publicId}`,
+          idempotencyKey: `admin-refund:${order.id}`,
+          adminUserId: actor.userId,
+          reason: reason.trim()
+        }
+      });
+    }
     await tx.orderLog.create({
       data: {
         orderId: order.id,
         fromStatus: order.status,
         toStatus: OrderStatus.REFUNDED,
-        message: `Hoàn tiền bởi quản trị viên: ${reason.trim()}`,
+        message: settlesWithoutCredit
+          ? `Đóng đơn chưa capture bởi quản trị viên: ${reason.trim()}`
+          : `Hoàn tiền bởi quản trị viên: ${reason.trim()}`,
         metadata: { adminUserId: actor.userId }
       }
     });
@@ -327,7 +342,7 @@ export async function refundOrder(actor: AdminActor, publicId: string, reason: s
       entityId: order.publicId,
       before: { status: order.status, walletBalanceMinor: wallet.balanceMinor.toString() },
       after: { status: OrderStatus.REFUNDED, walletBalanceMinor: nextBalance.toString() },
-      metadata: { amountMinor: order.chargeMinor.toString(), reason: reason.trim() }
+      metadata: { amountMinor: order.chargeMinor.toString(), reservationReleased: releasesReservation, postedRefundCreated: !settlesWithoutCredit, reason: reason.trim() }
     });
     return tx.order.findUniqueOrThrow({ where: { id: order.id } });
   });

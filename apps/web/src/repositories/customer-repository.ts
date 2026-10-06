@@ -7,6 +7,7 @@ import type {
   DepositMethod,
   DepositRequest,
   Order,
+  OrderQuote,
   OrderFilters,
   Service,
   ServiceCategory,
@@ -26,6 +27,7 @@ export interface CustomerRepository {
   getService(id: string): Promise<Service | null>;
   listOrders(filters?: OrderFilters): Promise<Order[]>;
   getOrder(id: string): Promise<Order | null>;
+  createQuote(serviceId: string, quantity: number): Promise<OrderQuote>;
   createOrder(input: CreateOrderInput): Promise<Order>;
   getWallet(): Promise<Wallet>;
   listWalletTransactions(): Promise<WalletTransaction[]>;

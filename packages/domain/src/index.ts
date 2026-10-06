@@ -4,3 +4,4 @@ export * from "./id";
 export * from "./customer-domain";
 export * from "./admin-domain";
 export * from "./provider-domain";
+export * from "./wallet-domain";

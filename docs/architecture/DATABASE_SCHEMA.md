@@ -1,5 +1,9 @@
 # Tương Tác Pro — Database Schema
 
+The detailed sections below retain the original long-term blueprint. The authoritative physical schema is `packages/db/prisma/schema.prisma` and its five official migrations. Work 07 runtime uses `OrderStatus.PENDING`, `WalletTransactionType.PURCHASE`, `WalletReservationStatus.RESERVED | CAPTURED | RELEASED` and `ProviderSubmissionState.UNKNOWN_SUBMISSION`, rather than the older blueprint names. No Redis/outbox/FX price-version table is required by the deployed quote/reservation flow.
+
+Work 07 adds `order_quotes` (UUID, user/service, quantity, rate and charge snapshot, currency, expiry, consumed timestamp) and `wallet_reservations` (UUID, wallet, unique order, amount, state and terminal timestamps). `orders.quote_id` is nullable and unique for historical compatibility. A conditional wallet update reserves only available funds; acceptance capture updates reservation, wallet and one PURCHASE ledger atomically; release never credits money that was not debited. Reservations are not automatically released on quote expiry or unknown submission.
+
 ## 1. Quy ước dữ liệu
 
 - Primary key: UUID.
@@ -608,7 +612,7 @@ Mismatch generates high-severity alert and blocks automated money actions for th
 
 The concrete Prisma schema now lives at `packages/db/prisma/schema.prisma` with baseline migration `202609160001_work4_backend`.
 
-Work 04 intentionally debits an order at creation and leaves the order `PENDING`, because no provider call exists in this Work. The earlier reservation/capture model remains the target for the provider-integration Work, where ambiguous external side effects matter. `wallets.reserved_minor` remains in the physical schema but Work 04 create-order does not reserve funds.
+Historical Work 04 orders were debited at creation. Work 07 preserves those rows but all new orders reserve funds first. Legacy submission/refund verifies the existing completed PURCHASE and never performs a second debit. Migration `202610060001_work7_wallet_quotes` officially creates the quote/reservation models; `prisma db push` is not used.
 
 Work 04 VND uses PostgreSQL `BIGINT`; one stored unit equals one VND. Service rates are VND per 1,000 units and order charge is integer-ceiling arithmetic.
 

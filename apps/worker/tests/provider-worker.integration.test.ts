@@ -1,5 +1,6 @@
 import test, { beforeEach, after } from "node:test";
 import assert from "node:assert/strict";
+import { assertSafeTestDatabaseUrl } from "../../../qa/test-database-safety.mjs";
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import {
@@ -15,7 +16,6 @@ import {
   SocialPlatform,
   UserRole,
   UserStatus,
-  WalletTransactionStatus,
   WalletTransactionType,
   disconnectDb,
   getDb
@@ -23,6 +23,7 @@ import {
 import {
   ProviderAdapterError,
   ProviderRegistry,
+  type NormalizedProviderOrderStatus,
   type NormalizedProviderService,
   type ProviderAdapter,
   type ProviderBalanceResult,
@@ -32,12 +33,13 @@ import {
   type ProviderOrderStatusInput,
   type ProviderOrderStatusResult
 } from "@tuong-tac-pro/providers";
-import { claimDueProviderJobs } from "../src/queue";
+import { claimDueProviderJobs, completeProviderJob, retryProviderJob } from "../src/queue";
 import { processProviderJob } from "../src/provider-worker";
 
 const rootEnvPath = fileURLToPath(new URL("../../../.env", import.meta.url));
 if (existsSync(rootEnvPath)) process.loadEnvFile(rootEnvPath);
 const testDatabaseUrl = process.env.TEST_DATABASE_URL;
+assertSafeTestDatabaseUrl(testDatabaseUrl, process.env.DATABASE_URL);
 if (!testDatabaseUrl) throw new Error("TEST_DATABASE_URL is required for Work 06 worker tests.");
 process.env.DATABASE_URL = testDatabaseUrl;
 process.env.PROVIDER_POLL_INITIAL_MS = "1";
@@ -55,7 +57,8 @@ class FakeAdapter implements ProviderAdapter {
   };
   createCalls = 0;
   statusCalls = 0;
-  createMode: "ACCEPT" | "AMBIGUOUS" = "ACCEPT";
+  createMode: "ACCEPT" | "REJECT" | "AMBIGUOUS" = "ACCEPT";
+  createStatus: NormalizedProviderOrderStatus = "SUBMITTED";
   nextStatus: ProviderOrderStatusResult = { status: "PROCESSING" };
 
   async testConnection(): Promise<ProviderConnectionResult> { return { ok: true, latencyMs: 1 }; }
@@ -66,7 +69,10 @@ class FakeAdapter implements ProviderAdapter {
     if (this.createMode === "AMBIGUOUS") {
       throw new ProviderAdapterError("PROVIDER_TIMEOUT", "timeout after send", { retryable: true, ambiguousSideEffect: true });
     }
-    return { outcome: "ACCEPTED", externalOrderId: "fake-order-1", status: "SUBMITTED", raw: { order: "fake-order-1" } };
+    if (this.createMode === "REJECT") {
+      return { outcome: "REJECTED", code: "PROVIDER_INVALID_REQUEST", message: "provider rejected before acceptance", retryable: false };
+    }
+    return { outcome: "ACCEPTED", externalOrderId: "fake-order-1", status: this.createStatus, raw: { order: "fake-order-1" } };
   }
   async getOrderStatus(_input: ProviderOrderStatusInput): Promise<ProviderOrderStatusResult> {
     this.statusCalls += 1;
@@ -86,13 +92,28 @@ async function reset() {
   await db.providerPriceHistory.deleteMany();
   await db.providerService.deleteMany();
   await db.provider.deleteMany();
+  await db.adminAuditLog.deleteMany();
+  await db.servicePriceHistory.deleteMany();
+  await db.paymentEvent.deleteMany();
+  await db.payment.deleteMany();
   await db.walletTransaction.deleteMany();
+  await db.walletReservation.deleteMany();
   await db.orderLog.deleteMany();
+  await db.supportMessage.deleteMany();
+  await db.deposit.deleteMany();
   await db.order.deleteMany();
+  await db.orderQuote.deleteMany();
+  await db.supportTicket.deleteMany();
+  await db.passwordResetToken.deleteMany();
+  await db.session.deleteMany();
+  await db.account.deleteMany();
+  await db.notificationPreference.deleteMany();
   await db.wallet.deleteMany();
   await db.user.deleteMany();
   await db.service.deleteMany();
   await db.serviceCategory.deleteMany();
+  await db.depositMethod.deleteMany();
+  await db.systemSetting.deleteMany();
 
   await db.serviceCategory.create({ data: { id: "worker-cat", name: "Worker", enabled: true } });
   await db.service.create({
@@ -103,7 +124,7 @@ async function reset() {
 async function seedOrder(publicId: string) {
   const db = getDb();
   const customer = await db.user.create({ data: { email: `${publicId.toLowerCase()}@example.com`, passwordHash: "test", name: "Worker Customer", role: UserRole.CUSTOMER, status: UserStatus.ACTIVE } });
-  const wallet = await db.wallet.create({ data: { userId: customer.id, balanceMinor: 980_000n, reservedMinor: 0n, currency: "VND" } });
+  const wallet = await db.wallet.create({ data: { userId: customer.id, balanceMinor: 1_000_000n, reservedMinor: 20_000n, currency: "VND" } });
   const provider = await db.provider.create({ data: { code: "FAKE6", name: "Fake Test Provider", status: ProviderStatus.ACTIVE, health: ProviderHealth.HEALTHY, enabled: true, priority: 1, minRequestIntervalMs: 0, maxConcurrentRequests: 1 } });
   const providerService = await db.providerService.create({
     data: { providerId: provider.id, externalServiceId: "fake-service-1", name: "Fake Service", platform: SocialPlatform.FACEBOOK, providerRateMinor: 10_000n, rateUnit: 1000, currency: "VND", min: 100, max: 10_000, status: ProviderServiceStatus.AVAILABLE, lastSyncedAt: new Date() }
@@ -114,9 +135,7 @@ async function seedOrder(publicId: string) {
   const order = await db.order.create({
     data: { publicId, userId: customer.id, serviceId: "worker-service", targetUrl: "https://example.com/worker-target", quantity: 1000, chargeMinor: 20_000n, remaining: 1000, status: OrderStatus.PENDING, idempotencyKey: `idem-${publicId}`, requestFingerprint: `fp-${publicId}` }
   });
-  await db.walletTransaction.create({
-    data: { walletId: wallet.id, type: WalletTransactionType.PURCHASE, status: WalletTransactionStatus.COMPLETED, amountMinor: -20_000n, balanceBeforeMinor: 1_000_000n, balanceAfterMinor: 980_000n, referenceType: "ORDER", referenceId: publicId, description: `Order ${publicId}`, idempotencyKey: `purchase-${publicId}` }
-  });
+  await db.walletReservation.create({ data: { walletId: wallet.id, orderId: order.id, amountMinor: 20_000n } });
   const submitJob = await db.providerJob.create({ data: { type: ProviderJobType.SUBMIT_ORDER, status: ProviderJobStatus.PENDING, dedupeKey: `submit:${order.id}`, orderId: order.id, runAt: new Date(0) } });
   return { customer, wallet, provider, providerService, order, submitJob };
 }
@@ -149,6 +168,10 @@ test("worker snapshots economics, stores external order id and does not duplicat
   assert.equal(providerOrder.customerChargeMinor, 20_000n);
   assert.equal(providerOrder.grossMarginMinor, 10_000n);
   assert.equal((await getDb().order.findUniqueOrThrow({ where: { id: fixture.order.id } })).status, OrderStatus.SUBMITTED);
+  const capturedWallet = await getDb().wallet.findUniqueOrThrow({ where: { id: fixture.wallet.id } });
+  assert.equal(capturedWallet.balanceMinor, 980_000n);
+  assert.equal(capturedWallet.reservedMinor, 0n);
+  assert.equal(await getDb().walletTransaction.count({ where: { walletId: fixture.wallet.id, type: WalletTransactionType.PURCHASE } }), 1);
   assert.equal(adapter.createCalls, 1);
 
   await getDb().providerJob.create({ data: { type: ProviderJobType.SUBMIT_ORDER, status: ProviderJobStatus.PENDING, dedupeKey: `submit-replay:${fixture.order.id}`, orderId: fixture.order.id, runAt: new Date(0) } });
@@ -157,6 +180,26 @@ test("worker snapshots economics, stores external order id and does not duplicat
   await processProviderJob(replay, registry);
   assert.equal(adapter.createCalls, 1, "accepted provider order must never be created again");
   assert.equal(await getDb().providerOrder.count({ where: { orderId: fixture.order.id } }), 1);
+  assert.equal(await getDb().walletTransaction.count({ where: { walletId: fixture.wallet.id, type: WalletTransactionType.PURCHASE } }), 1);
+});
+
+test("accepted create with an early terminal status is polled and refunded rather than stranding captured funds", async () => {
+  const fixture = await seedOrder("TT-W7-EARLY-FAILED");
+  const adapter = new FakeAdapter();
+  adapter.createStatus = "FAILED";
+  adapter.nextStatus = { status: "FAILED", remaining: 1000 };
+  await processProviderJob(await claimOne(), registryFor(adapter));
+  const providerOrder = await getDb().providerOrder.findUniqueOrThrow({ where: { orderId: fixture.order.id } });
+  assert.equal(providerOrder.status, ProviderOrderStatus.SUBMITTED);
+  await getDb().providerJob.updateMany({ where: { providerOrderId: providerOrder.id, type: ProviderJobType.POLL_ORDER_STATUS }, data: { runAt: new Date(0) } });
+  const poll = (await claimDueProviderJobs("work7-early-status", 10)).find((job) => job.type === ProviderJobType.POLL_ORDER_STATUS);
+  assert.ok(poll);
+  await processProviderJob(poll, registryFor(adapter));
+  const wallet = await getDb().wallet.findUniqueOrThrow({ where: { id: fixture.wallet.id } });
+  assert.equal(wallet.balanceMinor, 1_000_000n);
+  assert.equal(wallet.reservedMinor, 0n);
+  assert.equal(await getDb().walletTransaction.count({ where: { walletId: wallet.id, type: WalletTransactionType.PURCHASE } }), 1);
+  assert.equal(await getDb().walletTransaction.count({ where: { walletId: wallet.id, type: WalletTransactionType.REFUND } }), 1);
 });
 
 test("ambiguous create without provider idempotency stops in manual review without refund or blind retry", async () => {
@@ -172,8 +215,35 @@ test("ambiguous create without provider idempotency stops in manual review witho
   assert.equal(providerOrder.status, ProviderOrderStatus.UNKNOWN);
   assert.equal(providerOrder.submissionState, "UNKNOWN_SUBMISSION");
   assert.equal(adapter.createCalls, 1);
-  assert.equal((await getDb().wallet.findUniqueOrThrow({ where: { id: fixture.wallet.id } })).balanceMinor, 980_000n);
+  const wallet = await getDb().wallet.findUniqueOrThrow({ where: { id: fixture.wallet.id } });
+  assert.equal(wallet.balanceMinor, 1_000_000n);
+  assert.equal(wallet.reservedMinor, 20_000n);
+  assert.equal(await getDb().walletTransaction.count({ where: { walletId: fixture.wallet.id, type: WalletTransactionType.PURCHASE } }), 0);
   assert.equal(await getDb().walletTransaction.count({ where: { walletId: fixture.wallet.id, type: WalletTransactionType.REFUND } }), 0);
+});
+
+test("explicit provider rejection releases reservation exactly once without purchase", async () => {
+  const fixture = await seedOrder("TT-W7-REJECT-1");
+  const adapter = new FakeAdapter();
+  adapter.createMode = "REJECT";
+  const registry = registryFor(adapter);
+  await processProviderJob(await claimOne(), registry);
+
+  const reservation = await getDb().walletReservation.findUniqueOrThrow({ where: { orderId: fixture.order.id } });
+  const wallet = await getDb().wallet.findUniqueOrThrow({ where: { id: fixture.wallet.id } });
+  const order = await getDb().order.findUniqueOrThrow({ where: { id: fixture.order.id } });
+  assert.equal(reservation.status, "RELEASED");
+  assert.equal(wallet.balanceMinor, 1_000_000n);
+  assert.equal(wallet.reservedMinor, 0n);
+  assert.equal(order.status, OrderStatus.FAILED);
+  assert.equal(await getDb().walletTransaction.count({ where: { walletId: fixture.wallet.id, type: WalletTransactionType.PURCHASE } }), 0);
+
+  await getDb().providerJob.create({ data: { type: ProviderJobType.SUBMIT_ORDER, status: ProviderJobStatus.PENDING, dedupeKey: `submit-rejected-replay:${fixture.order.id}`, orderId: fixture.order.id, runAt: new Date(0) } });
+  const replay = (await claimDueProviderJobs("work7-reject-replay", 10)).find((item) => item.dedupeKey.startsWith("submit-rejected-replay:"));
+  assert.ok(replay);
+  await processProviderJob(replay, registry);
+  assert.equal(adapter.createCalls, 1);
+  assert.equal((await getDb().wallet.findUniqueOrThrow({ where: { id: fixture.wallet.id } })).reservedMinor, 0n);
 });
 
 test("repeated PARTIAL polling refunds only the server-calculated target once", async () => {
@@ -228,4 +298,48 @@ test("durable queue recovers stale RUNNING jobs and conditional claim prevents d
     claimDueProviderJobs("worker-b", 1)
   ]);
   assert.equal(a.length + b.length, 1, "one durable job must be owned by only one worker claim");
+});
+
+test("concurrent distinct submit jobs admit one provider create and capture once", async () => {
+  const fixture = await seedOrder("TT-W7-CONCURRENT-CREATE");
+  await getDb().providerJob.create({ data: { type: ProviderJobType.SUBMIT_ORDER, dedupeKey: `duplicate:${fixture.order.id}`, orderId: fixture.order.id, runAt: new Date(0) } });
+  const jobs = await claimDueProviderJobs("concurrent-worker", 10);
+  assert.equal(jobs.length, 2);
+  const adapter = new FakeAdapter();
+  const registry = registryFor(adapter);
+  await Promise.all(jobs.map((job) => processProviderJob(job, registry)));
+  assert.equal(adapter.createCalls, 1);
+  assert.equal(await getDb().providerOrder.count({ where: { orderId: fixture.order.id } }), 1);
+  assert.equal(await getDb().walletTransaction.count({ where: { walletId: fixture.wallet.id, type: WalletTransactionType.PURCHASE } }), 1);
+  const wallet = await getDb().wallet.findUniqueOrThrow({ where: { id: fixture.wallet.id } });
+  assert.equal(wallet.balanceMinor, 980_000n);
+  assert.equal(wallet.reservedMinor, 0n);
+});
+
+test("crashed SENDING submission keeps reservation and is not blindly recreated", async () => {
+  const fixture = await seedOrder("TT-W7-CRASHED-SEND");
+  await getDb().providerOrder.create({ data: { orderId: fixture.order.id, providerId: fixture.provider.id, providerServiceId: fixture.providerService.id, clientReference: `ttp:${fixture.order.publicId}`, submissionState: "SENDING", providerRateSnapshotMinor: 10_000n, rateUnitSnapshot: 1000, providerCostMinor: 10_000n, customerChargeMinor: 20_000n, grossMarginMinor: 10_000n, currency: "VND" } });
+  const adapter = new FakeAdapter();
+  const job = await claimOne();
+  await processProviderJob(job, registryFor(adapter));
+  assert.equal(adapter.createCalls, 0);
+  assert.equal((await getDb().providerJob.findUniqueOrThrow({ where: { id: job.id } })).status, ProviderJobStatus.MANUAL_REVIEW);
+  const wallet = await getDb().wallet.findUniqueOrThrow({ where: { id: fixture.wallet.id } });
+  assert.equal(wallet.balanceMinor, 1_000_000n);
+  assert.equal(wallet.reservedMinor, 20_000n);
+});
+
+test("stale worker cannot complete or reschedule another worker's claim", async () => {
+  await seedOrder("TT-W7-STALE-FENCE");
+  const stale = await claimOne();
+  await getDb().providerJob.update({ where: { id: stale.id }, data: { lockedAt: new Date(0) } });
+  const replacement = (await claimDueProviderJobs("replacement-worker", 1))[0]!;
+  assert.equal(replacement.id, stale.id);
+  await completeProviderJob(stale);
+  await retryProviderJob(stale, "PROVIDER_TIMEOUT", "stale retry");
+  const latest = await getDb().providerJob.findUniqueOrThrow({ where: { id: stale.id } });
+  assert.equal(latest.status, ProviderJobStatus.RUNNING);
+  assert.equal(latest.lockedBy, "replacement-worker");
+  await completeProviderJob(replacement);
+  assert.equal((await getDb().providerJob.findUniqueOrThrow({ where: { id: stale.id } })).status, ProviderJobStatus.COMPLETED);
 });

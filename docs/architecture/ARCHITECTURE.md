@@ -13,12 +13,7 @@ Giữ stack ưu tiên của dự án:
 - REST API.
 - Docker + Nginx.
 
-Bổ sung:
-
-- Redis: queue, rate limiting và distributed coordination ngắn hạn.
-- BullMQ: async jobs/provider polling/retry.
-- Dedicated Node.js worker process.
-- Transactional Outbox trong PostgreSQL.
+Bản triển khai hiện tại dùng dedicated Node.js worker cùng hàng đợi bền vững `provider_jobs` trong PostgreSQL. Redis, BullMQ và transactional outbox vẫn là hướng scale-out sau này, không phải dependency correctness của Work 07.
 
 Không chuyển backend sang NestJS. Với scope hiện tại, Next.js Route Handlers làm HTTP boundary; business logic nằm trong package domain/service riêng nên không bị khóa vào framework. Nếu sau này API/worker mở rộng rất lớn, domain packages có thể được chuyển sang một API service riêng mà không viết lại core business rules.
 
@@ -30,7 +25,6 @@ flowchart LR
   N[Nginx]
   W[Next.js Web + REST API]
   DB[(PostgreSQL)]
-  R[(Redis)]
   WK[Worker]
   PA[Provider Adapter Registry]
   EP[External Providers]
@@ -39,9 +33,7 @@ flowchart LR
   U -->|HTTPS| N
   N --> W
   W --> DB
-  W --> R
   WK --> DB
-  WK --> R
   WK --> PA
   PA --> EP
   PG -->|signed webhook| N
@@ -54,7 +46,7 @@ flowchart LR
 Frontend
   -> REST API / Auth.js
     -> Application/Domain Services
-      -> PostgreSQL + Outbox
+      -> PostgreSQL + durable provider job
         -> Worker
           -> Provider Adapter
             -> External Provider
@@ -111,12 +103,9 @@ Business rules thuần server-side:
 - Transaction helpers.
 - DB-level raw queries cần atomic conditional update.
 
-### `packages/queue`
+### Queue runtime hiện hành
 
-- Queue names.
-- Job schemas.
-- BullMQ setup.
-- Retry/backoff defaults.
+`apps/worker/src/queue.ts` quản lý claim/retry/complete trên `provider_jobs`. Mỗi mutation của worker phải khớp lock owner, locked timestamp và attempt counter. Chưa có package `packages/queue` hay BullMQ runtime; đó là thiết kế scale-out tương lai.
 
 ## 5. Transaction boundaries
 
@@ -131,13 +120,13 @@ Trong một transaction:
 1. Lock/consume quote bằng condition.
 2. Kiểm tra quote chưa hết hạn.
 3. Atomically reserve wallet funds.
-4. Create `orders` status `CREATED`.
+4. Create `orders` status `PENDING`.
 5. Create `wallet_reservations`.
 6. Create initial `order_logs`.
-7. Create `outbox_events(ORDER_SUBMIT_REQUESTED)`.
+7. Create deterministic `provider_jobs(SUBMIT_ORDER)` khi provider routing được bật.
 8. Commit.
 
-Sau commit, API trả order cho client. Outbox dispatcher đảm bảo job vẫn được publish ngay cả nếu Redis tạm thời down.
+Sau commit, API trả order cho client. Worker claim trực tiếp durable job trong PostgreSQL, không cần Redis hay bước publish ngoài transaction.
 
 ### Provider acknowledgement transaction
 
@@ -148,28 +137,18 @@ Sau khi provider trả về một provider order ID hợp lệ:
 3. Capture reservation:
    - decrement `reserved_minor`.
    - decrement `balance_minor`.
-   - append `wallet_transactions(ORDER_DEBIT)`.
+   - append immutable `wallet_transactions(PURCHASE, COMPLETED)`.
 4. Set order `SUBMITTED`.
 5. Write order log.
-6. Create next outbox event/status poll schedule if needed.
+6. Create initial durable poll job trong cùng transaction nếu cần.
 
 Nếu provider từ chối rõ ràng trước khi tạo order, release reservation và set `FAILED`.
 
-Nếu kết quả provider call không xác định, không capture và cũng không release reservation; `provider_submission_state=UNKNOWN`, order giữ ở `VALIDATING`, sau đó reconciliation/manual review xử lý.
+Nếu kết quả provider call không xác định, không capture và cũng không release reservation; `provider_submission_state=UNKNOWN_SUBMISSION`, order giữ ở `VALIDATING`, sau đó reconciliation/manual review xử lý. HTTP 5xx khi create cũng là kết quả mơ hồ. Submission `PREPARED`/`SENDING` được bảo vệ bằng order row lock và không tự gửi lại sau crash.
 
-## 6. Transactional Outbox
+## 6. Durable PostgreSQL provider queue
 
-### Vấn đề cần giải quyết
-
-Nếu API commit order vào PostgreSQL rồi `queue.add()` thất bại vì Redis down, order có thể bị kẹt vĩnh viễn. Nếu queue trước rồi DB rollback, worker có thể chạy một job không tồn tại.
-
-### Giải pháp
-
-- Business transaction luôn ghi `outbox_events` cùng commit.
-- Dispatcher query các event chưa publish bằng `FOR UPDATE SKIP LOCKED`.
-- Enqueue BullMQ với deterministic `jobId=outbox-<eventId>`.
-- Sau enqueue thành công, set `publishedAt`.
-- Consumer vẫn idempotent; không coi Redis uniqueness là lớp bảo vệ duy nhất.
+Order và `provider_jobs` được ghi trong cùng PostgreSQL transaction nên không tồn tại khoảng trống giữa DB commit và queue publish. Worker claim job bằng conditional update, có lock owner, lock timeout, retry và manual review state. `dedupe_key` bảo đảm một logical submission job chỉ có một durable row; reservation state và ledger idempotency tiếp tục bảo vệ khi job bị replay.
 
 ## 7. Order create sequence
 
@@ -178,27 +157,24 @@ sequenceDiagram
   actor C as Customer
   participant API as REST API
   participant DB as PostgreSQL
-  participant O as Outbox
-  participant Q as Redis/BullMQ
   participant WK as Worker
   participant P as Provider Adapter
 
-  C->>API: POST /orders/quote
+  C->>API: POST /api/v1/quotes
   API->>DB: resolve price version
   API-->>C: quoteId + charge + expiresAt
 
-  C->>API: POST /orders + Idempotency-Key
-  API->>DB: transaction: consume quote + reserve + order + outbox
+  C->>API: POST /api/v1/orders + Idempotency-Key
+  API->>DB: transaction: consume quote + reserve + order + provider job
   DB-->>API: commit
   API-->>C: Created
 
-  O->>Q: publish deterministic job
-  Q->>WK: ORDER_SUBMIT_REQUESTED
+  WK->>DB: claim SUBMIT_ORDER job
   WK->>DB: set VALIDATING + create submission attempt
   WK->>P: createOrder()
   P-->>WK: providerOrderId
   WK->>DB: transaction: capture reservation + SUBMITTED
-  WK->>Q: schedule status sync
+  WK->>DB: schedule durable status poll
 ```
 
 ## 8. Price architecture
@@ -213,7 +189,7 @@ sequenceDiagram
 
 ### Anti-TOCTOU
 
-Frontend never sends “charge=10000” and expects backend to trust it. Frontend sends `serviceId`, `quantity`, target to quote endpoint. Backend computes charge. Create order must reference `quoteId`.
+Frontend never sends charge. Quote endpoint nhận `serviceId` và `quantity`, backend tính và lưu rate/charge snapshot. Create order chỉ nhận `quoteId` và `targetUrl`; thay đổi giá dịch vụ sau khi quote được tạo không làm thay đổi charge của quote còn hiệu lực.
 
 ## 9. Provider routing
 

@@ -1,5 +1,7 @@
 # Tương Tác Pro — Project Specification
 
+Implementation checkpoint (Work 07): server-priced expiring quotes and reservation/capture/release are implemented as a candidate; database integration verification remains BLOCKED in the audit environment. This specification also contains future requirements (2FA, email, role-specific permission policy, price versions, automated reconciliation); they must not be read as already shipped capabilities. Current quotes snapshot the service's stored integer VND rate; provider AUTO_MARKUP mapping can update that rate, but an independent service_price_versions engine is not implemented.
+
 ## 1. Mục tiêu
 
 Tương Tác Pro là hệ thống bán dịch vụ mạng xã hội theo mô hình reseller. Khách hàng sử dụng số dư nội bộ để đặt dịch vụ; backend chọn dịch vụ provider tương ứng, gửi đơn qua Provider Adapter, đồng bộ trạng thái và xử lý hoàn tiền khi cần.
@@ -61,7 +63,7 @@ Quản lý người dùng, dịch vụ, provider, pricing, order, tài chính, c
 
 ### Service catalog
 
-- Platform: Facebook, TikTok, Instagram, YouTube, Threads.
+- Platform: Facebook, TikTok, Instagram, YouTube, Threads, Google Maps.
 - Category có thể phân cấp.
 - Internal `services` tách khỏi raw `provider_services`.
 - Một internal service có thể route tới một hoặc nhiều provider service.
@@ -93,10 +95,10 @@ Mỗi lần provider price, FX rate, markup hoặc manual override thay đổi, 
 
 ### Order
 
-- Tạo quote trước khi create order.
+- Tạo quote qua `POST /api/v1/quotes` trước khi create order. Quote lưu `userId`, `serviceId`, `quantity`, rate/charge snapshot, thời điểm hết hạn và dấu thời gian consume.
 - `POST /orders` bắt buộc `Idempotency-Key`.
-- Backend xác thực quote, số dư khả dụng và giữ tiền (reservation) trong một transaction.
-- Provider submission chạy async qua outbox + queue + worker.
+- Backend xác thực quote, atomically consume quote, kiểm tra số dư khả dụng và giữ tiền trong cùng transaction tạo order, log và durable provider job.
+- Provider submission chạy async qua PostgreSQL-backed `provider_jobs` và worker.
 - Không gọi provider bên trong DB transaction.
 - Order phải có public ID riêng, không lộ UUID nội bộ nếu không cần.
 - Mỗi transition phải ghi `order_logs`.
@@ -153,6 +155,8 @@ Mỗi lần provider price, FX rate, markup hoặc manual override thay đổi, 
 10. Provider secret không được trả về frontend hoặc ghi plaintext vào log.
 11. Admin money action phải có actor + reason + audit log.
 12. Queue có thể giao job nhiều lần; worker vẫn phải cho kết quả như xử lý một lần.
+13. Reservation chỉ chuyển một lần từ `RESERVED` sang `CAPTURED` hoặc `RELEASED`; hai trạng thái cuối loại trừ nhau.
+14. `UNKNOWN_SUBMISSION` phải giữ nguyên reservation cho tới khi reconciliation xác định kết quả.
 
 ## 7. Order lifecycle
 

@@ -4,6 +4,8 @@
 
 **NOT ACCEPTED YET.** The TTC API v2 protocol is now implemented from the supplied provider documentation. Final acceptance still requires developer-machine technical gates and live verification with a real TTC API credential plus an authoritative XU->VND conversion.
 
+Work 07 supersedes the Work 06 immediate-debit test fixtures with quote-backed wallet reservations. Provider acceptance now captures the held amount, explicit provider rejection releases it, and ambiguous submission keeps it reserved for reconciliation.
+
 ## Provider adapter coverage
 
 `packages/providers/tests/provider-core.test.ts` covers:

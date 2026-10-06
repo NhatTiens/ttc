@@ -1,5 +1,6 @@
 import test, { beforeEach, after } from "node:test";
 import assert from "node:assert/strict";
+import { assertSafeTestDatabaseUrl } from "../../../../qa/test-database-safety.mjs";
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import {
@@ -24,6 +25,7 @@ import {
   DomainError,
   applyProviderServiceSync,
   createCustomerOrder,
+  createOrderQuote,
   enqueueProviderJob,
   refundProviderOrderToTarget,
   upsertServiceProviderMapping
@@ -32,6 +34,7 @@ import {
 const rootEnvPath = fileURLToPath(new URL("../../../../.env", import.meta.url));
 if (existsSync(rootEnvPath)) process.loadEnvFile(rootEnvPath);
 const testDatabaseUrl = process.env.TEST_DATABASE_URL;
+assertSafeTestDatabaseUrl(testDatabaseUrl, process.env.DATABASE_URL);
 if (!testDatabaseUrl) throw new Error("TEST_DATABASE_URL is required for Work 06 provider integration tests.");
 process.env.DATABASE_URL = testDatabaseUrl;
 
@@ -57,10 +60,12 @@ async function reset() {
   await db.paymentEvent.deleteMany();
   await db.payment.deleteMany();
   await db.walletTransaction.deleteMany();
+  await db.walletReservation.deleteMany();
   await db.orderLog.deleteMany();
   await db.supportMessage.deleteMany();
   await db.deposit.deleteMany();
   await db.order.deleteMany();
+  await db.orderQuote.deleteMany();
   await db.supportTicket.deleteMany();
   await db.passwordResetToken.deleteMany();
   await db.session.deleteMany();
@@ -159,7 +164,7 @@ test("provider routing rejects unmapped customer order before wallet debit, then
   const { admin, customer, wallet } = await seedActorAndCustomer();
   process.env.PROVIDER_ROUTING_ENABLED = "true";
   await assert.rejects(
-    () => createCustomerOrder(customer.id, { serviceId: "work6-service", targetUrl: "https://example.com/profile", quantity: 1000 }, "work6-unmapped-order"),
+    () => createOrderQuote(customer.id, { serviceId: "work6-service", quantity: 1000 }),
     (error: unknown) => error instanceof DomainError && error.code === "SERVICE_UNAVAILABLE"
   );
   assert.equal((await getDb().wallet.findUniqueOrThrow({ where: { id: wallet.id } })).balanceMinor, 1_000_000n);
@@ -193,12 +198,16 @@ test("provider routing rejects unmapped customer order before wallet debit, then
   });
   assert.equal(mapping.status, ProviderMappingStatus.ACTIVE);
 
-  const order = await createCustomerOrder(customer.id, { serviceId: "work6-service", targetUrl: "https://example.com/profile", quantity: 1000 }, "work6-mapped-order");
+  const quote = await createOrderQuote(customer.id, { serviceId: "work6-service", quantity: 1000 });
+  const order = await createCustomerOrder(customer.id, { quoteId: quote.id, targetUrl: "https://example.com/profile" }, "work6-mapped-order");
   assert.equal(order.status, OrderStatus.PENDING);
   const job = await getDb().providerJob.findUniqueOrThrow({ where: { dedupeKey: `submit:${order.id}` } });
   assert.equal(job.type, ProviderJobType.SUBMIT_ORDER);
   assert.equal(job.status, ProviderJobStatus.PENDING);
   assert.equal(job.orderId, order.id);
+  const reservedWallet = await getDb().wallet.findUniqueOrThrow({ where: { id: wallet.id } });
+  assert.equal(reservedWallet.balanceMinor, 1_000_000n);
+  assert.equal(reservedWallet.reservedMinor, 20_000n);
 });
 
 test("durable provider job dedupe returns the original row", async () => {
@@ -240,6 +249,7 @@ test("provider refund target is idempotent and never double-credits wallet", asy
     }
   });
   await getDb().wallet.update({ where: { id: wallet.id }, data: { balanceMinor: 980_000n } });
+  await getDb().walletTransaction.create({ data: { walletId: wallet.id, referenceType: "ORDER", referenceId: order.publicId, type: WalletTransactionType.PURCHASE, status: WalletTransactionStatus.COMPLETED, amountMinor: -20_000n, balanceBeforeMinor: 1_000_000n, balanceAfterMinor: 980_000n, description: "Historical Work 06 posted purchase" } });
   const providerOrder = await getDb().providerOrder.create({
     data: {
       orderId: order.id,

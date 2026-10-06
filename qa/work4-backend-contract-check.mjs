@@ -36,6 +36,7 @@ for (const route of [
   "apps/web/src/app/api/v1/me/route.ts",
   "apps/web/src/app/api/v1/dashboard/route.ts",
   "apps/web/src/app/api/v1/services/route.ts",
+  "apps/web/src/app/api/v1/quotes/route.ts",
   "apps/web/src/app/api/v1/orders/route.ts",
   "apps/web/src/app/api/v1/orders/[id]/route.ts",
   "apps/web/src/app/api/v1/wallet/route.ts",
@@ -48,7 +49,8 @@ for (const route of [
 
 requireText("apps/web/src/services/customer-service.ts", "restCustomerRepository", "new CustomerService(restCustomerRepository)");
 if (read("apps/web/src/services/customer-service.ts").includes("mockCustomerRepository")) throw new Error("Production CustomerService must not default to MockCustomerRepository.");
-requireText("packages/domain/src/customer-domain.ts", "TransactionIsolationLevel.Serializable", "balanceMinor: { gte: chargeMinor }", "WalletTransactionType.PURCHASE", "OrderStatus.PENDING", "requestFingerprint");
+requireText("packages/domain/src/customer-domain.ts", "TransactionIsolationLevel.Serializable", '"balance_minor" - "reserved_minor"', "walletReservation.create", "OrderStatus.PENDING", "requestFingerprint");
+requireText("packages/domain/src/wallet-domain.ts", "WalletTransactionType.PURCHASE", "WalletReservationStatus.CAPTURED", "WalletReservationStatus.RELEASED");
 requireText("packages/domain/src/customer-domain.ts", "DepositStatus.PENDING", "WalletTransactionStatus.PENDING", "balanceAfterMinor: wallet.balanceMinor");
 requireText("apps/web/src/server/auth-user.ts", "sessionVersion", "UserStatus.ACTIVE", "UserRole.CUSTOMER");
 requireText("apps/web/src/app/(app)/layout.tsx", "redirect(\"/login\")");
@@ -59,6 +61,7 @@ const mutationRoutes = [
   "apps/web/src/app/api/v1/me/route.ts",
   "apps/web/src/app/api/v1/me/password/route.ts",
   "apps/web/src/app/api/v1/me/notifications/route.ts",
+  "apps/web/src/app/api/v1/quotes/route.ts",
   "apps/web/src/app/api/v1/orders/route.ts",
   "apps/web/src/app/api/v1/deposits/route.ts",
   "apps/web/src/app/api/v1/support/tickets/route.ts",

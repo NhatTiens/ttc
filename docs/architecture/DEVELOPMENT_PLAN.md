@@ -2,6 +2,8 @@
 
 ## Guiding rule
 
+Current implementation status is Work 07 candidate, not production acceptance. Financial/quote code and regression tests are present; database-backed tests must pass on a real isolated PostgreSQL test database before sign-off. Redis/BullMQ, notifications, 2FA, email delivery and SePay webhook integration described in later phases are not asserted to be implemented by this patch. Windows verification is available in `scripts/work7-verify.ps1` and Bash verification in `scripts/work7-verify.sh`; both stop on the first failed native command.
+
 Không làm UI hoàn chỉnh trước khi money/order/provider invariants có test. UI có thể dùng skeleton pages để kiểm thử flow nhưng không polish ở các phase nền tảng.
 
 ## Phase 0 — Architecture review
@@ -149,6 +151,8 @@ Tests:
 - provider create timeout without idempotency.
 - provider create retry with idempotency.
 - no fallback after ambiguous provider submission.
+
+Trạng thái Work 07: quote snapshot, atomic quote consume, wallet reservation, provider capture/release và unknown-submission hold đã được triển khai bằng Prisma migration chính thức. Integration suite bao phủ overspend concurrency, quote reuse/expiry, idempotency payload conflict, capture/release race và duplicate worker delivery. Gate cần PostgreSQL thật trước khi đánh dấu hoàn tất.
 
 ## Phase 8 — Deposit/payment framework
 

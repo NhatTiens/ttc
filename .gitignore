@@ -5,6 +5,8 @@ out
 .env.*
 !.env.example
 coverage
+*.tsbuildinfo
+*.patch
 .DS_Store
 *.log
 qa/screenshots/*.png

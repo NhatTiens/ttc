@@ -7,7 +7,8 @@ const platformToDb = {
   tiktok: SocialPlatform.TIKTOK,
   instagram: SocialPlatform.INSTAGRAM,
   youtube: SocialPlatform.YOUTUBE,
-  threads: SocialPlatform.THREADS
+  threads: SocialPlatform.THREADS,
+  google: SocialPlatform.GOOGLE
 } as const;
 
 const publicStatusToDb = {
@@ -75,7 +76,7 @@ export async function readDashboard(userId: string) {
         ? "youtube"
         : popularPlatformDb === SocialPlatform.THREADS
           ? "threads"
-          : "facebook";
+          : popularPlatformDb === SocialPlatform.GOOGLE ? "google" : "facebook";
 
   return {
     profile: toProfile(user, user.notificationPreference),

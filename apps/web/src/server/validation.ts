@@ -23,17 +23,18 @@ export const passwordSchema = z.object({
 export const notificationSchema = z.object({
   orderUpdates: z.boolean(), walletUpdates: z.boolean(), promotions: z.boolean(), supportReplies: z.boolean()
 });
-export const createOrderSchema = z.object({ serviceId: z.string().trim().min(1).max(64), targetUrl: httpUrl, quantity: z.number().int().positive().max(10_000_000) });
+export const createQuoteSchema = z.object({ serviceId: z.string().trim().min(1).max(64), quantity: z.number().int().positive().max(10_000_000) });
+export const createOrderSchema = z.object({ quoteId: z.string().uuid(), targetUrl: httpUrl });
 export const serviceQuerySchema = z.object({
   search: z.string().trim().max(120).optional(),
-  platform: z.enum(["facebook", "tiktok", "instagram", "youtube", "threads", "all"]).optional(),
+  platform: z.enum(["facebook", "tiktok", "instagram", "youtube", "threads", "google", "all"]).optional(),
   category: z.string().trim().max(64).optional(),
   page: z.coerce.number().int().min(1).max(10000).default(1),
   pageSize: z.coerce.number().int().min(1).max(200).default(200)
 });
 export const orderQuerySchema = z.object({
   search: z.string().trim().max(160).optional(),
-  platform: z.enum(["facebook", "tiktok", "instagram", "youtube", "threads", "all"]).optional(),
+  platform: z.enum(["facebook", "tiktok", "instagram", "youtube", "threads", "google", "all"]).optional(),
   status: z.enum(["Processing", "Completed", "Pending", "Failed", "Cancelled", "Partial", "Refunded", "all"]).optional(),
   dateRange: z.enum(["all", "7d", "30d", "90d"]).optional(),
   page: z.coerce.number().int().min(1).max(10000).default(1),

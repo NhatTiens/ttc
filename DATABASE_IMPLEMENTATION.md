@@ -1,5 +1,7 @@
 # Work 04 — Database Implementation
 
+Current Work 07 additions: official migration `202610060001_work7_wallet_quotes` introduces `OrderQuote`, `WalletReservation`, unique nullable `Order.quoteId`, terminal reservation timestamps and database checks. All five checked-in migrations are deployed with `npm run db:migrate`. Historical immediate-debit behavior below is superseded by reservation/capture; see `WALLET_LEDGER.md` and `WORK7_ARCHITECTURE_HARDENING.md`.
+
 ## Engine and ORM
 
 - PostgreSQL
@@ -63,7 +65,7 @@ No customer money mutation uses JavaScript floating point as the authoritative v
 Every Work 04 wallet balance change has a ledger entry:
 
 - development seed funding -> `ADJUSTMENT / COMPLETED`;
-- order debit -> `PURCHASE / COMPLETED`;
+- provider acceptance capture -> `PURCHASE / COMPLETED`; order creation only reserves funds;
 - deposit request -> `DEPOSIT / PENDING` but no balance change.
 
 ## Order concurrency
@@ -71,10 +73,11 @@ Every Work 04 wallet balance change has a ledger entry:
 The order transaction is Serializable and uses a conditional update:
 
 ```text
-UPDATE-equivalent wallet mutation only when balance >= charge
+UPDATE wallets SET reserved_minor = reserved_minor + charge
+WHERE balance_minor - reserved_minor >= charge
 ```
 
-The domain retries Prisma serialization conflict `P2034` a bounded number of times. Two concurrent orders cannot independently spend the same wallet balance.
+The domain retries Prisma serialization conflict `P2034` and raw SQL serialization/deadlock failures a bounded number of times. Quote consumption, reservation, order/log and the enabled submission job commit atomically. Two concurrent orders cannot independently spend the same available balance.
 
 ## Seed
 

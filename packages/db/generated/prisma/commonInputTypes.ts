@@ -351,6 +351,23 @@ export type UuidNullableWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedStringNullableFilter<$PrismaModel>
 }
 
+export type EnumWalletReservationStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.WalletReservationStatus | Prisma.EnumWalletReservationStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.WalletReservationStatus[] | Prisma.ListEnumWalletReservationStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.WalletReservationStatus[] | Prisma.ListEnumWalletReservationStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumWalletReservationStatusFilter<$PrismaModel> | $Enums.WalletReservationStatus
+}
+
+export type EnumWalletReservationStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.WalletReservationStatus | Prisma.EnumWalletReservationStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.WalletReservationStatus[] | Prisma.ListEnumWalletReservationStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.WalletReservationStatus[] | Prisma.ListEnumWalletReservationStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumWalletReservationStatusWithAggregatesFilter<$PrismaModel> | $Enums.WalletReservationStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumWalletReservationStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumWalletReservationStatusFilter<$PrismaModel>
+}
+
 export type EnumSocialPlatformFilter<$PrismaModel = never> = {
   equals?: $Enums.SocialPlatform | Prisma.EnumSocialPlatformFieldRefInput<$PrismaModel>
   in?: $Enums.SocialPlatform[] | Prisma.ListEnumSocialPlatformFieldRefInput<$PrismaModel>
@@ -1164,6 +1181,23 @@ export type NestedUuidNullableWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedStringNullableFilter<$PrismaModel>
   _max?: Prisma.NestedStringNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumWalletReservationStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.WalletReservationStatus | Prisma.EnumWalletReservationStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.WalletReservationStatus[] | Prisma.ListEnumWalletReservationStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.WalletReservationStatus[] | Prisma.ListEnumWalletReservationStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumWalletReservationStatusFilter<$PrismaModel> | $Enums.WalletReservationStatus
+}
+
+export type NestedEnumWalletReservationStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.WalletReservationStatus | Prisma.EnumWalletReservationStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.WalletReservationStatus[] | Prisma.ListEnumWalletReservationStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.WalletReservationStatus[] | Prisma.ListEnumWalletReservationStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumWalletReservationStatusWithAggregatesFilter<$PrismaModel> | $Enums.WalletReservationStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumWalletReservationStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumWalletReservationStatusFilter<$PrismaModel>
 }
 
 export type NestedEnumSocialPlatformFilter<$PrismaModel = never> = {
